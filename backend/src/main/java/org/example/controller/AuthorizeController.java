@@ -21,26 +21,31 @@ public class AuthorizeController {
     @Resource
     private AccountService accountService;
 
-//    /**
-//     * 请求邮件验证码
-//     * @param email 邮箱
-//     * @param type 请求邮件类型
-//     * @param request 请求
-//     * @return 响应实体对象
-//     */
-//    @GetMapping("/ask-code")
-//    public RestBean<Void> askVerifyCode(@RequestParam @Email String email,
-//                                        @RequestParam @Pattern(regexp = "(register|reset|login)") String type,
-//                                        HttpServletRequest request) {
-//
-//    }
+    /**
+     * 请求邮件验证码
+     * @param email 邮箱
+     * @param type 请求邮件类型
+     * @param request 请求
+     * @return 响应实体对象
+     */
+    @GetMapping("/ask-code")
+    public RestBean<Void> askVerifyCode(@RequestParam @Email String email,
+                                        @RequestParam @Pattern(regexp = "(register|reset|login)") String type,
+                                        HttpServletRequest request) {
+        return messageHandler(() -> accountService.emailVerifyCode(type, email, request.getRemoteAddr()));
+    }
 
     @PostMapping("/verifyCode-login")
     public void verifyCodeLogin() {
     }
 
-//    private RestBean<Void> messageHandler(Supplier<String> action) {
-//        String message = action.get();
-//        return message == null ? RestBean.success() : RestBean.failure()
-//    }
+    /**
+     * 对于业务返回信息进行封装响应实体
+     * @param action 执行业务操作
+     * @return 响应实体
+     */
+    private RestBean<Void> messageHandler(Supplier<String> action) {
+        String message = action.get();
+        return message == null ? RestBean.success() : RestBean.argumentNotValid(message);
+    }
 }
