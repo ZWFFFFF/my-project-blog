@@ -6,3 +6,34 @@ spring:
     username: root
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
+  security:
+    filter:
+      order: -100
+  data:
+    redis:
+      port: 6379
+      host: 127.0.0.1
+  mail:
+    host: smtp.163.com
+    username: 13823003118@163.com
+    password: VSEXRKIYOLGSUBAQ
+  rabbitmq:
+    addresses: localhost
+    username: guest
+    password: guest
+    virtual-host: /
+
+# 自定义配置
+my-config:
+  web:
+    flow:
+      period: 3 # 计数时间周期，单位为秒
+      limit: 10 # 指定时间内最大请求次数限制
+      block: 30 # 超出请求限制封禁时间，单位为秒
+    cors:
+      origin: '*' # 跨域请求原始站点
+      methods: '*' # 跨域请求方法
+  security:
+    jwt:
+      key: 'h9J@*2&^zQ148' # 密钥
+      expire: 72 # 令牌持续时间，单位为小时
