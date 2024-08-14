@@ -1,11 +1,15 @@
 package org.example.service.serviceImpl;
 
 import jakarta.annotation.Resource;
+import org.example.entity.RestBean;
 import org.example.entity.dto.Account;
+import org.example.entity.vo.request.VerifyCodeLoginVO;
+import org.example.entity.vo.response.AuthorizeVO;
 import org.example.mapper.AccountMapper;
 import org.example.service.AccountService;
 import org.example.utils.Const;
 import org.example.utils.FlowUtil;
+import org.example.utils.JwtUtil;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.userdetails.User;
@@ -26,6 +30,8 @@ public class AccountServiceImpl implements AccountService {
     private AccountMapper accountMapper;
     @Resource
     private FlowUtil flowUtil;
+    @Resource
+    private JwtUtil jwtUtil;
     @Resource
     private AmqpTemplate amqpTemplate;
     @Resource
@@ -83,7 +89,7 @@ public class AccountServiceImpl implements AccountService {
         // 所有的String ip都是同一对象，所有线程共享这个对象，
         // synchronized(线程竞争的资源):确保在同一时间只有一个线程能够执行某个代码块，从而避免线程安全问题
         synchronized (ip.intern()) {
-            if(verifyEmailCodeLimit(ip) == false) return "请求频繁，请稍后再试"; // 获取验证码限流
+            if(!verifyEmailCodeLimit(ip)) return "请求频繁，请稍后再试"; // 获取验证码限流
             // 生成验证码
             Random random = new Random();
             int code = random.nextInt(900000) + 100000;
@@ -94,6 +100,30 @@ public class AccountServiceImpl implements AccountService {
             stringRedisTemplate.opsForValue().set(this.getCodeKey(email), String.valueOf(code), 5, TimeUnit.MINUTES);
             return null;
         }
+    }
+
+    /**
+     * 根据验证码登录
+     * @param vo 验证码登录表单
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<AuthorizeVO> loginByVerifyCode(VerifyCodeLoginVO vo) {
+        String email = vo.getEmail();
+        String code = stringRedisTemplate.opsForValue().get(this.getCodeKey(email));
+
+        if(!this.isAccountExistByEmail(email)) return RestBean.unauthorized("邮箱不存在，请先注册");
+        if(code == null) return RestBean.unauthorized("请先获取验证码");
+        if(!code.equals(vo.getCode())) return RestBean.unauthorized("验证码输入错误，请重新输入");
+
+        // 生成jwt令牌
+        Account account = accountMapper.getAccountByEmail(email);
+        String token = jwtUtil.createJwt(account.getId(), account.getUsername(), account.getRole());
+
+        // 封装用户权限信息实体
+        AuthorizeVO authorizeVO = new AuthorizeVO(account.getUsername(), account.getRole(), token, jwtUtil.expireTime());
+
+        return RestBean.success(authorizeVO);
     }
 
     /**
@@ -113,5 +143,23 @@ public class AccountServiceImpl implements AccountService {
      */
     private String getCodeKey(String email) {
         return Const.VERIFY_EMAIL_DATA + email;
+    }
+
+    /**
+     * 根据邮箱判断账号是否存在
+     * @param email 邮箱
+     * @return true表示存在，false表示不存在
+     */
+    private boolean isAccountExistByEmail(String email) {
+        return accountMapper.getAccountByEmail(email) != null;
+    }
+
+    /**
+     * 根据用户名判断账号是否存在
+     * @param name 用户名
+     * @return true表示存在，false表示不存在
+     */
+    private boolean isAccountExistByName(String name) {
+        return accountMapper.getAccountByName(name) != null;
     }
 }

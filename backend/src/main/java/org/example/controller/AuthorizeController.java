@@ -1,10 +1,15 @@
 package org.example.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import org.example.entity.RestBean;
+import org.example.entity.vo.request.VerifyCodeLoginVO;
+import org.example.entity.vo.response.AuthorizeVO;
 import org.example.service.AccountService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +22,7 @@ import java.util.function.Supplier;
 @Validated // 开启方法参数校验
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "验证相关接口", description = "包括用户登录、注册、验证码请求等操作")
 public class AuthorizeController {
     @Resource
     private AccountService accountService;
@@ -29,14 +35,18 @@ public class AuthorizeController {
      * @return 响应实体对象
      */
     @GetMapping("/ask-code")
+    @Operation(summary = "请求邮件验证码")
     public RestBean<Void> askVerifyCode(@RequestParam @Email String email,
                                         @RequestParam @Pattern(regexp = "(register|reset|login)") String type,
                                         HttpServletRequest request) {
         return messageHandler(() -> accountService.emailVerifyCode(type, email, request.getRemoteAddr()));
     }
 
+
     @PostMapping("/verifyCode-login")
-    public void verifyCodeLogin() {
+    @Operation(summary = "验证码登录")
+    public RestBean<AuthorizeVO> verifyCodeLogin(@RequestBody @Valid VerifyCodeLoginVO vo) {
+        return accountService.loginByVerifyCode(vo);
     }
 
     /**
