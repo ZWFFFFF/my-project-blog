@@ -3,6 +3,7 @@ package org.example.service.serviceImpl;
 import jakarta.annotation.Resource;
 import org.example.entity.RestBean;
 import org.example.entity.dto.Account;
+import org.example.entity.vo.request.EmailRegisterVO;
 import org.example.entity.vo.request.VerifyCodeLoginVO;
 import org.example.entity.vo.response.AuthorizeVO;
 import org.example.mapper.AccountMapper;
@@ -15,8 +16,11 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -36,6 +40,8 @@ public class AccountServiceImpl implements AccountService {
     private AmqpTemplate amqpTemplate;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private PasswordEncoder encoder;
 
     /**
      * 从数据库中通过邮箱查找用户详细信息（用户登录表单信息校验）
@@ -127,6 +133,32 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
+     * 注册账号
+     * @param vo 注册表单信息封装
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    public String registerAccount(EmailRegisterVO vo) {
+        String email = vo.getEmail();
+        String code = stringRedisTemplate.opsForValue().get(this.getCodeKey(email));
+
+        if(code == null) return "请先获取验证码";
+        if(!code.equals(vo.getCode())) return "验证码输入错误，请重新输入";
+        if(this.isAccountExistByEmail(email)) return "该邮箱已被注册";
+
+        String password = encoder.encode(vo.getPassword());
+        String username = this.generateDefaultUsername();
+        Account account = new Account(username, password, email, "USER");
+
+        if(this.addAccount(account)) {
+            stringRedisTemplate.delete(this.getCodeKey(email)); // 删除验证码
+            return null;
+        } else {
+            return "内部错误，请联系管理员";
+        }
+    }
+
+    /**
      * 针对IP地址进行邮件验证码获取限流(60s)
      * @param ip ip地址
      * @return true表示可以获取验证码并对ip限流，false表示不能获取ip正在受限制
@@ -161,5 +193,22 @@ public class AccountServiceImpl implements AccountService {
      */
     private boolean isAccountExistByName(String name) {
         return accountMapper.getAccountByName(name) != null;
+    }
+
+    /**
+     * 生成默认用户名：user_当前时间戳
+     * @return 默认用户名
+     */
+    private String generateDefaultUsername() {
+        return "user_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+    }
+
+    /**
+     * 添加账号
+     * @param account 账号信息
+     * @return true表示添加成功，false表示添加失败
+     */
+    private boolean addAccount(Account account) {
+        return accountMapper.insertAccount(account) == 1;
     }
 }

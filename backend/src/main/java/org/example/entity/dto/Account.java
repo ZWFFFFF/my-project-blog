@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Account {
     private Integer id;
@@ -16,4 +15,11 @@ public class Account {
     private String email;
     private String role;
     private Date registerTime;
+
+    public Account(String username, String password, String email, String role) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.role = role;
+    }
 }

@@ -13,4 +13,6 @@ public interface AccountMapper {
     Integer insertAccount(Account account);
     @Update("update account set password = #{password} where email = #{email}")
     Integer updateAccountPasswordByEmail(@Param("email") String email, @Param("password") String password);
+    @Select("select max(id) from account")
+    Integer getCurrentMaxId();
 }

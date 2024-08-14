@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import org.example.entity.RestBean;
+import org.example.entity.vo.request.EmailRegisterVO;
 import org.example.entity.vo.request.VerifyCodeLoginVO;
 import org.example.entity.vo.response.AuthorizeVO;
 import org.example.service.AccountService;
@@ -43,10 +44,26 @@ public class AuthorizeController {
     }
 
 
-    @PostMapping("/verifyCode-login")
+    /**
+     * 邮箱验证码登录
+     * @param vo 验证码登录表单封装
+     * @return 响应实体对象
+     */
+    @PostMapping("/code-login")
     @Operation(summary = "验证码登录")
     public RestBean<AuthorizeVO> verifyCodeLogin(@RequestBody @Valid VerifyCodeLoginVO vo) {
         return accountService.loginByVerifyCode(vo);
+    }
+
+    /**
+     * 用户注册
+     * @param vo 注册表单封装
+     * @return 响应实体对象
+     */
+    @PostMapping("/register")
+    @Operation(summary = "用户注册")
+    public RestBean<Void> register(@RequestBody @Valid EmailRegisterVO vo) {
+        return messageHandler(() -> accountService.registerAccount(vo));
     }
 
     /**
