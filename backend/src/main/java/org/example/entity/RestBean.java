@@ -4,6 +4,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
 import lombok.Data;
 
+import java.util.function.Supplier;
+
 /**
  * 响应实体类封装
  * @param <T> 响应数据类型
@@ -120,5 +122,15 @@ public class RestBean<T> {
      */
     public String asJsonString() {
         return JSONObject.toJSONString(this, JSONWriter.Feature.WriteNulls); // JSONWriter.Feature.WriteNulls指将null值也写上，不省略
+    }
+
+    /**
+     * 对于业务返回string信息进行封装成响应实体
+     * @param action 执行业务操作
+     * @return 响应实体
+     */
+    public static RestBean<Void> messageHandler(Supplier<String> action) {
+        String message = action.get();
+        return message == null ? success() : argumentNotValid(message);
     }
 }

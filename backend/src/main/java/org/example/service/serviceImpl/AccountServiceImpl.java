@@ -1,10 +1,13 @@
 package org.example.service.serviceImpl;
 
 import jakarta.annotation.Resource;
+import lombok.Synchronized;
 import org.example.entity.RestBean;
 import org.example.entity.dto.Account;
 import org.example.entity.vo.request.EmailRegisterVO;
+import org.example.entity.vo.request.ResetPasswordVO;
 import org.example.entity.vo.request.VerifyCodeLoginVO;
+import org.example.entity.vo.response.AccountVO;
 import org.example.entity.vo.response.AuthorizeVO;
 import org.example.mapper.AccountMapper;
 import org.example.service.AccountService;
@@ -13,11 +16,13 @@ import org.example.utils.FlowUtil;
 import org.example.utils.JwtUtil;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -156,6 +161,64 @@ public class AccountServiceImpl implements AccountService {
         } else {
             return "内部错误，请联系管理员";
         }
+    }
+
+    /**
+     * 重置密码
+     * @param vo 重置密码表单信息封装
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    public String resetPassword(ResetPasswordVO vo) {
+        String email = vo.getEmail();
+        String code = stringRedisTemplate.opsForValue().get(this.getCodeKey(email));
+
+        if(!isAccountExistByEmail(email)) return "该邮箱不存在";
+        if(code == null) return "请先获取验证码";
+        if(!code.equals(vo.getCode())) return "验证码输入错误，请重新输入";
+
+        String password = encoder.encode(vo.getPassword());
+
+        Integer update = accountMapper.updateAccountPasswordByEmail(email, password);
+        if(update == 1) {
+            stringRedisTemplate.delete(this.getCodeKey(email)); // 删除验证码
+            return null;
+        } else {
+            return "发生了一些错误，请联系管理员";
+        }
+    }
+
+    /**
+     * 修改用户名
+     * @param newUsername 新的用户名
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    public String changeUsername(String newUsername) {
+        if(isAccountExistByName(newUsername)) return "该用户名已存在";
+
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String oldUsername = user.getUsername();
+        accountMapper.updateUsername(newUsername, oldUsername);
+        return null;
+    }
+
+    /**
+     * 通过用户id获取用户信息
+     * @param id 用户id
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<AccountVO> getAccountInfoById(Integer id) {
+        Account account = accountMapper.getAccountById(id);
+        if(account == null) return RestBean.argumentNotValid("该用户不存在");
+        AccountVO vo = new AccountVO();
+        vo.setId(account.getId());
+        vo.setEmail(account.getEmail());
+        vo.setUsername(account.getUsername());
+        vo.setRole(account.getRole());
+        vo.setRegisterTime(account.getRegisterTime());
+        return RestBean.success(vo);
     }
 
     /**

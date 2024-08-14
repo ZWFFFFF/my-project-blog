@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import org.example.entity.RestBean;
 import org.example.entity.vo.request.EmailRegisterVO;
+import org.example.entity.vo.request.ResetPasswordVO;
 import org.example.entity.vo.request.VerifyCodeLoginVO;
 import org.example.entity.vo.response.AuthorizeVO;
 import org.example.service.AccountService;
@@ -40,7 +41,7 @@ public class AuthorizeController {
     public RestBean<Void> askVerifyCode(@RequestParam @Email String email,
                                         @RequestParam @Pattern(regexp = "(register|reset|login)") String type,
                                         HttpServletRequest request) {
-        return messageHandler(() -> accountService.emailVerifyCode(type, email, request.getRemoteAddr()));
+        return RestBean.messageHandler(() -> accountService.emailVerifyCode(type, email, request.getRemoteAddr()));
     }
 
 
@@ -63,16 +64,18 @@ public class AuthorizeController {
     @PostMapping("/register")
     @Operation(summary = "用户注册")
     public RestBean<Void> register(@RequestBody @Valid EmailRegisterVO vo) {
-        return messageHandler(() -> accountService.registerAccount(vo));
+        return RestBean.messageHandler(() -> accountService.registerAccount(vo));
     }
 
     /**
-     * 对于业务返回信息进行封装响应实体
-     * @param action 执行业务操作
-     * @return 响应实体
+     * 重置密码
+     * @param vo 重置密码表单封装
+     * @return 响应实体对象
      */
-    private RestBean<Void> messageHandler(Supplier<String> action) {
-        String message = action.get();
-        return message == null ? RestBean.success() : RestBean.argumentNotValid(message);
+    @PostMapping("/reset-password")
+    @Operation(summary = "重置密码")
+    public RestBean<Void> resetPassword(@RequestBody @Valid ResetPasswordVO vo) {
+        return RestBean.messageHandler(() -> accountService.resetPassword(vo));
     }
+
 }
