@@ -223,7 +223,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public RestBean<List<AccountVO>> getAllUser() {
         List<Account> accountList = accountMapper.getAccountByRole("USER");
-        if(accountList == null) return RestBean.internalServerError("发生了一些错误请联系管理员");
+        if(accountList == null) return RestBean.internalServerError("发生了一些错误，请联系管理员");
 
         List<AccountVO> voList = new ArrayList<>();
         for(Account account: accountList) {
