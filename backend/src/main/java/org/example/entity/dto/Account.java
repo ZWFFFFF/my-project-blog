@@ -1,6 +1,5 @@
 package org.example.entity.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,10 +15,8 @@ public class Account {
     private String role;
     private Date registerTime;
 
-    public Account(String username, String password, String email, String role) {
-        this.username = username;
+    public Account(String password, String email) {
         this.password = password;
         this.email = email;
-        this.role = role;
     }
 }

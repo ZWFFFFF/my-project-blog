@@ -1,7 +1,6 @@
 package org.example.service.serviceImpl;
 
 import jakarta.annotation.Resource;
-import lombok.Synchronized;
 import org.example.entity.RestBean;
 import org.example.entity.dto.Account;
 import org.example.entity.vo.request.EmailRegisterVO;
@@ -22,12 +21,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -134,6 +129,7 @@ public class AccountServiceImpl implements AccountService {
         // 封装用户权限信息实体
         AuthorizeVO authorizeVO = new AuthorizeVO(account.getUsername(), account.getRole(), token, jwtUtil.expireTime());
 
+        stringRedisTemplate.delete(this.getCodeKey(email)); // 删除验证码
         return RestBean.success(authorizeVO);
     }
 
@@ -152,19 +148,18 @@ public class AccountServiceImpl implements AccountService {
         if(this.isAccountExistByEmail(email)) return "该邮箱已被注册";
 
         String password = encoder.encode(vo.getPassword());
-        String username = this.generateDefaultUsername();
-        Account account = new Account(username, password, email, "USER");
+        Account account = new Account(password, email);
 
         if(this.addAccount(account)) {
             stringRedisTemplate.delete(this.getCodeKey(email)); // 删除验证码
             return null;
         } else {
-            return "内部错误，请联系管理员";
+            return "发生了一些错误，请联系管理员";
         }
     }
 
     /**
-     * 重置密码
+     * 登录前忘记密码进行重置
      * @param vo 重置密码表单信息封装
      * @return 操作结果，null表示正常，否则为错误原因string
      */
@@ -212,13 +207,56 @@ public class AccountServiceImpl implements AccountService {
     public RestBean<AccountVO> getAccountInfoById(Integer id) {
         Account account = accountMapper.getAccountById(id);
         if(account == null) return RestBean.argumentNotValid("该用户不存在");
-        AccountVO vo = new AccountVO();
-        vo.setId(account.getId());
-        vo.setEmail(account.getEmail());
-        vo.setUsername(account.getUsername());
-        vo.setRole(account.getRole());
-        vo.setRegisterTime(account.getRegisterTime());
+        AccountVO vo = new AccountVO(account.getId(), account.getUsername(), account.getEmail(), account.getRole(), account.getRegisterTime());
         return RestBean.success(vo);
+    }
+
+    /**
+     * 获取所有User用户信息
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<List<AccountVO>> getAllUser() {
+        List<Account> accountList = accountMapper.getAccountByRole("USER");
+        if(accountList == null) return RestBean.internalServerError("发生了一些错误请联系管理员");
+
+        List<AccountVO> voList = new ArrayList<>();
+        for(Account account: accountList) {
+            AccountVO vo = new AccountVO(account.getId(), account.getUsername(), account.getEmail(), account.getRole(), account.getRegisterTime());
+            voList.add(vo);
+        }
+        return RestBean.success(voList);
+    }
+
+    /**
+     * 判断请求者是否为当前用户
+     * @param userId 用户id
+     * @return true or false
+     */
+    @Override
+    public boolean isCurrentUser(Integer userId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = user.getUsername();
+        Account account = accountMapper.getAccountByName(username);
+
+        if(account == null) return false;
+        return account.getId().equals(userId);
+    }
+
+    /**
+     * 判断请求者是否为当前用户且身份为管理员
+     * @param userId 用户id
+     * @return true or false
+     */
+    @Override
+    public boolean isCurrentAdmin(Integer userId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = user.getUsername();
+        Account account = accountMapper.getAccountByName(username);
+
+        if(account == null) return false;
+        if(account.getId().equals(userId)) return false;
+        return account.getRole().equals("ADMIN");
     }
 
     /**
@@ -256,14 +294,6 @@ public class AccountServiceImpl implements AccountService {
      */
     private boolean isAccountExistByName(String name) {
         return accountMapper.getAccountByName(name) != null;
-    }
-
-    /**
-     * 生成默认用户名：user_当前时间戳
-     * @return 默认用户名
-     */
-    private String generateDefaultUsername() {
-        return "user_" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
     }
 
     /**

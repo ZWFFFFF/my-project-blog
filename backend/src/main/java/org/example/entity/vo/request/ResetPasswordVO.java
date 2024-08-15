@@ -4,6 +4,9 @@ import jakarta.validation.constraints.Email;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+/**
+ * 重置密码表单实体（登录前）
+ */
 @Data
 public class ResetPasswordVO {
     @Email

@@ -11,6 +11,13 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class RabbitMQConfiguration {
+    @Bean("emailQueue")
+    public Queue emailQueue() {
+        return QueueBuilder
+                .durable("mail")
+                .build();
+    }
+
     // 消息转换器：将对象转换为JSON格式放入消息队列，从消息队列中取出消息时，将JSON格式的消息转换为对象
     @Bean("jacksonConverter")
     public Jackson2JsonMessageConverter jsonMessageConverter() {

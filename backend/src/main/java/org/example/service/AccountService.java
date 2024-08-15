@@ -9,6 +9,8 @@ import org.example.entity.vo.response.AccountVO;
 import org.example.entity.vo.response.AuthorizeVO;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import java.util.List;
+
 public interface AccountService extends UserDetailsService {
     Account findAccountByUsername(String username);
     Account findAccountByEmail(String email);
@@ -18,4 +20,7 @@ public interface AccountService extends UserDetailsService {
     String resetPassword(ResetPasswordVO vo);
     String changeUsername(String newUsername);
     RestBean<AccountVO> getAccountInfoById(Integer id);
+    RestBean<List<AccountVO>> getAllUser();
+    boolean isCurrentUser(Integer userId);
+    boolean isCurrentAdmin(Integer userId);
 }

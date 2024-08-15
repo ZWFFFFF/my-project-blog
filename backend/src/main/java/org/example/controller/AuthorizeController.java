@@ -16,8 +16,6 @@ import org.example.service.AccountService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.function.Supplier;
-
 /**
  * 用于验证相关Controller包含用户的注册、重置密码等操作
  */
@@ -68,7 +66,7 @@ public class AuthorizeController {
     }
 
     /**
-     * 重置密码
+     * 重置密码（登录前）
      * @param vo 重置密码表单封装
      * @return 响应实体对象
      */
@@ -77,5 +75,4 @@ public class AuthorizeController {
     public RestBean<Void> resetPassword(@RequestBody @Valid ResetPasswordVO vo) {
         return RestBean.messageHandler(() -> accountService.resetPassword(vo));
     }
-
 }
