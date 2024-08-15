@@ -71,7 +71,7 @@ public class UserController {
     @Operation(summary = "注销账号")
     public RestBean<Void> deleteAccount(@RequestParam @NotNull Integer id,
                                         @RequestParam @Length(min = 1, max = 20) String username)  {
-        return null;
+        return RestBean.messageHandler(() -> accountService.deleteAccount(id, username));
     }
 
     /**

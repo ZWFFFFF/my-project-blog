@@ -257,6 +257,23 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
+     * 删除账号
+     * @param userId 用户id
+     * @param username 用户名
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    public String deleteAccount(Integer userId, String username) {
+        if(!this.isCurrentUser(userId)) return "非法操作";
+        Account account = accountMapper.getAccountById(userId);
+        if(account == null) return "发生了一些错误，请联系管理员";
+        if(!account.getUsername().equals(username)) return "用户名不匹配";
+        int delete = accountMapper.deleteAccountById(userId);
+        if(delete <= 0) return "发生了一些错误，请联系管理员";
+        return null;
+    }
+
+    /**
      * 针对IP地址进行邮件验证码获取限流(60s)
      * @param ip ip地址
      * @return true表示可以获取验证码并对ip限流，false表示不能获取ip正在受限制

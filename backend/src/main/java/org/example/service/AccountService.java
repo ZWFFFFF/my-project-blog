@@ -23,4 +23,5 @@ public interface AccountService extends UserDetailsService {
     RestBean<List<AccountVO>> getAllUser();
     boolean isCurrentUser(Integer userId);
     boolean isCurrentAdmin(Integer userId);
+    String deleteAccount(Integer userId, String username);
 }
