@@ -39,17 +39,15 @@ public class JwtUtil {
     /**
      * 根据UserDetails生成Jwt令牌(存储用户权限信息)
      * @param id 用户唯一标识
-     * @param username 用户名或邮箱
      * @param authorities 用户权限
      * @return Jwt令牌
      */
-    public String createJwt(int id, String username, String authorities)  {
+    public String createJwt(int id, String authorities)  {
         Algorithm algorithm = Algorithm.HMAC256(key); // 设置加密算法
         Date expire = this.expireTime(); // jwt过期时间
         return JWT.create()
                 .withJWTId(UUID.randomUUID().toString())
                 .withClaim("id", id) // 用户唯一标识
-                .withClaim("name", username) // 用户名
                 .withClaim("authorities", authorities) // 用户权限
                 .withExpiresAt(expire) // 设置过期时间
                 .withIssuedAt(new Date()) // 令牌创建时间
@@ -108,7 +106,7 @@ public class JwtUtil {
     public UserDetails toUser(DecodedJWT jwt) {
         Map<String, Claim> claims = jwt.getClaims();
         return User
-                .withUsername(claims.get("name").asString())
+                .withUsername(claims.get("id").toString())
                 .password("***********") // 密码不存
                 .authorities(claims.get("authorities").asString())
                 .build();

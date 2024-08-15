@@ -18,7 +18,7 @@ public interface AccountService extends UserDetailsService {
     RestBean<AuthorizeVO> loginByVerifyCode(VerifyCodeLoginVO vo);
     String registerAccount(EmailRegisterVO vo);
     String resetPassword(ResetPasswordVO vo);
-    String changeUsername(String newUsername);
+    String changeUsername(Integer id, String newUsername);
     RestBean<AccountVO> getAccountInfoById(Integer id);
     RestBean<List<AccountVO>> getAllUser();
     boolean isCurrentUser(Integer userId);

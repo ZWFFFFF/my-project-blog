@@ -29,16 +29,15 @@ public class UserController {
 
     /**
      * 修改用户名
+     * @param id 用户id
      * @param newUsername 新的用户名
      * @return 响应实体
      */
     @GetMapping("/change-username")
     @Operation(summary = "修改用户名")
-    public RestBean<Void> changeUsername(@RequestParam
-                                         @Length(min = 1, max = 10)
-                                         @Pattern(regexp = "^[a-zA-Z0-9\\u4e00-\\u9fa5]+$")
-                                         String newUsername) {
-        return RestBean.messageHandler(() -> accountService.changeUsername(newUsername));
+    public RestBean<Void> changeUsername(@RequestParam @NotNull Integer id,
+                                         @RequestParam @Length(min = 1, max = 10) @Pattern(regexp = "^[a-zA-Z0-9\\u4e00-\\u9fa5]+$") String newUsername) {
+        return RestBean.messageHandler(() -> accountService.changeUsername(id, newUsername));
     }
 
     /**

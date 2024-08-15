@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +54,7 @@ public class AccountServiceImpl implements AccountService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Account account = accountMapper.getAccountByEmail(username);
         if(account == null) {
-            throw new UsernameNotFoundException("邮箱或密码错误");
+            throw new UsernameNotFoundException("邮箱或密码错误"); // 邮箱填错时
         }
         return User
                 .withUsername(account.getUsername())
@@ -124,7 +125,7 @@ public class AccountServiceImpl implements AccountService {
 
         // 生成jwt令牌
         Account account = accountMapper.getAccountByEmail(email);
-        String token = jwtUtil.createJwt(account.getId(), account.getUsername(), account.getRole());
+        String token = jwtUtil.createJwt(account.getId(), account.getRole());
 
         // 封装用户权限信息实体
         AuthorizeVO authorizeVO = new AuthorizeVO(account.getUsername(), account.getRole(), token, jwtUtil.expireTime());
@@ -185,16 +186,20 @@ public class AccountServiceImpl implements AccountService {
 
     /**
      * 修改用户名
+     * @param id 用户id
      * @param newUsername 新的用户名
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
-    public String changeUsername(String newUsername) {
+    public String changeUsername(Integer id, String newUsername) {
+        if(!this.isCurrentUser(id)) return "非法操作";
+
         if(isAccountExistByName(newUsername)) return "该用户名已存在";
 
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String oldUsername = user.getUsername();
-        accountMapper.updateUsername(newUsername, oldUsername);
+        Account account = accountMapper.getAccountById(id);
+        if(account == null) return "发生了一些错误，请联系管理员";
+
+        accountMapper.updateUsername(newUsername, account.getUsername());
         return null;
     }
 
@@ -236,11 +241,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public boolean isCurrentUser(Integer userId) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = user.getUsername();
-        Account account = accountMapper.getAccountByName(username);
-
-        if(account == null) return false;
-        return account.getId().equals(userId);
+        return user.getUsername().equals(String.valueOf(userId));
     }
 
     /**
@@ -250,13 +251,9 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public boolean isCurrentAdmin(Integer userId) {
+        if(!this.isCurrentUser(userId)) return false;
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = user.getUsername();
-        Account account = accountMapper.getAccountByName(username);
-
-        if(account == null) return false;
-        if(account.getId().equals(userId)) return false;
-        return account.getRole().equals("ADMIN");
+        return user.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ADMIN"));
     }
 
     /**

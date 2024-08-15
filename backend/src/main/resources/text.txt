@@ -1,0 +1,2 @@
+jwt生成只通过用户id和角色信息
+每次请求对jwt进行解析后生成的系统UserDetails对象中的username保存的是用户id（不保存username，因为username可以被修改）
