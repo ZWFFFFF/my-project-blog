@@ -3,6 +3,7 @@ package org.example.service.serviceImpl;
 import jakarta.annotation.Resource;
 import org.example.entity.RestBean;
 import org.example.entity.dto.Account;
+import org.example.entity.vo.request.ChangePasswordVO;
 import org.example.entity.vo.request.EmailRegisterVO;
 import org.example.entity.vo.request.ResetPasswordVO;
 import org.example.entity.vo.request.VerifyCodeLoginVO;
@@ -266,10 +267,31 @@ public class AccountServiceImpl implements AccountService {
     public String deleteAccount(Integer userId, String username) {
         if(!this.isCurrentUser(userId)) return "非法操作";
         Account account = accountMapper.getAccountById(userId);
-        if(account == null) return "发生了一些错误，请联系管理员";
+        if(account == null) return "用户不存在";
         if(!account.getUsername().equals(username)) return "用户名不匹配";
         int delete = accountMapper.deleteAccountById(userId);
         if(delete <= 0) return "发生了一些错误，请联系管理员";
+        return null;
+    }
+
+    /**
+     * 修改密码
+     * @param vo 修改密码表单实体
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    public String changePassword(ChangePasswordVO vo) {
+        Integer userId = vo.getId();
+        String oldPassword = vo.getOldPassword();
+
+        if(!this.isCurrentUser(userId)) return "非法操作";
+        Account account = accountMapper.getAccountById(userId);
+        if(account == null) return "用户不存在";
+        if(!encoder.matches(oldPassword, account.getPassword())) return "旧密码不正确";
+
+        String newPassword = encoder.encode(vo.getNewPassword());
+        int update = accountMapper.updateAccountPasswordByEmail(account.getEmail(), newPassword);
+        if(update <= 0) return "发生了一些错误，请联系管理员";
         return null;
     }
 

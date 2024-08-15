@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.entity.RestBean;
 import org.example.entity.dto.Account;
+import org.example.entity.vo.request.ChangePasswordVO;
 import org.example.entity.vo.request.EmailRegisterVO;
 import org.example.entity.vo.request.ResetPasswordVO;
 import org.example.entity.vo.request.VerifyCodeLoginVO;
@@ -24,4 +25,5 @@ public interface AccountService extends UserDetailsService {
     boolean isCurrentUser(Integer userId);
     boolean isCurrentAdmin(Integer userId);
     String deleteAccount(Integer userId, String username);
+    String changePassword(ChangePasswordVO vo);
 }

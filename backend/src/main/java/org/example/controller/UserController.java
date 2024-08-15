@@ -82,6 +82,6 @@ public class UserController {
     @PostMapping("/change-password")
     @Operation(summary = "修改密码")
     public RestBean<Void> changePassword(@RequestBody @Valid ChangePasswordVO vo) {
-        return null;
+        return RestBean.messageHandler(() -> accountService.changePassword(vo));
     }
 }
