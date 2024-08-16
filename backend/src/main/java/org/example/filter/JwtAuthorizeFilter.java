@@ -11,6 +11,7 @@ import org.example.service.AccountService;
 import org.example.utils.JwtUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -44,8 +45,10 @@ public class JwtAuthorizeFilter extends OncePerRequestFilter {
 
         if(jwt != null) {
             UserDetails user = jwtUtil.toUser(jwt); // 将token中的信息解析成UserDetail对象
-            // 判断用户是否存在，可能存在用户已经注销但自己保留了jwt的情况
-            if (accountService.isAccountExistById(Integer.valueOf(user.getUsername()))) {
+            Integer userId = Integer.valueOf(user.getUsername());
+
+            // 判断用户是否存在(可能存在用户已经注销账号但自己保留了jwt的情况)和用户是否被封禁
+            if (accountService.isAccountExistById(userId) && !accountService.isAccountBanned(userId))  {
                 // 让用户通过校验
                 UsernamePasswordAuthenticationToken authenticationToken = // 生成SpringSecurity内部的校验Token
                         new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());

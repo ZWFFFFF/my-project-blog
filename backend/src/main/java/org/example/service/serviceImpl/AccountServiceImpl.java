@@ -319,9 +319,8 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public boolean isAccountBanned(Integer userId) {
-//        Account account = accountMapper.getAccountById(userId);
-//        if(account == null)
-        return true;
+        Account account = accountMapper.getAccountById(userId);
+        return account.getActive() != 1;
     }
 
     @Override

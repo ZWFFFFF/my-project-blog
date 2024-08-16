@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.annotation.Resource;
+import org.example.mapper.AccountMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.userdetails.User;
@@ -32,7 +33,6 @@ public class JwtUtil {
     // 令牌持续时间，单位为小时
     @Value("${my-config.security.jwt.expire}")
     private int expireTime;
-
     @Resource
     StringRedisTemplate stringRedisTemplate;
 
