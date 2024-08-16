@@ -1,2 +1,5 @@
-jwt生成只通过用户id和角色信息
-每次请求对jwt进行解析后生成的系统UserDetails对象中的username保存的是用户id（不保存username，因为username可以被修改）
+注意：
+1.jwt生成只通过用户id和角色信息
+2.每次请求对jwt进行解析后生成的系统UserDetails对象中的username保存的是用户id（不保存username，因为username可以被修改）
+3.每次请求对jwt进行解析后生成的系统UserDetails对象中的authorities保存的是角色信息USER或ADMIN
+4.账号USER修改为ADMIN后需要重新登录来重新获取jwt（更新角色）

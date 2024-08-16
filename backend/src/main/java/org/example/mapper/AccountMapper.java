@@ -24,4 +24,8 @@ public interface AccountMapper {
     Integer updateUsername(@Param("username") String username, @Param("oldUsername") String oldUsername);
     @Delete("delete from account where id = #{id}")
     Integer deleteAccountById(Integer id);
+    @Update("update account set active = 0 where id = #{id}")
+    Integer banAccountById(Integer id);
+    @Update("update account set active = 1 where id = #{id}")
+    Integer unbanAccountById(Integer id);
 }

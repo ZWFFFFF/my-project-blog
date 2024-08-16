@@ -3,6 +3,7 @@ package org.example.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -70,8 +71,10 @@ public class UserController {
     @GetMapping("/delete-account")
     @Operation(summary = "注销账号")
     public RestBean<Void> deleteAccount(@RequestParam @NotNull Integer id,
-                                        @RequestParam @Length(min = 1, max = 20) String username)  {
-        return RestBean.messageHandler(() -> accountService.deleteAccount(id, username));
+                                        @RequestParam @Length(min = 1, max = 20) String username,
+                                        HttpServletRequest request)  {
+        String authorization = request.getHeader("Authorization");
+        return RestBean.messageHandler(() -> accountService.deleteAccount(id, username, authorization));
     }
 
     /**

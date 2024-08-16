@@ -54,6 +54,7 @@ public class SecurityConfiguration {
         return http
                 .authorizeHttpRequests(conf -> conf
                         .requestMatchers("/api/auth/**", "/error").permitAll()
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated() // 任何请求都需要验证才可以通过
                 )
@@ -67,7 +68,7 @@ public class SecurityConfiguration {
                         .logoutSuccessHandler(this::onLogoutSuccess)
                 )
                 .exceptionHandling(conf -> conf
-                        .authenticationEntryPoint(this::commence) // 未登录或身份校验失败的处理（无token或token错误）
+                        .authenticationEntryPoint(this::commence) // 未登录或身份校验失败的处理（无token或token错误或用户被禁用）
                         .accessDeniedHandler(this::accessDeniedHandler) // 用户访问没有权限的接口时的处理（例：普通用户 -> 管理员页面）
                 )
                 .csrf(AbstractHttpConfigurer::disable) // 禁用csrf
@@ -91,16 +92,20 @@ public class SecurityConfiguration {
                                         Authentication authentication) throws IOException, ServletException {
         response.setContentType("application/json;charset=UTF-8");
 
-        // 登录成功生成jwt令牌
         User user = (User) authentication.getPrincipal();
         Account account = accountService.findAccountByUsername(user.getUsername());
-        String token = jwtUtil.createJwt(account.getId(), account.getRole());
+        // 判断账号是否被禁用
+        if(account.getActive() == 1) {
+            // 登录成功生成jwt令牌
+            String token = jwtUtil.createJwt(account.getId(), account.getRole());
+            // 封装用户权限信息实体
+            AuthorizeVO authorizeVO = new AuthorizeVO(account.getUsername(), account.getRole(), token, jwtUtil.expireTime());
+            // 将用户权限信息返回给前端（前端不用解析jwt获取用户信息，前端的jwt只用于给后端身份校验）
+            response.getWriter().write(RestBean.success(authorizeVO).asJsonString());
+        } else {
+            response.getWriter().write(RestBean.forbidden("账号已被禁用").asJsonString());
+        }
 
-        // 封装用户权限信息实体
-        AuthorizeVO authorizeVO = new AuthorizeVO(account.getUsername(), account.getRole(), token, jwtUtil.expireTime());
-
-        // 将用户权限信息返回给前端（前端不用解析jwt获取用户信息，前端的jwt只用于给后端身份校验）
-        response.getWriter().write(RestBean.success(authorizeVO).asJsonString());
     }
 
     /**
@@ -158,7 +163,7 @@ public class SecurityConfiguration {
     }
 
     /**
-     * 未登录和身份校验失败（无token或token错误）处理handler
+     * 未登录和身份校验失败（无token或token错误或用户被禁用）处理handler
      * @param request 请求
      * @param response 响应
      * @param exception 异常

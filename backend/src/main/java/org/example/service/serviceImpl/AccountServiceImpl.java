@@ -22,7 +22,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -246,32 +245,26 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
-     * 判断请求者是否为当前用户且身份为管理员
-     * @param userId 用户id
-     * @return true or false
-     */
-    @Override
-    public boolean isCurrentAdmin(Integer userId) {
-        if(!this.isCurrentUser(userId)) return false;
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return user.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ADMIN"));
-    }
-
-    /**
      * 删除账号
      * @param userId 用户id
      * @param username 用户名
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
-    public String deleteAccount(Integer userId, String username) {
+    public String deleteAccount(Integer userId, String username, String token) {
         if(!this.isCurrentUser(userId)) return "非法操作";
         Account account = accountMapper.getAccountById(userId);
         if(account == null) return "用户不存在";
         if(!account.getUsername().equals(username)) return "用户名不匹配";
+
         int delete = accountMapper.deleteAccountById(userId);
         if(delete <= 0) return "发生了一些错误，请联系管理员";
-        return null;
+        // 吊销当前用户jwt
+        if(jwtUtil.revokeJwt(token)) {
+            return null;
+        } else {
+            return "发生了一些错误，请联系管理员";
+        }
     }
 
     /**
@@ -293,6 +286,47 @@ public class AccountServiceImpl implements AccountService {
         int update = accountMapper.updateAccountPasswordByEmail(account.getEmail(), newPassword);
         if(update <= 0) return "发生了一些错误，请联系管理员";
         return null;
+    }
+
+    /**
+     * 封禁账号
+     * @param userId 用户id
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    public String banAccount(Integer userId) {
+        int update = accountMapper.banAccountById(userId);
+        if(update <= 0) return "用户不存在";
+        return null;
+    }
+
+    /**
+     * 解封账号
+     * @param userId 用户id
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    public String unbanAccount(Integer userId) {
+        int update = accountMapper.unbanAccountById(userId);
+        if(update <= 0) return "用户不存在";
+        return null;
+    }
+
+    /**
+     * 判断账号是否被封禁
+     * @param userId 用户id
+     * @return true表示被封禁，false表示未被封禁
+     */
+    @Override
+    public boolean isAccountBanned(Integer userId) {
+//        Account account = accountMapper.getAccountById(userId);
+//        if(account == null)
+        return true;
+    }
+
+    @Override
+    public boolean isAccountExistById(Integer userId) {
+        return accountMapper.getAccountById(userId) != null;
     }
 
     /**

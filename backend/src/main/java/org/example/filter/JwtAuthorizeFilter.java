@@ -6,6 +6,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.mapper.AccountMapper;
+import org.example.service.AccountService;
 import org.example.utils.JwtUtil;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +29,8 @@ import java.io.IOException;
 public class JwtAuthorizeFilter extends OncePerRequestFilter {
     @Resource
     private JwtUtil jwtUtil;
+    @Resource
+    private AccountService accountService;
 
     // Jwt校验逻辑：
     @Override
@@ -35,15 +39,18 @@ public class JwtAuthorizeFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         // 从请求头中的Authorization字段读取值，格式为：Bearer Token
         String authorization = request.getHeader("Authorization");
+        // 解析jwt
+        DecodedJWT jwt = jwtUtil.resolveJwt(authorization);
 
-        DecodedJWT jwt = jwtUtil.resolveJwt(authorization); // 解析jwt
-
-        // 进行授权，直接根据token用户信息生成UsernamePasswordAuthenticationToken，让AuthenticationManager直接创建一个 Authentication 对象，让其通过认证
         if(jwt != null) {
             UserDetails user = jwtUtil.toUser(jwt); // 将token中的信息解析成UserDetail对象
-            UsernamePasswordAuthenticationToken authenticationToken = // 生成SpringSecurity内部的校验Token
-                    new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken); // 直接让该用户通过SpringSecurity的身份校验
+            // 判断用户是否存在，可能存在用户已经注销但自己保留了jwt的情况
+            if (accountService.isAccountExistById(Integer.valueOf(user.getUsername()))) {
+                // 让用户通过校验
+                UsernamePasswordAuthenticationToken authenticationToken = // 生成SpringSecurity内部的校验Token
+                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken); // 直接让该用户通过SpringSecurity的身份校验
+            }
         }
 
         filterChain.doFilter(request, response);

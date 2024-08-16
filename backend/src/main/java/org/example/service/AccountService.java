@@ -23,7 +23,10 @@ public interface AccountService extends UserDetailsService {
     RestBean<AccountVO> getAccountInfoById(Integer id);
     RestBean<List<AccountVO>> getAllUser();
     boolean isCurrentUser(Integer userId);
-    boolean isCurrentAdmin(Integer userId);
-    String deleteAccount(Integer userId, String username);
+    String deleteAccount(Integer userId, String username, String token);
     String changePassword(ChangePasswordVO vo);
+    String banAccount(Integer userId);
+    String unbanAccount(Integer userId);
+    boolean isAccountBanned(Integer userId);
+    boolean isAccountExistById(Integer userId);
 }
