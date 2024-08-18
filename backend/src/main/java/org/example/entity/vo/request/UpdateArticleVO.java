@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class UpdateArticleVO {
+    @NotNull
+    private Integer id;
     @NotBlank
     private String title;
     @NotBlank

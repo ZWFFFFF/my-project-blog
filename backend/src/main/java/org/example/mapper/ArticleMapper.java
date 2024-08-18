@@ -12,5 +12,5 @@ public interface ArticleMapper {
     @Select("select * from article where id = #{id}")
     Article getArticleById(Integer id);
     @Update("update article set title = #{title}, summary = #{summary}, content = #{content}, updatedAt = now() where id = #{id}")
-    int updateArticleById(Integer id, Article article);
+    int updateArticleById(@Param("id") Integer id, @Param("title") String title, @Param("summary") String summary, @Param("content") String content);
 }

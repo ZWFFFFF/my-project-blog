@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.example.entity.RestBean;
 import org.example.entity.vo.request.CreateArticleVO;
+import org.example.entity.vo.request.UpdateArticleVO;
 import org.example.service.ArticleService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -44,5 +45,16 @@ public class ArticleController {
     public RestBean<Void> deleteArticle(@RequestParam @NotNull Integer userId,
                                         @RequestParam @NotNull Integer articleId) {
         return RestBean.messageHandler(() -> articleService.deleteArticle(userId, articleId));
+    }
+
+    /**
+     * 更新文章
+     * @param vo 更新文章表单实体
+     * @return 响应实体
+     */
+    @PostMapping("/update-article")
+    @Operation(summary = "更新文章")
+    public RestBean<Void> updateArticle(@RequestBody @Valid UpdateArticleVO vo) {
+        return RestBean.messageHandler(() -> articleService.updateArticle(vo));
     }
 }

@@ -3,6 +3,7 @@ package org.example.service.serviceImpl;
 import jakarta.annotation.Resource;
 import org.example.entity.dto.Article;
 import org.example.entity.vo.request.CreateArticleVO;
+import org.example.entity.vo.request.UpdateArticleVO;
 import org.example.mapper.ArticleMapper;
 import org.example.service.AccountService;
 import org.example.service.ArticleService;
@@ -51,6 +52,26 @@ public class ArticleServiceImpl implements ArticleService {
 
         int delete = articleMapper.deleteArticle(articleId);
         if(delete != 1) return "发生了一些错误，请联系管理员";
+        return null;
+    }
+
+    /**
+     * 更新文章
+     * @param vo 更新文章表单实体
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    public String updateArticle(UpdateArticleVO vo) {
+        Integer userId = vo.getAuthorId();
+        Integer articleId = vo.getId();
+        if(!accountService.isCurrentUser(userId)) return "非法操作";
+        if(!this.isArticlePublisher(userId, articleId)) return "非法操作";
+
+        String title = vo.getTitle();
+        String summary = vo.getSummary();
+        String content = vo.getContent();
+        int update = articleMapper.updateArticleById(articleId, title, summary, content);
+        if(update != 1) return "发生了一些错误，请联系管理员";
         return null;
     }
 

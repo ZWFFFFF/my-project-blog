@@ -28,10 +28,4 @@ public class Article {
         this.content = content;
         this.authorId = authorId;
     }
-
-    public Article(String title, String summary, String content) {
-        this.title = title;
-        this.summary = summary;
-        this.content = content;
-    }
 }
