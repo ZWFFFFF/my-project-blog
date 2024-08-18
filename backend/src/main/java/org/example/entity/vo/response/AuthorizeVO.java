@@ -13,6 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthorizeVO {
+    private Integer id;
     private String username;
     private String role;
     private String token; // JWT令牌

@@ -99,7 +99,7 @@ public class SecurityConfiguration {
             // 登录成功生成jwt令牌
             String token = jwtUtil.createJwt(account.getId(), account.getRole());
             // 封装用户权限信息实体
-            AuthorizeVO authorizeVO = new AuthorizeVO(account.getUsername(), account.getRole(), token, jwtUtil.expireTime());
+            AuthorizeVO authorizeVO = new AuthorizeVO(account.getId(), account.getUsername(), account.getRole(), token, jwtUtil.expireTime());
             // 将用户权限信息返回给前端（前端不用解析jwt获取用户信息，前端的jwt只用于给后端身份校验）
             response.getWriter().write(RestBean.success(authorizeVO).asJsonString());
         } else {

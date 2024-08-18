@@ -128,7 +128,7 @@ public class AccountServiceImpl implements AccountService {
         String token = jwtUtil.createJwt(account.getId(), account.getRole());
 
         // 封装用户权限信息实体
-        AuthorizeVO authorizeVO = new AuthorizeVO(account.getUsername(), account.getRole(), token, jwtUtil.expireTime());
+        AuthorizeVO authorizeVO = new AuthorizeVO(account.getId(), account.getUsername(), account.getRole(), token, jwtUtil.expireTime());
 
         stringRedisTemplate.delete(this.getCodeKey(email)); // 删除验证码
         return RestBean.success(authorizeVO);

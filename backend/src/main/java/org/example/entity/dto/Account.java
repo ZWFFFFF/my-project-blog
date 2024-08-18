@@ -5,7 +5,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+/**
+ * 数据库中用户信息
+ */
 @Data
+@NoArgsConstructor
 public class Account {
     private Integer id;
     private String username;
