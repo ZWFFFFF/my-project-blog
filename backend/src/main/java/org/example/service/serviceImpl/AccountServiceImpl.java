@@ -212,7 +212,7 @@ public class AccountServiceImpl implements AccountService {
     public RestBean<AccountVO> getAccountInfoById(Integer id) {
         Account account = accountMapper.getAccountById(id);
         if(account == null) return RestBean.argumentNotValid("该用户不存在");
-        AccountVO vo = new AccountVO(account.getId(), account.getUsername(), account.getEmail(), account.getRole(), account.getRegisterTime());
+        AccountVO vo = this.toAccountVO(account);
         return RestBean.success(vo);
     }
 
@@ -227,8 +227,7 @@ public class AccountServiceImpl implements AccountService {
 
         List<AccountVO> voList = new ArrayList<>();
         for(Account account: accountList) {
-            AccountVO vo = new AccountVO(account.getId(), account.getUsername(), account.getEmail(), account.getRole(), account.getRegisterTime());
-            voList.add(vo);
+            voList.add(this.toAccountVO(account));
         }
         return RestBean.success(voList);
     }
@@ -323,19 +322,14 @@ public class AccountServiceImpl implements AccountService {
         return account.getActive() != 1;
     }
 
+    /**
+     * 判断账号是否存在
+     * @param userId 用户id
+     * @return true表示存在，false表示不存在
+     */
     @Override
     public boolean isAccountExistById(Integer userId) {
         return accountMapper.getAccountById(userId) != null;
-    }
-
-    /**
-     * 针对IP地址进行邮件验证码获取限流(60s)
-     * @param ip ip地址
-     * @return true表示可以获取验证码并对ip限流，false表示不能获取ip正在受限制
-     */
-    private boolean verifyEmailCodeLimit(String ip) {
-        String key = Const.VERIFY_EMAIL_LIMIT + ip;
-        return flowUtil.limitOnceCheck(key, 60);
     }
 
     /**
@@ -346,6 +340,31 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public String getUsernameById(Integer userId) {
         return accountMapper.getUsernameById(userId);
+    }
+
+    /**
+     * 将用户实体转换为用户信息实体
+     * @param account 用户实体
+     * @return 用户信息实体
+     */
+    private AccountVO toAccountVO(Account account) {
+        AccountVO vo = new AccountVO();
+        vo.setId(account.getId());
+        vo.setUsername(account.getUsername());
+        vo.setEmail(account.getEmail());
+        vo.setRole(account.getRole());
+        vo.setRegisterTime(account.getRegisterTime());
+        return vo;
+    }
+
+    /**
+     * 针对IP地址进行邮件验证码获取限流(60s)
+     * @param ip ip地址
+     * @return true表示可以获取验证码并对ip限流，false表示不能获取ip正在受限制
+     */
+    private boolean verifyEmailCodeLimit(String ip) {
+        String key = Const.VERIFY_EMAIL_LIMIT + ip;
+        return flowUtil.limitOnceCheck(key, 60);
     }
 
     /**

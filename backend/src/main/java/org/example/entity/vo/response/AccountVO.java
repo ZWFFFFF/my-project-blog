@@ -10,8 +10,6 @@ import java.util.Date;
  * 用户信息实体封装
  */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class AccountVO {
     private Integer id;
     private String username;

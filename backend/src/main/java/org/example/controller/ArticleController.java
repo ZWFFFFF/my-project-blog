@@ -13,6 +13,8 @@ import org.example.service.ArticleService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 用于文章管理相关Controller包含新建文章、编辑文章、删除文章、获取文章列表等接口
  */
@@ -68,5 +70,26 @@ public class ArticleController {
     @Operation(summary = "获取文章信息")
     public RestBean<ArticleVO> getArticle(@RequestParam @NotNull Integer articleId) {
         return articleService.getArticle(articleId);
+    }
+
+    /**
+     * 获取文章列表
+     * @return 响应实体
+     */
+    @GetMapping("/article-list")
+    @Operation(summary = "获取文章列表")
+    public RestBean<List<ArticleVO>> getArticleList() {
+        return articleService.getAllArticle();
+    }
+
+    /**
+     * 搜索文章通过标题
+     * @param title 文章标题
+     * @return 响应实体
+     */
+    @GetMapping("/search-title")
+    @Operation(summary = "搜索文章通过标题")
+    public RestBean<List<ArticleVO>> searchArticleByTitle(@RequestParam @NotNull String title) {
+        return articleService.getArticleByTitle(title);
     }
 }

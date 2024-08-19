@@ -11,6 +11,9 @@ import org.example.service.AccountService;
 import org.example.service.ArticleService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 文章管理相关服务
  */
@@ -87,6 +90,59 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = articleMapper.getArticleById(articleId);
         if(article == null) return RestBean.argumentNotValid("文章不存在");
 
+        ArticleVO vo = this.toArticleVO(article);
+        return RestBean.success(vo);
+    }
+
+    /**
+     * 获取所有文章
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<List<ArticleVO>> getAllArticle() {
+        List<Article> articles = articleMapper.getAllArticles();
+
+        List<ArticleVO> voList = new ArrayList<>();
+        for(Article article: articles) {
+            voList.add(this.toArticleVO(article));
+        }
+        return RestBean.success(voList);
+    }
+
+    /**
+     * 根据标题获取文章
+     * @param title 文章标题
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<List<ArticleVO>> getArticleByTitle(String title) {
+        List<Article> articles = articleMapper.getArticleByTitle(title);
+
+        List<ArticleVO> voList = new ArrayList<>();
+        for(Article article: articles) {
+            voList.add(this.toArticleVO(article));
+        }
+        return RestBean.success(voList);
+    }
+
+    /**
+     * 判断文章是否属于用户(文章不存在也返回false)
+     * @param userId 用户id
+     * @param articleId 文章id
+     * @return true表示属于，false表示不属于
+     */
+    private boolean isArticlePublisher(Integer userId, Integer articleId) {
+        Article article = articleMapper.getArticleById(articleId);
+        if(article == null) return false;
+        return article.getAuthorId().equals(userId);
+    }
+
+    /**
+     * 将文章实体转换为文章信息实体
+     * @param article 文章实体
+     * @return 文章信息实体
+     */
+    private ArticleVO toArticleVO(Article article) {
         Integer authorId = article.getAuthorId();
         String author = accountService.getUsernameById(authorId);
         if(author == null) {
@@ -105,18 +161,6 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setUpdatedAt(article.getUpdatedAt());
         vo.setView(article.getView());
         vo.setLike(article.getLike());
-        return RestBean.success(vo);
-    }
-
-    /**
-     * 判断文章是否属于用户(文章不存在也返回false)
-     * @param userId 用户id
-     * @param articleId 文章id
-     * @return true表示属于，false表示不属于
-     */
-    private boolean isArticlePublisher(Integer userId, Integer articleId) {
-        Article article = articleMapper.getArticleById(articleId);
-        if(article == null) return false;
-        return article.getAuthorId().equals(userId);
+        return vo;
     }
 }
