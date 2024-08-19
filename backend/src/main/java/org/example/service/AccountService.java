@@ -29,4 +29,5 @@ public interface AccountService extends UserDetailsService {
     String unbanAccount(Integer userId);
     boolean isAccountBanned(Integer userId);
     boolean isAccountExistById(Integer userId);
+    String getUsernameById(Integer userId);
 }

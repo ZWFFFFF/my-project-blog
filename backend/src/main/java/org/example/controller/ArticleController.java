@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import org.example.entity.RestBean;
 import org.example.entity.vo.request.CreateArticleVO;
 import org.example.entity.vo.request.UpdateArticleVO;
+import org.example.entity.vo.response.ArticleVO;
 import org.example.service.ArticleService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -56,5 +57,16 @@ public class ArticleController {
     @Operation(summary = "更新文章")
     public RestBean<Void> updateArticle(@RequestBody @Valid UpdateArticleVO vo) {
         return RestBean.messageHandler(() -> articleService.updateArticle(vo));
+    }
+
+    /**
+     * 获取文章信息
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @GetMapping("/article-info")
+    @Operation(summary = "获取文章信息")
+    public RestBean<ArticleVO> getArticle(@RequestParam @NotNull Integer articleId) {
+        return articleService.getArticle(articleId);
     }
 }

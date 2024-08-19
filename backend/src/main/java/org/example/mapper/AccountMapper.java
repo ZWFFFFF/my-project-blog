@@ -16,6 +16,8 @@ public interface AccountMapper {
     List<Account> getAccountByRole(@Param("role") String role);
     @Select("select * from account where id = #{id} limit 1")
     Account getAccountById(@Param("id") Integer id);
+    @Select("select username from account where id = #{id}")
+    String getUsernameById(@Param("id") Integer id);
     @Insert("insert into account(password, email) values(#{password}, #{email})")
     Integer insertAccount(Account account);
     @Update("update account set password = #{password} where email = #{email}")

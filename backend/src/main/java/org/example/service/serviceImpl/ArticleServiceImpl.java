@@ -1,9 +1,11 @@
 package org.example.service.serviceImpl;
 
 import jakarta.annotation.Resource;
+import org.example.entity.RestBean;
 import org.example.entity.dto.Article;
 import org.example.entity.vo.request.CreateArticleVO;
 import org.example.entity.vo.request.UpdateArticleVO;
+import org.example.entity.vo.response.ArticleVO;
 import org.example.mapper.ArticleMapper;
 import org.example.service.AccountService;
 import org.example.service.ArticleService;
@@ -73,6 +75,37 @@ public class ArticleServiceImpl implements ArticleService {
         int update = articleMapper.updateArticleById(articleId, title, summary, content);
         if(update != 1) return "发生了一些错误，请联系管理员";
         return null;
+    }
+
+    /**
+     * 获取文章信息(若作者账号已注销，则作者名显示为"账号已注销"，id置为null)
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<ArticleVO> getArticle(Integer articleId) {
+        Article article = articleMapper.getArticleById(articleId);
+        if(article == null) return RestBean.argumentNotValid("文章不存在");
+
+        Integer authorId = article.getAuthorId();
+        String author = accountService.getUsernameById(authorId);
+        if(author == null) {
+            author = "账号已注销";
+            authorId = null;
+        }
+
+        ArticleVO vo = new ArticleVO();
+        vo.setId(article.getId());
+        vo.setTitle(article.getTitle());
+        vo.setSummary(article.getSummary());
+        vo.setContent(article.getContent());
+        vo.setAuthorId(authorId);
+        vo.setAuthor(author);
+        vo.setCreatedAt(article.getCreatedAt());
+        vo.setUpdatedAt(article.getUpdatedAt());
+        vo.setView(article.getView());
+        vo.setLike(article.getLike());
+        return RestBean.success(vo);
     }
 
     /**

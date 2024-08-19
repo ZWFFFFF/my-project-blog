@@ -339,6 +339,16 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
+     * 获取用户名
+     * @param userId 用户id
+     * @return 用户名
+     */
+    @Override
+    public String getUsernameById(Integer userId) {
+        return accountMapper.getUsernameById(userId);
+    }
+
+    /**
      * 获取Redis中存储的邮件验证码的key
      * @param email 邮箱
      * @return 邮件验证码
