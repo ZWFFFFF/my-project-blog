@@ -18,7 +18,8 @@ function isAuthorized() {
     return takeAccessToken() !== null
 }
 
-function login(username, password, success) {
+// 密码登录
+function passwordLogin(username, password, success) {
     post({
         url: 'api/auth/login',
         data: {
@@ -38,6 +39,24 @@ function login(username, password, success) {
     })
 }
 
+// 邮箱验证码登录
+function verifyCodeLogin(email, code, success) {
+    post({
+        url: 'api/auth/code-login',
+        data: {
+            email: email,
+            code: code
+        },
+        success: (data) => {
+            storeAccessToken(data.token, data.expire)
+            ElMessage.success(`登录成功，${data.username}`)
+            success(data) // 可以取出其他信息保存....
+        },
+        withToken: false
+    })
+}
+
+// 登出
 function logout(success) {
     get({
         url: 'api/auth/logout',
@@ -48,3 +67,5 @@ function logout(success) {
         }
     })
 }
+
+export {passwordLogin, verifyCodeLogin, logout, isAuthorized}

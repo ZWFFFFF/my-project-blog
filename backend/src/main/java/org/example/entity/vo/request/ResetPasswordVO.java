@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.Length;
 public class ResetPasswordVO {
     @Email
     private String email;
-    @Length(min = 6, max = 6)
+    @Length(max = 6)
     private String code;
     @Length(min = 6, max = 20)
     private String password;

@@ -1,6 +1,7 @@
 package org.example.entity.vo.request;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
@@ -10,7 +11,8 @@ import org.hibernate.validator.constraints.Length;
 @Data
 public class VerifyCodeLoginVO {
     @Email
+    @NotBlank
     private String email;
-    @Length(min = 6, max = 6)
+    @Length(max = 6)
     private String code;
 }
