@@ -68,4 +68,38 @@ function logout(success) {
     })
 }
 
-export {passwordLogin, verifyCodeLogin, logout, isAuthorized}
+// 重置密码
+function resetPassword(email, code, password, success) {
+    post({
+        url: 'api/auth/reset-password',
+        data: {
+            email: email,
+            code: code,
+            password: password
+        },
+        success: () => {
+            ElMessage.success('密码重置成功')
+            success()
+        },
+        withToken: false
+    })
+}
+
+// 注册
+function emailRegister(email, code, password, success) {
+    post({
+        url: 'api/auth/register',
+        data: {
+            email: email,
+            code: code,
+            password: password
+        },
+        success: () => {
+            ElMessage.success('注册成功')
+            success()
+        },
+        withToken: false
+    })
+}
+
+export {passwordLogin, verifyCodeLogin, logout, isAuthorized, resetPassword, emailRegister}
