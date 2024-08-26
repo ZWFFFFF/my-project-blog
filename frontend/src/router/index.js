@@ -27,7 +27,14 @@ const routes = [
     }, {
         path: '/',
         name: 'index',
-        component: () => import('@/views/index/IndexView.vue')
+        component: () => import('@/views/index/IndexView.vue'),
+        children: [
+            {
+                path: '',
+                name: 'index-article',
+                component: () => import('@/views/index/pages/ArticlePage.vue')
+            }
+        ]
     }, {
         path: '/:pathMatch(.*)*',
         name: 'notfound',
