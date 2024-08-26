@@ -6,7 +6,7 @@ import images from '@/assets/img';
   <div class="h-screen flex w-full">
     <div class="w-2/3 overflow-hidden">
       <el-image class="w-full h-full" :src="images.welcome_page" fit="cover"/>
-      <div class="absolute left-16 bottom-16 text-gray-200 flex flex-col gap-2">
+      <div class="absolute left-16 bottom-16 text-gray-200 flex flex-col gap-2 text-wrap">
         <p class="font-bold text-4xl">Welcome!</p>
         <p class="font-semibold text-2xl">Lorem ipsum dolor sit amet.</p>
         <p class="font-semibold text-2xl">Sint optio dignissimos, adipisci minus.</p>

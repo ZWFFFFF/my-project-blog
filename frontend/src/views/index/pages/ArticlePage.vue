@@ -55,23 +55,23 @@ const currentPageArticles = computed(() => {
     <div class="font-bold text-2xl"><span>文章</span></div>
     <div class="py-4 flex flex-wrap">
       <div v-for="(article, index) in currentPageArticles" :key="article.id" class="w-1/3">
-        <el-card class="m-2">
-          <template #header>
-            <div>
-              <span class="cursor-pointer">{{ article.title }}</span>
+        <div class="m-2 p-4 h-[300px] bg-white rounded shadow">
+          <div class="h-full">
+            <div class="h-1/4 flex items-center">
+              <span class="cursor-pointer text-xl font-bold truncate">{{ article.title }}</span>
             </div>
-          </template>
-          <div>{{ article.summary }}</div>
-          <template #footer>
-            <div class="flex items-center gap-4">
+            <div class="h-2/4">
+              <p class="line-clamp-5 break-words">{{ article.summary }}</p>
+            </div>
+            <div class="h-1/4 flex items-center gap-4">
               <el-avatar :size="30" :icon="UserFilled" class="cursor-pointer"></el-avatar>
               <div class="flex flex-col text-xs">
                 <span>{{ article.author }}</span>
                 <span>{{ formatTimestamp(article.createdAt) }}</span>
               </div>
             </div>
-          </template>
-        </el-card>
+          </div>
+        </div>
       </div>
     </div>
     <div class="flex justify-center items-center">
