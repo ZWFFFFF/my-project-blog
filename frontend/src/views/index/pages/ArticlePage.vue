@@ -1,11 +1,8 @@
 <script setup>
 import {ref, onMounted, computed} from "vue"
 import {UserFilled} from "@element-plus/icons-vue";
-import {useRouter} from "vue-router";
 import {getArticleList} from "@/net/article.js";
 import {formatTimestamp} from "@/net/utils.js";
-
-const router = useRouter()
 
 const articleList = ref([])
 
@@ -20,7 +17,7 @@ const handleCurrentChange = (page) => {
   currentPage.value = page;
 };
 
-onMounted(() => {
+const fetchData = () => {
   getArticleList((data) => {
     articleList.value = data
     total.value = data.length
@@ -39,6 +36,10 @@ onMounted(() => {
       return diffA - diffB;
     })
   })
+}
+
+onMounted(() => {
+  fetchData()
 })
 
 // 计算当前页显示的数据
@@ -55,7 +56,7 @@ const currentPageArticles = computed(() => {
     <div class="font-bold text-2xl"><span>文章</span></div>
     <div class="py-4 flex flex-wrap">
       <div v-for="(article, index) in currentPageArticles" :key="article.id" class="w-1/3">
-        <div class="m-2 p-4 h-[300px] bg-white rounded shadow">
+        <div class="m-2 px-8 h-[300px] bg-white rounded shadow">
           <div class="h-full">
             <div class="h-1/4 flex items-center">
               <span class="cursor-pointer text-xl font-bold truncate">{{ article.title }}</span>

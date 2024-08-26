@@ -83,13 +83,13 @@ public class ArticleController {
     }
 
     /**
-     * 搜索文章通过标题
-     * @param title 文章标题
+     * 搜索文章通过关键词
+     * @param keyword 关键词
      * @return 响应实体
      */
-    @GetMapping("/search-title")
-    @Operation(summary = "搜索文章通过标题")
-    public RestBean<List<ArticleVO>> searchArticleByTitle(@RequestParam @NotNull String title) {
-        return articleService.getArticleByTitle(title);
+    @GetMapping("/search")
+    @Operation(summary = "搜索文章通过关键词")
+    public RestBean<List<ArticleVO>> searchArticleByTitle(@RequestParam @NotNull String keyword) {
+        return articleService.getArticleByTitle(keyword);
     }
 }

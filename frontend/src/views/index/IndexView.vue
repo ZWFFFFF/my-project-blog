@@ -1,6 +1,15 @@
 <script setup>
-
 import {Search, UserFilled} from "@element-plus/icons-vue";
+import {ref} from 'vue'
+import {useRouter} from "vue-router";
+
+const router = useRouter()
+
+const keyword = ref('');
+
+function searchArticle() {
+  router.push({ path: '/search', query: { keyword: keyword.value } })
+}
 </script>
 
 <template>
@@ -8,9 +17,9 @@ import {Search, UserFilled} from "@element-plus/icons-vue";
     <el-header>
       <div class="flex justify-between p-4 gap-4 items-center">
         <div class="w-1/2 flex gap-8">
-          <button class="font-extrabold text-2xl">Logo</button>
+          <button class="font-extrabold text-2xl" @click="router.push('/')">Logo</button>
           <div>
-            <el-input type="text">
+            <el-input v-model="keyword" type="text" placeholder="搜索" @keyup.enter="searchArticle">
               <template #prefix>
                 <el-icon><Search/></el-icon>
               </template>

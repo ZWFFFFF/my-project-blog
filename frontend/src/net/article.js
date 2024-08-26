@@ -10,4 +10,13 @@ function getArticleList(success) {
     })
 }
 
-export {getArticleList}
+function searchArticleList(keyword, success) {
+    get({
+        url: 'api/article/search?keyword=' + keyword,
+        success: (data) => {
+            success(data)
+        },
+        withToken: false
+    })
+}
+export {getArticleList, searchArticleList}

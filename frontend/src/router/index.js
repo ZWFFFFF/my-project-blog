@@ -33,6 +33,11 @@ const routes = [
                 path: '',
                 name: 'index-article',
                 component: () => import('@/views/index/pages/ArticlePage.vue')
+            },
+            {
+                path: 'search',
+                name: 'index-search',
+                component: () => import('@/views/index/pages/SearchPage.vue')
             }
         ]
     }, {
