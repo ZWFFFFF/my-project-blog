@@ -58,7 +58,7 @@ const router = createRouter(
 // 配置导航守卫
 router.beforeEach((to, from) => {
     const isAuthenticated = isAuthorized()
-    if(isAuthenticated && to.name.startsWith('welcome')) return { name: 'index' } // 已登录，却访问登录页面，返回主页面
+    if(isAuthenticated && to.name.startsWith('welcome')) return { name: 'index-article' } // 已登录，却访问登录页面，返回主页面
     if(!isAuthenticated && !to.name.startsWith('welcome')) return { name: 'welcome-login' } // 未登录，却访问非登录页面，返回登录页面
     return true;
 })

@@ -1,14 +1,15 @@
 import {deleteAccessToken, get, post, takeAccessToken} from "@/net/index.js";
 import {ElMessage} from "element-plus";
+import keys from "@/net/const.js";
 
 // 权限相关
 
-// localStorage: ('access_token', {token: '', expire: })
-const authItemName = 'access_token'
+// localStorage: (key, authItem -> { token: token, expire: expire, id: id} )
+const authItemName = keys.authItemName
 
 // access_token保存
-function storeAccessToken(token, expire) {
-    const authObj = { token: token, expire: expire}
+function storeAccessToken(token, expire, id) {
+    const authObj = { token: token, expire: expire, id: id}
     const strAuthObj = JSON.stringify(authObj)
     localStorage.setItem(authItemName, strAuthObj)
 }
@@ -31,9 +32,9 @@ function passwordLogin(username, password, success) {
             'Content-Type': 'application/x-www-form-urlencoded' // 数据以表单形式发送
         },
         success: (data) => {
-            storeAccessToken(data.token, data.expire)
+            storeAccessToken(data.token, data.expire, data.id)
             ElMessage.success(`登录成功，${data.username}`)
-            success(data) // 可以取出其他信息保存....
+            success(data)
         },
         withToken: false
     })
@@ -48,9 +49,9 @@ function verifyCodeLogin(email, code, success) {
             code: code
         },
         success: (data) => {
-            storeAccessToken(data.token, data.expire)
+            storeAccessToken(data.token, data.expire, data.id)
             ElMessage.success(`登录成功，${data.username}`)
-            success(data) // 可以取出其他信息保存....
+            success(data)
         },
         withToken: false
     })

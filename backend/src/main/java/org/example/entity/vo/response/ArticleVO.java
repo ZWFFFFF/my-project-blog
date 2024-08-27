@@ -13,7 +13,7 @@ public class ArticleVO {
     private Integer id;
     private String title;
     private String summary;
-    private String content;
+    private String content; // list中的文章内容为null
     private Integer authorId; // 账号已注销，设为null
     private String author; // 账号已注销，设为“账号已注销”
     private Date createdAt;

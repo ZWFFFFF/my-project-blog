@@ -13,9 +13,9 @@ public interface ArticleMapper {
     int deleteArticle(Integer id);
     @Select("select * from article where id = #{id}")
     Article getArticleById(Integer id);
-    @Select("select * from article")
+    @Select("select id, title, summary, authorId, createdAt, updatedAt, status, view, `like` from article")
     List<Article> getAllArticles();
-    @Select("select * from article where title like concat('%', #{title}, '%')")
+    @Select("select id, title, summary, authorId, createdAt, updatedAt, status, view, `like` from article where title like concat('%', #{title}, '%')")
     List<Article> getArticleByTitle(@Param("title") String title);
     @Update("update article set title = #{title}, summary = #{summary}, content = #{content}, updatedAt = now() where id = #{id}")
     int updateArticleById(@Param("id") Integer id, @Param("title") String title, @Param("summary") String summary, @Param("content") String content);

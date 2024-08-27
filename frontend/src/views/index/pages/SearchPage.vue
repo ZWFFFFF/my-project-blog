@@ -74,7 +74,7 @@ const currentPageArticles = computed(() => {
             <span class="cursor-pointer text-xl font-bold truncate">{{ article.title }}</span>
           </div>
           <div class="h-2/4">
-            <p class="line-clamp-5 break-words">{{ article.summary }}</p>
+            <p class="line-clamp-3 break-words">{{ article.summary }}</p>
           </div>
           <div class="h-1/4 flex items-center gap-4">
             <el-avatar :size="30" :icon="UserFilled" class="cursor-pointer"></el-avatar>

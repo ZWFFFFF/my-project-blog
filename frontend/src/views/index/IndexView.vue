@@ -2,6 +2,10 @@
 import {Search, UserFilled} from "@element-plus/icons-vue";
 import {ref} from 'vue'
 import {useRouter} from "vue-router";
+import {logout} from "@/net/auth.js";
+import {useStore} from "vuex";
+
+const store = useStore()
 
 const router = useRouter()
 
@@ -9,6 +13,13 @@ const keyword = ref('');
 
 function searchArticle() {
   router.push({ path: '/search', query: { keyword: keyword.value } })
+}
+
+function userLogout() {
+  logout(() => {
+    store.dispatch('logout')
+    router.push('/welcome')
+  })
 }
 </script>
 
@@ -34,7 +45,7 @@ function searchArticle() {
               <el-dropdown-menu>
                 <el-dropdown-item>个人主页</el-dropdown-item>
                 <el-dropdown-item>设置</el-dropdown-item>
-                <el-dropdown-item>退出</el-dropdown-item>
+                <el-dropdown-item @click="userLogout">退出</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>

@@ -5,8 +5,11 @@ import {ref, reactive, computed} from 'vue'
 import {passwordLogin, verifyCodeLogin} from "@/net/auth.js";
 import {ElMessage} from "element-plus";
 import {get} from "@/net"
+import {useStore} from "vuex";
 
 const router = useRouter()
+
+const store = useStore()
 
 const coldTime = ref(0) // 验证码请求冷却时间
 
@@ -76,7 +79,8 @@ function userLogin() {
   if(active.value === 0) {
     verifyCodeLoginFormRef.value.validate((valid) => {
       if(valid) {
-        verifyCodeLogin(verifyCodeLoginForm.email, verifyCodeLoginForm.code, () => {
+        verifyCodeLogin(verifyCodeLoginForm.email, verifyCodeLoginForm.code, (data) => {
+          store.dispatch('login', data.id)
           router.push('/')
         })
       } else {
@@ -86,7 +90,8 @@ function userLogin() {
   } else {
     passwordLoginFormRef.value.validate((valid) => {
       if(valid) {
-        passwordLogin(passwordLoginForm.username, passwordLoginForm.password, () => {
+        passwordLogin(passwordLoginForm.username, passwordLoginForm.password, (data) => {
+          store.dispatch('login', data.id)
           router.push('/')
         })
       } else {

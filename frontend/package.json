@@ -15,7 +15,8 @@
     "element-plus": "^2.8.0",
     "quill-blot-formatter": "^1.0.5",
     "vue": "^3.4.29",
-    "vue-router": "^4.4.3"
+    "vue-router": "^4.4.3",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",

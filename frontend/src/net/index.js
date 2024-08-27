@@ -1,9 +1,10 @@
 // axios异步请求封装
 import axios from'axios'
 import {ElMessage} from "element-plus";
+import keys from "@/net/const.js";
 
-// localStorage: ('access_token', {token: '', expire: })
-const authItemName = 'access_token'
+// localStorage: (key, authItem -> { token: token, expire: expire, id: id} )
+const authItemName = keys.authItemName
 
 const defaultError = (err) => {
     console.log(err)
