@@ -1,89 +1,64 @@
 <script setup>
-import {ref, onMounted, computed} from "vue"
+import { onMounted, ref, reactive} from 'vue'
+import { useRoute, useRouter } from "vue-router";
+import {getArticle} from "@/net/article.js";
 import {UserFilled} from "@element-plus/icons-vue";
-import {getArticleList} from "@/net/article.js";
-import {formatTimestamp} from "@/net/utils.js";
+import '@vueup/vue-quill/dist/vue-quill.bubble.css';
+import { QuillEditor } from '@vueup/vue-quill'
+import {formatTimestamp} from "../../../net/utils.js";
 
-const articleList = ref([])
+const route = useRoute();
 
-const currentPage = ref(1)
+const router = useRouter();
 
-const pageSize = ref(6)
+const editorRef = ref()
 
-const total = ref(30)
-
-// 处理页码变化
-const handleCurrentChange = (page) => {
-  currentPage.value = page;
-};
+const article = reactive({
+  id: null,
+  title: '',
+  summary: '',
+  content: '',
+  authorId: null,
+  author: '',
+  createdAt: '',
+  updatedAt: '',
+  view: null,
+  like: null
+})
 
 const fetchData = () => {
-  getArticleList((data) => {
-    articleList.value = data
-    total.value = data.length
-    // 按时间排序
-    articleList.value.sort((a, b) => {
-      const now = new Date();
-      // 将日期字符串转换为日期对象
-      const dateA = new Date(a.createdAt);
-      const dateB = new Date(b.createdAt);
-
-      // 计算与当前时间的差值
-      const diffA = Math.abs(now - dateA);
-      const diffB = Math.abs(now - dateB);
-
-      // 按照差值进行排序，差值小的排在前面
-      return diffA - diffB;
-    })
+  getArticle(route.params.id, (data) => {
+    Object.assign(article, data);
   })
 }
 
 onMounted(() => {
   fetchData()
 })
-
-// 计算当前页显示的数据
-const currentPageArticles = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value;
-  const end = start + pageSize.value;
-  return articleList.value.slice(start, end);
-})
-
 </script>
 
 <template>
-  <div>
-    <div class="font-bold text-2xl"><span>文章</span></div>
-    <div class="py-4 flex flex-wrap">
-      <div v-for="(article, index) in currentPageArticles" :key="article.id" class="w-1/3">
-        <div class="m-2 px-8 h-[300px] bg-white rounded shadow">
-          <div class="h-full">
-            <div class="h-1/4 flex items-center">
-              <span class="cursor-pointer text-xl font-bold truncate">{{ article.title }}</span>
-            </div>
-            <div class="h-2/4">
-              <p class="line-clamp-3 break-words">{{ article.summary }}</p>
-            </div>
-            <div class="h-1/4 flex items-center gap-4">
-              <el-avatar :size="30" :icon="UserFilled" class="cursor-pointer"></el-avatar>
-              <div class="flex flex-col text-xs">
-                <span>{{ article.author }}</span>
-                <span>{{ formatTimestamp(article.createdAt) }}</span>
-              </div>
-            </div>
-          </div>
+  <div class="bg-white pt-20 min-h-screen">
+    <div class="container mx-auto w-1/2">
+      <div class="mb-20">
+        <div class="mb-4"><h1 class="font-extrabold text-4xl">{{ article.title }}</h1></div>
+        <div class="mb-4"><p>{{ article.summary }}</p></div>
+        <div class="flex items-center">
+          <a class="flex items-center mr-2"><el-avatar :icon="UserFilled" class="mr-2"></el-avatar><span>{{ article.author }}</span></a>
+          <span>{{ formatTimestamp(article.createdAt) }}</span>
         </div>
       </div>
-    </div>
-    <div class="flex justify-center items-center">
-      <el-pagination
-          layout="prev, pager, next"
-          @current-change="handleCurrentChange"
-          :current-page="currentPage"
-          :pager-count="11"
-          :page-size="pageSize"
-          :total="total"
-      />
+      <div class="px-16">
+        <QuillEditor
+            ref="editorRef"
+            theme="bubble"
+            contentType="html"
+            :content="article.content"
+            :readOnly="true"
+        >
+
+        </QuillEditor>
+      </div>
     </div>
   </div>
 </template>

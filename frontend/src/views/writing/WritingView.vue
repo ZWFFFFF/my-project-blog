@@ -1,41 +1,15 @@
 <script setup>
-import {Search, UserFilled} from "@element-plus/icons-vue";
-import {ref} from 'vue'
-import {useRouter} from "vue-router";
-import {logout} from "@/net/auth.js";
-import {useStore} from "vuex";
-
-const store = useStore()
-
+import { useRouter } from 'vue-router'
+import {UserFilled} from "@element-plus/icons-vue";
 const router = useRouter()
-
-const keyword = ref('');
-
-function searchArticle() {
-  router.push({ path: '/search', query: { keyword: keyword.value } })
-}
-
-function userLogout() {
-  logout(() => {
-    store.dispatch('logout')
-    router.push('/welcome')
-  })
-}
 </script>
 
 <template>
   <div class="bg-gray-100 w-full min-h-screen">
     <header>
       <div class="bg-white flex justify-between p-4 gap-4 items-center">
-        <div class="w-1/2 flex gap-8">
+        <div class="w-1/2">
           <button class="font-extrabold text-2xl" @click="router.push('/')">Logo</button>
-          <div>
-            <el-input v-model="keyword" type="text" placeholder="搜索" @keyup.enter="searchArticle">
-              <template #prefix>
-                <el-icon><Search/></el-icon>
-              </template>
-            </el-input>
-          </div>
         </div>
         <div class="flex w-1/2 justify-end gap-8 items-center">
           <el-button @click="router.push('/editor')">投稿</el-button>
@@ -61,4 +35,5 @@ function userLogout() {
 </template>
 
 <style scoped>
+
 </style>

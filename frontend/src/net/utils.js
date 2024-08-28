@@ -1,4 +1,8 @@
 function formatTimestamp(timestamp)  {
+    if(timestamp === null || timestamp === '') {
+        return ''
+    }
+
     const date = new Date(timestamp);
     const now = new Date();
 

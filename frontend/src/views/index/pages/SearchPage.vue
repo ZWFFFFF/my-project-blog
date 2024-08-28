@@ -13,7 +13,7 @@ const articleList = ref([])
 
 const currentPage = ref(1)
 
-const pageSize = ref(6)
+const pageSize = ref(8)
 
 const total = ref(0)
 
@@ -64,10 +64,10 @@ const currentPageArticles = computed(() => {
 </script>
 
 <template>
-<div>
+<div class="p-8">
   <div class="font-bold text-2xl"><span>文章</span></div>
-  <div class="py-4 flex flex-wrap">
-    <div v-for="(article, index) in currentPageArticles" :key="article.id" class="w-1/3">
+  <div class="container py-4 flex flex-wrap">
+    <div v-for="(article, index) in currentPageArticles" :key="article.id" class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4">
       <div class="m-2 px-8 h-[300px] bg-white rounded shadow">
         <div class="h-full">
           <div class="h-1/4 flex items-center">
