@@ -65,11 +65,11 @@ const routes = [
         name: 'writing',
         component: () => import('@/views/writing/WritingView.vue'),
         children: [
-            {
-                path: '',
-                name: 'writing-draft',
-                component: () => import('@/views/writing/pages/DraftPage.vue')
-            },
+            // {
+            //     path: '',
+            //     name: 'writing-draft',
+            //     component: () => import('@/views/writing/pages/DraftPage.vue')
+            // },
             {
                 path: 'published',
                 name: 'writing-published',

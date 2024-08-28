@@ -33,7 +33,7 @@ const submit = () => {
         <div class="flex items-center w-1/2 gap-8">
           <button class="font-extrabold text-2xl" @click="router.push('/')">Logo</button>
           <el-breadcrumb :separator-icon="ArrowRight">
-            <el-breadcrumb-item :to="{ path: '/writing' }">投稿管理</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/writing/published' }">投稿管理</el-breadcrumb-item>
             <el-breadcrumb-item>新建文章</el-breadcrumb-item>
           </el-breadcrumb>
         </div>

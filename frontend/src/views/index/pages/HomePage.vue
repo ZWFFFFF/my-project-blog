@@ -3,6 +3,7 @@ import {ref, onMounted, computed} from "vue"
 import {UserFilled} from "@element-plus/icons-vue";
 import {getArticleList} from "@/net/article.js";
 import {formatTimestamp} from "@/net/utils.js";
+import router from "@/router/index.js";
 
 const articleList = ref([])
 
@@ -56,13 +57,15 @@ const currentPageArticles = computed(() => {
     <div class="font-bold text-2xl"><span>文章</span></div>
     <div class="container py-4 flex flex-wrap">
       <div v-for="(article, index) in currentPageArticles" :key="article.id" class="w-full md:w-1/2 lg:w-1/3 xl:w-1/4">
-        <div class="m-2 px-8 h-[300px] bg-white rounded shadow">
+        <div class="p-8 m-2 h-[300px] bg-white rounded shadow">
           <div class="h-full">
-            <div class="h-1/4 flex items-center">
-              <span class="cursor-pointer text-xl font-bold truncate">{{ article.title }}</span>
-            </div>
-            <div class="h-2/4">
-              <p class="line-clamp-3 break-words">{{ article.summary }}</p>
+            <div class="h-3/4">
+              <div class="truncate mb-4" @click="router.push(`/article/${article.id}`)">
+                <span class="cursor-pointer text-xl font-bold">{{ article.title }}</span>
+              </div>
+              <div>
+                <p class="line-clamp-3 break-words">{{ article.summary }}</p>
+              </div>
             </div>
             <div class="h-1/4 flex items-center gap-4">
               <el-avatar :size="30" :icon="UserFilled" class="cursor-pointer"></el-avatar>
