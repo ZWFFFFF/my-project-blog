@@ -83,6 +83,17 @@ public class ArticleController {
     }
 
     /**
+     * 获取用户文章列表
+     * @param userId 用户id
+     * @return 响应实体
+     */
+    @GetMapping("/user-articles")
+    @Operation(summary = "获取用户文章列表")
+    public RestBean<List<ArticleVO>> getUserArticles(@RequestParam @NotNull Integer userId)  {
+        return articleService.getArticleByAuthorId(userId);
+    }
+
+    /**
      * 搜索文章通过关键词
      * @param keyword 关键词
      * @return 响应实体

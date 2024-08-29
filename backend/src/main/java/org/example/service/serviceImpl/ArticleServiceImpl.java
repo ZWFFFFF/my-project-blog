@@ -110,6 +110,22 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
+     * 根据作者id获取用户所有文章
+     * @param authorId 作者id
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<List<ArticleVO>> getArticleByAuthorId(Integer authorId) {
+        List<Article> articles = articleMapper.getArticleByAuthorId(authorId);
+
+        List<ArticleVO> voList = new ArrayList<>();
+        for(Article article: articles) {
+            voList.add(this.toArticleVO(article));
+        }
+        return RestBean.success(voList);
+    }
+
+    /**
      * 根据标题获取文章
      * @param title 文章标题
      * @return 响应实体

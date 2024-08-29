@@ -13,5 +13,6 @@ public interface ArticleService {
     String updateArticle(UpdateArticleVO vo);
     RestBean<ArticleVO> getArticle(Integer articleId);
     RestBean<List<ArticleVO>> getAllArticle();
+    RestBean<List<ArticleVO>> getArticleByAuthorId(Integer authorId);
     RestBean<List<ArticleVO>> getArticleByTitle(String title);
 }

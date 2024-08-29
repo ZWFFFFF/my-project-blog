@@ -1,5 +1,25 @@
 <script setup>
+import { ref, onMounted } from "vue";
+import { useStore } from "vuex";
+import { useRouter  } from "vue-router";
 
+const router = useRouter()
+
+const store = useStore()
+
+const articleList = ref([])
+
+const fetchData = () => {
+  if(store.state.userId !== null) {
+
+  } else {
+    router.push('/welcome')
+  }
+}
+
+onMounted(() => {
+
+})
 </script>
 
 <template>
