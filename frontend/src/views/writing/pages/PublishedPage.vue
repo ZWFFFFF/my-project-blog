@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter  } from "vue-router";
-import {getUserArticles} from "@/net/article.js";
+import {deleteArticle, getUserArticles} from "@/net/article.js";
 import {formatTimestamp} from "@/net/utils.js";
 
 const router = useRouter()
@@ -37,6 +37,12 @@ const fetchData = () => {
 onMounted(() => {
   fetchData()
 })
+
+function deleteWriting(id) {
+  if(confirm("确定删除该内容吗？")) {
+    deleteArticle(id, () => fetchData())
+  }
+}
 </script>
 
 <template>
@@ -54,7 +60,7 @@ onMounted(() => {
             <div>
               <el-button @click="router.push('/article/' + article.id)">预览</el-button>
               <el-button @click="router.push('/editor/update/' + article.id)">编辑</el-button>
-              <el-button>删除</el-button>
+              <el-button @click="deleteWriting(article.id)">删除</el-button>
             </div>
           </div>
         </div>

@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ArticleService {
     String createArticle(CreateArticleVO vo);
-    String deleteArticle(Integer userId, Integer articleId);
+    String deleteArticle(Integer articleId);
     String updateArticle(UpdateArticleVO vo);
     RestBean<ArticleVO> getArticle(Integer articleId);
     RestBean<List<ArticleVO>> getAllArticle();

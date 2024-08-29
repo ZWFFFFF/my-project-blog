@@ -67,4 +67,14 @@ function updateArticle(article, success) {
         }
     })
 }
-export {getArticleList, getArticle, getUserArticles, searchArticleList, createArticle, updateArticle}
+
+function deleteArticle(id, success) {
+    get({
+        url: 'api/article/delete-article?articleId=' + id,
+        success: () => {
+            ElMessage.success('删除成功')
+            success()
+        }
+    })
+}
+export {getArticleList, getArticle, getUserArticles, searchArticleList, createArticle, updateArticle, deleteArticle}

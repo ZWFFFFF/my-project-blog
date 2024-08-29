@@ -39,15 +39,13 @@ public class ArticleController {
 
     /**
      * 删除文章
-     * @param userId 用户id
      * @param articleId 文章id
      * @return 响应实体
      */
     @GetMapping("/delete-article")
     @Operation(summary = "删除文章")
-    public RestBean<Void> deleteArticle(@RequestParam @NotNull Integer userId,
-                                        @RequestParam @NotNull Integer articleId) {
-        return RestBean.messageHandler(() -> articleService.deleteArticle(userId, articleId));
+    public RestBean<Void> deleteArticle(@RequestParam @NotNull Integer articleId) {
+        return RestBean.messageHandler(() -> articleService.deleteArticle(articleId));
     }
 
     /**

@@ -9,6 +9,8 @@ import org.example.entity.vo.response.ArticleVO;
 import org.example.mapper.ArticleMapper;
 import org.example.service.AccountService;
 import org.example.service.ArticleService;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -46,13 +48,14 @@ public class ArticleServiceImpl implements ArticleService {
 
     /**
      * 删除文章
-     * @param userId 当前用户id
      * @param articleId 文章id
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
-    public String deleteArticle(Integer userId, Integer articleId) {
-        if(!accountService.isCurrentUser(userId)) return "非法操作";
+    public String deleteArticle(Integer articleId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = Integer.valueOf(user.getUsername());
+
         if(!this.isArticlePublisher(userId, articleId)) return "非法操作";
 
         int delete = articleMapper.deleteArticle(articleId);
