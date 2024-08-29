@@ -1,5 +1,5 @@
 function formatTimestamp(timestamp)  {
-    if(timestamp === null || timestamp === '') {
+    if(timestamp === undefined || timestamp === null || timestamp === '') {
         return ''
     }
 

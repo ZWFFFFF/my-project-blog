@@ -1,8 +1,8 @@
 <script setup>
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import {ArrowRight} from "@element-plus/icons-vue";
-import {ref} from "vue";
-import {createArticle} from "@/net/article.js";
+import {ref, computed} from "vue";
+import {createArticle, updateArticle} from "@/net/article.js";
 import {ElMessage} from "element-plus";
 import {useStore} from "vuex";
 
@@ -10,20 +10,44 @@ const store = useStore()
 
 const router = useRouter()
 
+const route = useRoute()
+
 const editorRef = ref(null)
+
+const pathTitle = computed(() => {
+  if(route.fullPath.startsWith('/editor/create')) return '新建文章'
+  if(route.fullPath.startsWith('/editor/update')) return '编辑文章'
+})
 
 const submit = () => {
   if(store.state.userId !== null) {
-    const article = {...editorRef.value.article, authorId: store.state.userId}
-    if(article.title === '' || article.summary === '' || article.content === '') {
-      ElMessage.warning('请填写完整信息')
-    } else {
-      createArticle(article, () => router.push('/writing'))
-    }
+    if(pathTitle.value === '新建文章') create()
+    if(pathTitle.value === '编辑文章') update()
   } else {
     ElMessage.warning('请先登录')
   }
 }
+
+// 新建文章
+function create() {
+  const article = {...editorRef.value.article, authorId: store.state.userId}
+  if(article.title === '' || article.summary === '' || article.content === '') {
+    ElMessage.warning('请填写完整信息')
+  } else {
+    createArticle(article, () => router.push('/writing/published'))
+  }
+}
+
+// 编辑文章
+function update() {
+  const article = editorRef.value.article
+  if(article.title === '' || article.summary === '' || article.content === '') {
+    ElMessage.warning('请填写完整信息')
+  } else {
+    updateArticle(article, () => router.push('/writing/published'))
+  }
+}
+
 </script>
 
 <template>
@@ -34,7 +58,7 @@ const submit = () => {
           <button class="font-extrabold text-2xl" @click="router.push('/')">Logo</button>
           <el-breadcrumb :separator-icon="ArrowRight">
             <el-breadcrumb-item :to="{ path: '/writing/published' }">投稿管理</el-breadcrumb-item>
-            <el-breadcrumb-item>新建文章</el-breadcrumb-item>
+            <el-breadcrumb-item>{{ pathTitle }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
         <div class="w-1/2 flex justify-end">

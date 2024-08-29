@@ -55,9 +55,19 @@ const routes = [
         component: () => import('@/views/editor/EditView.vue'),
         children: [
             {
-                path: '',
-                name: 'editor-article',
-                component: () => import('@/views/editor/pages/EditorPages.vue')
+              path: '',
+              name: 'editor-index',
+              redirect: '/editor/create',
+            },
+            {
+                path: 'create',
+                name: 'editor-create',
+                component: () => import('@/views/editor/pages/CreatePage.vue')
+            },
+            {
+                path: 'update/:id',
+                name: 'editor-update',
+                component: () => import('@/views/editor/pages/UpdatePage.vue')
             }
         ]
     }, {

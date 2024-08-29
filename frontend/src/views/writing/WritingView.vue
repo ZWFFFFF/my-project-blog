@@ -1,7 +1,16 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import {UserFilled} from "@element-plus/icons-vue";
+import {logout} from "@/net/auth.js";
+import store from "@/store/index.js";
 const router = useRouter()
+
+function userLogout() {
+  logout(() => {
+    store.dispatch('logout')
+    router.push('/welcome')
+  })
+}
 </script>
 
 <template>

@@ -10,12 +10,15 @@ const article = reactive({
   content: ''
 })
 
+const titleRef = ref()
+
 const summaryRef = ref()
 
 const editorRef = ref()
 
-const updateSummaryHeight = () => {
+const updateTextareaHeight = () => {
   summaryRef.value.style.height = summaryRef.value.scrollHeight + 'px'
+  titleRef.value.style.height = titleRef.value.scrollHeight + 'px'
 }
 
 defineExpose({
@@ -26,12 +29,12 @@ defineExpose({
 <template>
   <div class="w-1/2 mx-auto">
     <div class="w-full">
-      <div>
+      <div class="mt-20">
         <div>
-          <input v-model="article.title" maxlength="40" placeholder="输入标题" class="mb-4 px-4 w-full outline-none font-bold text-3xl">
+          <textarea ref="titleRef" v-model="article.title" @input="updateTextareaHeight" maxlength="80" placeholder="输入标题" class="px-4 w-full h-12 outline-none resize-none font-bold text-3xl"/>
         </div>
         <div>
-          <textarea ref="summaryRef" v-model="article.summary" @input="updateSummaryHeight" maxlength="500" placeholder="输入摘要" class="px-4 w-full h-6 outline-none resize-none"></textarea>
+          <textarea ref="summaryRef" v-model="article.summary" @input="updateTextareaHeight" maxlength="500" placeholder="输入摘要" class="px-4 w-full h-6 outline-none resize-none"></textarea>
         </div>
       </div>
       <div class="my-8">

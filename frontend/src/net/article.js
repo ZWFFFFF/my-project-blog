@@ -11,11 +11,26 @@ function getArticleList(success) {
     })
 }
 
-function getArticle(id, success) {
+function getUserArticles(id, success) {
+    get({
+        url: 'api/article/user-articles?userId=' + id,
+        success: (data) => {
+            success(data)
+        },
+        withToken: false
+    })
+}
+
+function getArticle(id, success, failure) {
     get({
         url: 'api/article/article-info?articleId=' + id,
         success: (data) => {
             success(data)
+        },
+        failure: (message, code, url) => {
+            console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
+            ElMessage.warning(message)
+            failure()
         },
         withToken: false
     })
@@ -35,10 +50,21 @@ function createArticle(article, success) {
     post({
         url: 'api/article/create-article',
         data: {...article},
-        success: (data) => {
+        success: () => {
             ElMessage.success('创建成功')
             success()
         }
     })
 }
-export {getArticleList, getArticle, searchArticleList, createArticle}
+
+function updateArticle(article, success) {
+    post({
+        url: 'api/article/update-article',
+        data: {...article},
+        success: () => {
+            ElMessage.success('更新成功')
+            success()
+        }
+    })
+}
+export {getArticleList, getArticle, getUserArticles, searchArticleList, createArticle, updateArticle}
