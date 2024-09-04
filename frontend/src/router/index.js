@@ -30,9 +30,13 @@ const routes = [
         component: () => import('@/views/index/IndexView.vue'),
         children: [
             {
-                path: '',
+                path: 'home',
                 name: 'index-home',
                 component: () => import('@/views/index/pages/HomePage.vue')
+            },
+            {
+                path: '',
+                redirect: '/home'
             },
             {
                 path: 'search',

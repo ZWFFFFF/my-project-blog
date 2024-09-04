@@ -42,7 +42,10 @@ function takeAccessToken() {
     if(str === null) return null;
 
     const authObj = JSON.parse(str)
-    if(authObj.expire <= new Date()) {
+    const expireTime = new Date(authObj.expire).getTime()
+    const currentTime = new Date().getTime()
+
+    if(expireTime <= currentTime) {
         deleteAccessToken()
         ElMessage.warning('登录状态已过期，请重新登录')
         return null
