@@ -44,13 +44,14 @@ const routes = [
                 component: () => import('@/views/index/pages/SearchPage.vue')
             },
             {
-                path: 'article',
-                redirect: '/'
-            },
-            {
                 path: 'article/:id',
                 name: 'index-article',
                 component: () => import('@/views/index/pages/ArticlePage.vue')
+            },
+            {
+                path: 'user/:id',
+                name: 'index-user',
+                component: () => import('@/views/index/pages/UserPage.vue')
             }
         ]
     }, {
