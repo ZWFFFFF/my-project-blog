@@ -123,15 +123,17 @@ public class AccountServiceImpl implements AccountService {
         if(code == null) return RestBean.unauthorized("请先获取验证码");
         if(!code.equals(vo.getCode())) return RestBean.unauthorized("验证码输入错误，请重新输入");
 
-        // 生成jwt令牌
         Account account = accountMapper.getAccountByEmail(email);
-        String token = jwtUtil.createJwt(account.getId(), account.getRole());
-
-        // 封装用户权限信息实体
-        AuthorizeVO authorizeVO = new AuthorizeVO(account.getId(), account.getUsername(), account.getRole(), token, jwtUtil.expireTime());
-
-        stringRedisTemplate.delete(this.getCodeKey(email)); // 删除验证码
-        return RestBean.success(authorizeVO);
+        if(account.getActive() == 1) {
+            // 生成jwt令牌
+            String token = jwtUtil.createJwt(account.getId(), account.getRole());
+            // 封装用户权限信息实体
+            AuthorizeVO authorizeVO = new AuthorizeVO(account.getId(), account.getUsername(), account.getRole(), token, jwtUtil.expireTime());
+            stringRedisTemplate.delete(this.getCodeKey(email)); // 删除验证码
+            return RestBean.success(authorizeVO);
+        } else {
+            return RestBean.forbidden("账号已被禁用");
+        }
     }
 
     /**
