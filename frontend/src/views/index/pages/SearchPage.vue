@@ -20,9 +20,9 @@ const screenWidth = ref(window.innerWidth)
 const pageSize = computed(() => {
   if(screenWidth.value < 768) return 4
   if(screenWidth.value < 1024) return 6
-  if(screenWidth.value < 1280) return 8
-  if(screenWidth.value < 1536) return 10
-  return 12
+  if(screenWidth.value < 1280) return 9
+  if(screenWidth.value < 1536) return 12
+  return 15
 })
 
 const total = ref(0)
