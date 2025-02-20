@@ -13,11 +13,14 @@ provide('registerTab', (tab) => {
 provide('activeTab', activeTab)
 
 onMounted(() => {
-  console.log(tabs.value)
   if (tabs.value.length >= 1) {
     activeTab.value = tabs.value[0].name; // 默认激活第一个标签页
   }
 })
+
+const activateTab = (name) => {
+  activeTab.value = name
+}
 
 </script>
 
@@ -27,8 +30,8 @@ onMounted(() => {
       <button
           v-for="tab in tabs"
           :key="tab.name"
-          @click="activeTab = tab.name"
-          :class="[]"
+          @click="activateTab(tab.name)"
+          :class="{ active: activeTab === tab.name }"
       >
         {{ tab.title }}
       </button>
@@ -40,5 +43,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
+.active {
+  color: blue;
+  font-weight: bold;
+}
 </style>
