@@ -5,7 +5,7 @@ import {getArticle} from "@/net/article.js";
 import {UserFilled} from "@element-plus/icons-vue";
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 import { QuillEditor } from '@vueup/vue-quill'
-import {formatTimestamp} from "../../../net/utils.js";
+import {formatTimestamp} from "@/net/utils.js";
 
 const route = useRoute();
 

@@ -15,7 +15,7 @@ const store = createStore({
         setUserId(state, id) {
             state.userId = id
         },
-        clearUserId(state) {
+        cleanUserId(state) {
             state.userId = null
         }
     },
@@ -32,7 +32,7 @@ const store = createStore({
             commit('setUserId', userId)
         },
         logout({ commit }) {
-            commit('clearUserId')
+            commit('cleanUserId')
         }
     }
 })
