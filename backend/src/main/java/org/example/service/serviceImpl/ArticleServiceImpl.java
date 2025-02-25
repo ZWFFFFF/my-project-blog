@@ -58,6 +58,9 @@ public class ArticleServiceImpl implements ArticleService {
 
         if(!this.isArticlePublisher(userId, articleId)) return "非法操作";
 
+        // 判断该文章是否为审核通过后发布的文章
+        if(!this.getArticleStatus(articleId).equals("approved")) return "非法操作";
+
         int delete = articleMapper.deleteArticle(articleId);
         if(delete != 1) return "发生了一些错误，请联系管理员";
         return null;
@@ -181,5 +184,15 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setView(article.getView());
         vo.setLike(article.getLike());
         return vo;
+    }
+
+    /**
+     * 获取文章状态
+     * @param articleId 文章id
+     * @return 文章状态
+     */
+    private String getArticleStatus(Integer articleId) {
+        Article article = articleMapper.getArticleById(articleId);
+        return article.getStatus();
     }
 }

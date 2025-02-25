@@ -32,7 +32,7 @@ public class ArticleController {
      * @return 响应实体
      */
     @PostMapping("/create-article")
-    @Operation(summary = "新建文章")
+    @Operation(summary = "新建文章(存为草稿)")
     public RestBean<Void> createDraft(@RequestBody @Valid CreateArticleVO vo) {
         return RestBean.messageHandler(() -> articleService.createArticle(vo));
     }
