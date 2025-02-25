@@ -21,7 +21,7 @@ function getUserArticles(id, success) {
     })
 }
 
-function getArticle(id, success, failure) {
+function getArticle(id, success) {
     get({
         url: 'api/article/article-info?articleId=' + id,
         success: (data) => {
@@ -30,7 +30,6 @@ function getArticle(id, success, failure) {
         failure: (message, code, url) => {
             console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
             ElMessage.warning(message)
-            failure()
         },
         withToken: false
     })

@@ -61,7 +61,7 @@ CREATE TABLE `article` (
   `authorId` bigint NOT NULL COMMENT '作者唯一标识',
   `createdAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updatedAt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '最后一次更新时间',
-  `status` enum('draft','pending_review','reviewing','approved','archived') DEFAULT 'draft' COMMENT '状态',
+  `status` enum('draft','pending_review','reviewing','approved') DEFAULT 'draft' COMMENT '状态',
   `view` bigint DEFAULT '0' COMMENT '浏览量',
   `like` bigint DEFAULT '0' COMMENT '点赞数',
   PRIMARY KEY (`id`)

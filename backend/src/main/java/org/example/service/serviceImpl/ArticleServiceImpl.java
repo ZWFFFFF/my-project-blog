@@ -58,10 +58,19 @@ public class ArticleServiceImpl implements ArticleService {
 
         if(!this.isArticlePublisher(userId, articleId)) return "非法操作";
 
-        // 判断该文章是否为审核通过后发布的文章
-        if(!this.getArticleStatus(articleId).equals("approved")) return "非法操作";
+        int delete = articleMapper.deletePublishedArticle(articleId);
+        if(delete != 1) return "发生了一些错误，请联系管理员";
+        return null;
+    }
 
-        int delete = articleMapper.deleteArticle(articleId);
+    @Override
+    public String deleteDraft(Integer articleId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = Integer.valueOf(user.getUsername());
+
+        if(!this.isArticlePublisher(userId, articleId)) return "非法操作";
+
+        int delete = articleMapper.deleteDraftArticle(articleId);
         if(delete != 1) return "发生了一些错误，请联系管理员";
         return null;
     }
@@ -87,26 +96,57 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 获取文章信息(若作者账号已注销，则作者名显示为"账号已注销"，id置为null)
+     * 获取已发布文章信息(若作者账号已注销，则作者名显示为"账号已注销"，id置为null)
      * @param articleId 文章id
      * @return 响应实体
      */
     @Override
-    public RestBean<ArticleVO> getArticle(Integer articleId) {
+    public RestBean<ArticleVO> getPublishedArticle(Integer articleId) {
         Article article = articleMapper.getArticleById(articleId);
         if(article == null) return RestBean.argumentNotValid("文章不存在");
+        if(!article.getStatus().equals("approved")) return RestBean.argumentNotValid("非法操作");
 
         ArticleVO vo = this.toArticleVO(article);
         return RestBean.success(vo);
     }
 
     /**
-     * 获取所有文章
+     * 获取草稿信息
+     * @param articleId 文章id
      * @return 响应实体
      */
     @Override
-    public RestBean<List<ArticleVO>> getAllArticle() {
-        List<Article> articles = articleMapper.getAllArticles();
+    public RestBean<ArticleVO> getDraft(Integer articleId) {
+        Article article = articleMapper.getArticleById(articleId);
+        if(article == null) return RestBean.argumentNotValid("文章不存在");
+        if(!article.getStatus().equals("draft")) return RestBean.argumentNotValid("非法操作");
+
+        ArticleVO vo = this.toArticleVO(article);
+        return RestBean.success(vo);
+    }
+
+    /**
+     * 获取待审核文章信息
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<ArticleVO> getPendingReviewArticle(Integer articleId) {
+        Article article = articleMapper.getArticleById(articleId);
+        if(article == null) return RestBean.argumentNotValid("文章不存在");
+        if(!article.getStatus().equals("pending_review")) return RestBean.argumentNotValid("非法操作");
+
+        ArticleVO vo = this.toArticleVO(article);
+        return RestBean.success(vo);
+    }
+
+    /**
+     * 获取所有已发布文章列表
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<List<ArticleVO>> getAllPublishedArticle() {
+        List<Article> articles = articleMapper.getAllPublishedArticles();
 
         List<ArticleVO> voList = new ArrayList<>();
         for(Article article: articles) {
@@ -116,13 +156,52 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 根据作者id获取用户所有文章
+     * 获取当前用户所有草稿
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<List<ArticleVO>> getUserDrafts() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = Integer.valueOf(user.getUsername());
+
+        List<Article> articles = articleMapper.getArticleByAuthorId(userId);
+        articles.removeIf(article -> !article.getStatus().equals("draft"));
+
+        List<ArticleVO> voList = new ArrayList<>();
+        for(Article article: articles) {
+            voList.add(this.toArticleVO(article));
+        }
+        return RestBean.success(voList);
+    }
+
+    /**
+     * 获取当前用户所有待审核文章
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<List<ArticleVO>> getUserPendingReviewArticles() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = Integer.valueOf(user.getUsername());
+
+        List<Article> articles = articleMapper.getArticleByAuthorId(userId);
+        articles.removeIf(article -> !article.getStatus().equals("pending_review"));
+
+        List<ArticleVO> voList = new ArrayList<>();
+        for(Article article: articles) {
+            voList.add(this.toArticleVO(article));
+        }
+        return RestBean.success(voList);
+    }
+
+    /**
+     * 根据作者id获取用户所有已发布的文章
      * @param authorId 作者id
      * @return 响应实体
      */
     @Override
-    public RestBean<List<ArticleVO>> getArticleByAuthorId(Integer authorId) {
+    public RestBean<List<ArticleVO>> getPublishedArticleByAuthorId(Integer authorId) {
         List<Article> articles = articleMapper.getArticleByAuthorId(authorId);
+        articles.removeIf(article -> !article.getStatus().equals("approved"));
 
         List<ArticleVO> voList = new ArrayList<>();
         for(Article article: articles) {
@@ -184,15 +263,5 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setView(article.getView());
         vo.setLike(article.getLike());
         return vo;
-    }
-
-    /**
-     * 获取文章状态
-     * @param articleId 文章id
-     * @return 文章状态
-     */
-    private String getArticleStatus(Integer articleId) {
-        Article article = articleMapper.getArticleById(articleId);
-        return article.getStatus();
     }
 }

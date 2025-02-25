@@ -66,18 +66,18 @@ public class ArticleController {
      */
     @GetMapping("/article-info")
     @Operation(summary = "获取文章信息")
-    public RestBean<ArticleVO> getArticle(@RequestParam @NotNull Integer articleId) {
-        return articleService.getArticle(articleId);
+    public RestBean<ArticleVO> getPublishedArticle(@RequestParam @NotNull Integer articleId) {
+        return articleService.getPublishedArticle(articleId);
     }
 
     /**
-     * 获取文章列表
+     * 获取已发布文章列表
      * @return 响应实体
      */
     @GetMapping("/article-list")
     @Operation(summary = "获取文章列表")
     public RestBean<List<ArticleVO>> getArticleList() {
-        return articleService.getAllArticle();
+        return articleService.getAllPublishedArticle();
     }
 
     /**
@@ -88,7 +88,7 @@ public class ArticleController {
     @GetMapping("/user-articles")
     @Operation(summary = "获取用户文章列表")
     public RestBean<List<ArticleVO>> getUserArticles(@RequestParam @NotNull Integer userId)  {
-        return articleService.getArticleByAuthorId(userId);
+        return articleService.getPublishedArticleByAuthorId(userId);
     }
 
     /**

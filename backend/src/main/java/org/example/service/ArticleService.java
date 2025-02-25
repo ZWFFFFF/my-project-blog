@@ -10,9 +10,14 @@ import java.util.List;
 public interface ArticleService {
     String createArticle(CreateArticleVO vo);
     String deleteArticle(Integer articleId);
+    String deleteDraft(Integer articleId);
     String updateArticle(UpdateArticleVO vo);
-    RestBean<ArticleVO> getArticle(Integer articleId);
-    RestBean<List<ArticleVO>> getAllArticle();
-    RestBean<List<ArticleVO>> getArticleByAuthorId(Integer authorId);
+    RestBean<ArticleVO> getPublishedArticle(Integer articleId);
+    RestBean<ArticleVO> getDraft(Integer articleId);
+    RestBean<ArticleVO> getPendingReviewArticle(Integer articleId);
+    RestBean<List<ArticleVO>> getAllPublishedArticle();
+    RestBean<List<ArticleVO>> getUserDrafts();
+    RestBean<List<ArticleVO>> getUserPendingReviewArticles();
+    RestBean<List<ArticleVO>> getPublishedArticleByAuthorId(Integer authorId);
     RestBean<List<ArticleVO>> getArticleByTitle(String title);
 }
