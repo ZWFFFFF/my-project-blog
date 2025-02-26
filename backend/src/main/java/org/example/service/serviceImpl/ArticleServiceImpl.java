@@ -56,7 +56,8 @@ public class ArticleServiceImpl implements ArticleService {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Integer userId = Integer.valueOf(user.getUsername());
 
-        if(!this.isArticlePublisher(userId, articleId)) return "非法操作";
+        Article article = articleMapper.getArticleById(articleId);
+        if(article == null || !article.getAuthorId().equals(userId)) return "非法操作";
 
         int delete = articleMapper.deletePublishedArticle(articleId);
         if(delete != 1) return "发生了一些错误，请联系管理员";
@@ -68,7 +69,8 @@ public class ArticleServiceImpl implements ArticleService {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Integer userId = Integer.valueOf(user.getUsername());
 
-        if(!this.isArticlePublisher(userId, articleId)) return "非法操作";
+        Article article = articleMapper.getArticleById(articleId);
+        if(article == null || !article.getAuthorId().equals(userId)) return "非法操作";
 
         int delete = articleMapper.deleteDraftArticle(articleId);
         if(delete != 1) return "发生了一些错误，请联系管理员";
@@ -77,21 +79,38 @@ public class ArticleServiceImpl implements ArticleService {
 
     /**
      * 更新文章
+     * @param type 文章类型，draft表示草稿，approved表示审核通过已发布
      * @param vo 更新文章表单实体
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
-    public String updateArticle(UpdateArticleVO vo) {
+    public String updateArticle(String type, UpdateArticleVO vo) {
         Integer userId = vo.getAuthorId();
         Integer articleId = vo.getId();
         if(!accountService.isCurrentUser(userId)) return "非法操作";
-        if(!this.isArticlePublisher(userId, articleId)) return "非法操作";
+
+        Article article = articleMapper.getArticleById(articleId);
+        if(article == null || !article.getAuthorId().equals(userId)) return "非法操作";
+
+        switch (type) {
+            case "draft" -> {
+                if(!article.getStatus().equals("draft")) return "非法操作";
+            }
+            case "approved" -> {
+                if(!article.getStatus().equals("approved")) return "非法操作";
+            }
+            default -> {
+                return "非法操作";
+            }
+        }
 
         String title = vo.getTitle();
         String summary = vo.getSummary();
         String content = vo.getContent();
         int update = articleMapper.updateArticleById(articleId, title, summary, content);
         if(update != 1) return "发生了一些错误，请联系管理员";
+
+        // 状态更新：
         return null;
     }
 
@@ -111,15 +130,21 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 获取草稿信息
+     * 获取当前用户草稿信息
      * @param articleId 文章id
      * @return 响应实体
      */
     @Override
     public RestBean<ArticleVO> getDraft(Integer articleId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = Integer.valueOf(user.getUsername());
+
         Article article = articleMapper.getArticleById(articleId);
         if(article == null) return RestBean.argumentNotValid("文章不存在");
-        if(!article.getStatus().equals("draft")) return RestBean.argumentNotValid("非法操作");
+
+        if(!article.getStatus().equals("draft") || !article.getAuthorId().equals(userId)) {
+            return RestBean.argumentNotValid("非法操作");
+        }
 
         ArticleVO vo = this.toArticleVO(article);
         return RestBean.success(vo);
@@ -135,7 +160,7 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = articleMapper.getArticleById(articleId);
         if(article == null) return RestBean.argumentNotValid("文章不存在");
         if(!article.getStatus().equals("pending_review")) return RestBean.argumentNotValid("非法操作");
-
+        // 要修改
         ArticleVO vo = this.toArticleVO(article);
         return RestBean.success(vo);
     }
@@ -224,18 +249,6 @@ public class ArticleServiceImpl implements ArticleService {
             voList.add(this.toArticleVO(article));
         }
         return RestBean.success(voList);
-    }
-
-    /**
-     * 判断文章是否属于用户(文章不存在也返回false)
-     * @param userId 用户id
-     * @param articleId 文章id
-     * @return true表示属于，false表示不属于
-     */
-    private boolean isArticlePublisher(Integer userId, Integer articleId) {
-        Article article = articleMapper.getArticleById(articleId);
-        if(article == null) return false;
-        return article.getAuthorId().equals(userId);
     }
 
     /**

@@ -12,4 +12,4 @@ app.use(router)
 app.use(store)
 app.mount('#app')
 
-store.dispatch('initializeUserId')
+store.dispatch('initializeUserId').then()

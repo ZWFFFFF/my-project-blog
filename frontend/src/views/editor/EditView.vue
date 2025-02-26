@@ -2,7 +2,7 @@
 import { useRouter, useRoute } from 'vue-router'
 import {ArrowRight} from "@element-plus/icons-vue";
 import {ref, computed} from "vue";
-import {createArticle, updateArticle} from "@/net/article.js";
+import {createArticle, updateArticle, updateDraft} from "@/net/article.js";
 import {ElMessage} from "element-plus";
 import {useStore} from "vuex";
 
@@ -16,13 +16,15 @@ const editorRef = ref(null)
 
 const pathTitle = computed(() => {
   if(route.fullPath.startsWith('/editor/create')) return '新建文章'
-  if(route.fullPath.startsWith('/editor/update')) return '编辑文章'
+  if(route.fullPath.startsWith('/editor/update/article')) return '编辑文章'
+  if(route.fullPath.startsWith('/editor/update/draft')) return '编辑草稿'
 })
 
 const submit = () => {
   if(store.state.userId !== null) {
     if(pathTitle.value === '新建文章') create()
-    if(pathTitle.value === '编辑文章') update()
+    if(pathTitle.value === '编辑文章') update('article')
+    if(pathTitle.value === '编辑草稿') update('draft')
   } else {
     ElMessage.warning('请先登录')
   }
@@ -34,20 +36,28 @@ function create() {
   if(article.title === '' || article.summary === '' || article.content === '') {
     ElMessage.warning('请填写完整信息')
   } else {
-    createArticle(article, () => router.push('/writing/published'))
+    createArticle(article, () => router.push('/writing'))
   }
 }
 
 // 编辑文章
-function update() {
+function update(type) {
   const article = editorRef.value.article
   if(article.title === '' || article.summary === '' || article.content === '') {
     ElMessage.warning('请填写完整信息')
   } else {
-    updateArticle(article, () => router.push('/writing/published'))
+    switch (type) {
+      case 'article':
+        updateArticle(article, () => router.push('/writing'));
+        break;
+      case 'draft':
+        updateDraft(article, () => router.push('/writing'));
+        break;
+      default:
+        ElMessage.warning('发生了一些错误，请联系管理员')
+    }
   }
 }
-
 </script>
 
 <template>
@@ -57,7 +67,7 @@ function update() {
         <div class="flex items-center w-1/2 gap-8">
           <button class="font-extrabold text-2xl" @click="router.push('/')">Logo</button>
           <el-breadcrumb :separator-icon="ArrowRight">
-            <el-breadcrumb-item :to="{ path: '/writing/published' }">投稿管理</el-breadcrumb-item>
+            <el-breadcrumb-item :to="{ path: '/writing' }">投稿管理</el-breadcrumb-item>
             <el-breadcrumb-item>{{ pathTitle }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>

@@ -1,7 +1,7 @@
 <script setup>
-import {watch, ref, reactive, onMounted, computed, defineExpose} from "vue";
+import {ref, reactive, onMounted, defineExpose} from "vue";
 import {useRoute, useRouter} from "vue-router";
-import {getArticle} from "@/net/article.js";
+import {getArticle, getDraft} from "@/net/article.js";
 import {useStore} from "vuex";
 import {ElMessage} from "element-plus";
 import {QuillEditor} from "@vueup/vue-quill";
@@ -14,7 +14,9 @@ const route = useRoute()
 
 const store = useStore()
 
-const articleId = computed(() => route.params.id)
+const articleId = ref(route.params.id)
+
+const articleType = ref(route.params.type)
 
 const article = reactive({
   id: null,
@@ -31,16 +33,27 @@ const titleRef = ref()
 const summaryRef = ref()
 
 const fetchData = () => {
-  getArticle(articleId.value, (data) => {
-    Object.assign(article, data)
-
-    if(article.authorId !== store.state.userId) {
-      ElMessage.error('非法操作')
+  if(articleType.value === 'article') {
+    getArticle(articleId.value, (data) => {
+      Object.assign(article, data)
+      if(article.authorId !== store.state.userId) {
+        ElMessage.error('非法操作')
+        router.push('/')
+      }
+    }, () => {
       router.push('/')
-    }
-  }, () => {
-    router.push('/')
-  })
+    })
+  } else if(articleType.value === 'draft') {
+    getDraft(articleId.value, (data) => {
+      Object.assign(article, data)
+      if(article.authorId !== store.state.userId) {
+        ElMessage.error('非法操作')
+        router.push('/')
+      }
+    }, () => {
+      router.push('/')
+    })
+  }
 }
 
 const updateTextareaHeight = () => {
@@ -49,10 +62,6 @@ const updateTextareaHeight = () => {
 }
 
 onMounted(() => {
-  fetchData()
-})
-
-watch(articleId, () => {
   fetchData()
 })
 

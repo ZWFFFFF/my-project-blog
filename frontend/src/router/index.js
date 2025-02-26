@@ -44,7 +44,7 @@ const routes = [
                 component: () => import('@/views/index/pages/SearchPage.vue')
             },
             {
-                path: 'article/:id',
+                path: 'article/:type(draft|approved)/:id',
                 name: 'index-article',
                 component: () => import('@/views/index/pages/ArticlePage.vue')
             },
@@ -70,7 +70,7 @@ const routes = [
                 component: () => import('@/views/editor/pages/CreatePage.vue')
             },
             {
-                path: 'update/:id',
+                path: 'update/:type(draft|article)/:id',
                 name: 'editor-update',
                 component: () => import('@/views/editor/pages/UpdatePage.vue')
             }
@@ -80,11 +80,11 @@ const routes = [
         name: 'writing',
         component: () => import('@/views/writing/WritingView.vue'),
         children: [
-            // {
-            //     path: '',
-            //     name: 'writing-draft',
-            //     component: () => import('@/views/writing/pages/DraftPage.vue')
-            // },
+            {
+                path: '',
+                name: 'writing-draft',
+                component: () => import('@/views/writing/pages/DraftPage.vue')
+            },
             {
                 path: 'published',
                 name: 'writing-published',

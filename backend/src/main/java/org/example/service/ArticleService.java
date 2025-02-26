@@ -11,7 +11,7 @@ public interface ArticleService {
     String createArticle(CreateArticleVO vo);
     String deleteArticle(Integer articleId);
     String deleteDraft(Integer articleId);
-    String updateArticle(UpdateArticleVO vo);
+    String updateArticle(String type, UpdateArticleVO vo);
     RestBean<ArticleVO> getPublishedArticle(Integer articleId);
     RestBean<ArticleVO> getDraft(Integer articleId);
     RestBean<ArticleVO> getPendingReviewArticle(Integer articleId);

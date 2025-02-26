@@ -92,7 +92,7 @@ const currentPageArticles = computed(() => {
       <div class="p-8 m-2 h-[300px] bg-white rounded shadow">
         <div class="h-full">
           <div class="h-3/4">
-            <div class="truncate mb-4" @click="router.push(`/article/${article.id}`)">
+            <div class="truncate mb-4" @click="router.push('/article/approved/' +article.id)">
               <span class="cursor-pointer text-xl font-bold">{{ article.title }}</span>
             </div>
             <div>

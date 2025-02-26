@@ -49,6 +49,17 @@ public class ArticleController {
     }
 
     /**
+     * 删除草稿
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @GetMapping("/delete-draft")
+    @Operation(summary = "删除草稿")
+    public RestBean<Void> deleteDraft(@RequestParam @NotNull Integer articleId) {
+        return RestBean.messageHandler(() -> articleService.deleteDraft(articleId));
+    }
+
+    /**
      * 更新文章
      * @param vo 更新文章表单实体
      * @return 响应实体
@@ -56,7 +67,18 @@ public class ArticleController {
     @PostMapping("/update-article")
     @Operation(summary = "更新文章")
     public RestBean<Void> updateArticle(@RequestBody @Valid UpdateArticleVO vo) {
-        return RestBean.messageHandler(() -> articleService.updateArticle(vo));
+        return RestBean.messageHandler(() -> articleService.updateArticle("approved", vo));
+    }
+
+    /**
+     * 更新草稿
+     * @param vo 更新草稿表单实体
+     * @return 响应实体
+     */
+    @PostMapping("/update-draft")
+    @Operation(summary = "更新草稿")
+    public RestBean<Void> updateDraft(@RequestBody @Valid UpdateArticleVO vo) {
+        return RestBean.messageHandler(() -> articleService.updateArticle("draft", vo));
     }
 
     /**
@@ -68,6 +90,17 @@ public class ArticleController {
     @Operation(summary = "获取文章信息")
     public RestBean<ArticleVO> getPublishedArticle(@RequestParam @NotNull Integer articleId) {
         return articleService.getPublishedArticle(articleId);
+    }
+
+    /**
+     * 获取草稿信息
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @GetMapping("/draft-info")
+    @Operation(summary = "获取草稿信息")
+    public RestBean<ArticleVO> getDraft(@RequestParam @NotNull Integer articleId) {
+        return articleService.getDraft(articleId);
     }
 
     /**
@@ -89,6 +122,16 @@ public class ArticleController {
     @Operation(summary = "获取用户文章列表")
     public RestBean<List<ArticleVO>> getUserArticles(@RequestParam @NotNull Integer userId)  {
         return articleService.getPublishedArticleByAuthorId(userId);
+    }
+
+    /**
+     * 获取用户草稿列表
+     * @return 响应实体
+     */
+    @GetMapping("/draft-list")
+    @Operation(summary = "获取草稿列表")
+    public RestBean<List<ArticleVO>> getDraftList() {
+        return articleService.getUserDrafts();
     }
 
     /**

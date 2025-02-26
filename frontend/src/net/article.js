@@ -21,7 +21,16 @@ function getUserArticles(id, success) {
     })
 }
 
-function getArticle(id, success) {
+function getUserDrafts(success) {
+    get({
+        url: 'api/article/draft-list',
+        success: (data) => {
+            success(data)
+        },
+    })
+}
+
+function getArticle(id, success, failure = () => {}) {
     get({
         url: 'api/article/article-info?articleId=' + id,
         success: (data) => {
@@ -30,8 +39,23 @@ function getArticle(id, success) {
         failure: (message, code, url) => {
             console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
             ElMessage.warning(message)
+            failure()
         },
         withToken: false
+    })
+}
+
+function getDraft(id, success, failure = () => {}) {
+    get({
+        url: 'api/article/draft-info?articleId=' + id,
+        success: (data) => {
+            success(data)
+        },
+        failure: (message, code, url) => {
+            console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
+            ElMessage.warning(message)
+            failure()
+        }
     })
 }
 
@@ -67,6 +91,17 @@ function updateArticle(article, success) {
     })
 }
 
+function updateDraft(draft, success) {
+    post({
+        url: 'api/article/update-draft',
+        data: {...draft},
+        success: () => {
+            ElMessage.success('更新成功')
+            success()
+        }
+    })
+}
+
 function deleteArticle(id, success) {
     get({
         url: 'api/article/delete-article?articleId=' + id,
@@ -76,4 +111,14 @@ function deleteArticle(id, success) {
         }
     })
 }
-export {getArticleList, getArticle, getUserArticles, searchArticleList, createArticle, updateArticle, deleteArticle}
+
+function deleteDraft(id, success) {
+    get({
+        url: 'api/article/delete-draft?articleId=' + id,
+        success: () => {
+            ElMessage.success('删除成功')
+            success()
+        }
+    })
+}
+export {getArticleList, getArticle, getDraft, getUserArticles, getUserDrafts, searchArticleList, createArticle, updateArticle, updateDraft, deleteArticle, deleteDraft}
