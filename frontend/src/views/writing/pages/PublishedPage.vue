@@ -46,9 +46,8 @@ function deleteWriting(id) {
 </script>
 
 <template>
-  <div class="py-20">
+  <div>
     <div class="container mx-auto w-2/3">
-      <div class="mb-4"><span class="font-bold text-xl">投稿管理</span></div>
       <div class="flex flex-col gap-8">
         <div v-for="(article, index) in articleList" :key="article.id" class="bg-white w-full min-h-72 p-8 flex flex-col justify-between gap-8">
           <div>
@@ -58,8 +57,8 @@ function deleteWriting(id) {
           <div class="flex flex-col lg:flex-row lg:items-center justify-between items-start gap-2">
             <div class="text-sm"><span>{{ formatTimestamp(article.createdAt) }}创建</span><span class="ml-4">于{{ formatTimestamp(article.updatedAt) }}有过修改</span></div>
             <div>
-              <el-button @click="router.push('/article/' + article.id)">预览</el-button>
-              <el-button @click="router.push('/editor/update/' + article.id)">编辑</el-button>
+              <el-button @click="router.push('/article/approved/' + article.id)">预览</el-button>
+              <el-button @click="router.push('/editor/update/article/' + article.id)">编辑</el-button>
               <el-button @click="deleteWriting(article.id)">删除</el-button>
             </div>
           </div>

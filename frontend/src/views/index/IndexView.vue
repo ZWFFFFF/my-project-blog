@@ -28,7 +28,7 @@ function userLogout() {
     <header>
       <div class="bg-white flex justify-between p-4 gap-4 items-center">
         <div class="w-1/2 flex gap-8">
-          <button class="font-extrabold text-2xl" @click="router.push('/')">Logo</button>
+          <router-link to="/"><span class="font-extrabold text-2xl">Logo</span></router-link>
           <div>
             <el-input v-model="keyword" type="text" placeholder="搜索" @keyup.enter="searchArticle">
               <template #prefix>

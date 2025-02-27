@@ -82,6 +82,11 @@ const routes = [
         children: [
             {
                 path: '',
+                name: 'writing-index',
+                redirect: '/writing/draft'
+            },
+            {
+                path: 'draft',
                 name: 'writing-draft',
                 component: () => import('@/views/writing/pages/DraftPage.vue')
             },

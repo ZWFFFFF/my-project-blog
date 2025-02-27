@@ -42,9 +42,8 @@ function deleteWriting(id) {
 </script>
 
 <template>
-  <div class="py-20">
+  <div>
     <div class="container mx-auto w-2/3">
-      <div class="mb-4"><span class="font-bold text-xl">草稿管理</span></div>
       <div class="flex flex-col gap-8">
         <div v-for="(article, index) in articleList" :key="article.id" class="bg-white w-full min-h-72 p-8 flex flex-col justify-between gap-8">
           <div>

@@ -1,9 +1,10 @@
 <script setup>
-import { useRouter } from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
 import {UserFilled} from "@element-plus/icons-vue";
 import {logout} from "@/net/auth.js";
 import store from "@/store/index.js";
 const router = useRouter()
+const route = useRoute()
 
 function userLogout() {
   logout(() => {
@@ -36,7 +37,21 @@ function userLogout() {
       </div>
     </header>
     <div>
-      <div class="w-full">
+      <div class="w-full py-20">
+        <div class="container mx-auto w-2/3 mb-4">
+          <ul class="flex justify-start gap-x-10">
+            <li :class="{ 'border-black border-b-2' : route.path === '/writing/draft'  }">
+              <router-link to="/writing/draft">
+                <span class="font-bold text-xl">草稿管理</span>
+              </router-link>
+            </li>
+            <li :class="{ 'border-black border-b-2' : route.path === '/writing/published' }">
+              <router-link to="/writing/published">
+                <span class="font-bold text-xl">投稿管理</span>
+              </router-link>
+            </li>
+          </ul>
+        </div>
         <router-view></router-view>
       </div>
     </div>
