@@ -47,6 +47,27 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
+     * 投稿审核
+     * @param vo 表单实体
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    public String submitArticle(CreateArticleVO vo) {
+        String title = vo.getTitle();
+        String summary = vo.getSummary();
+        String content = vo.getContent();
+        Integer authorId = vo.getAuthorId();
+
+        if(!accountService.isCurrentUser(authorId)) return "非法操作";
+        Article article = new Article(title, summary, content, authorId);
+        article.setStatus("pending_review");
+
+        int insert = articleMapper.insertPendingReviewArticle(article);
+        if(insert != 1) return "发生了一些错误，请联系管理员";
+        return null;
+    }
+
+    /**
      * 删除文章
      * @param articleId 文章id
      * @return 操作结果，null表示正常，否则为错误原因string
@@ -64,6 +85,11 @@ public class ArticleServiceImpl implements ArticleService {
         return null;
     }
 
+    /**
+     * 删除草稿
+     * @param articleId 文章id
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
     @Override
     public String deleteDraft(Integer articleId) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

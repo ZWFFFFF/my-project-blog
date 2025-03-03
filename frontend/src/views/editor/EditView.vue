@@ -72,6 +72,7 @@ function update(type) {
           </el-breadcrumb>
         </div>
         <div class="w-1/2 flex justify-end">
+          <el-button @click=""><span class="font-bold p-2">存为草稿</span></el-button>
           <el-button @click="submit"><span class="font-bold p-2">投稿审核</span></el-button>
         </div>
       </div>

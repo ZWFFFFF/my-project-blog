@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface ArticleService {
     String createArticle(CreateArticleVO vo);
+    String submitArticle(CreateArticleVO vo);
     String deleteArticle(Integer articleId);
     String deleteDraft(Integer articleId);
     String updateArticle(String type, UpdateArticleVO vo);

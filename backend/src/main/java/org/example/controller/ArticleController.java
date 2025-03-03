@@ -37,6 +37,12 @@ public class ArticleController {
         return RestBean.messageHandler(() -> articleService.createArticle(vo));
     }
 
+    @PostMapping("/submission-review")
+    @Operation(summary = "投稿审核")
+    public RestBean<Void> submission(@RequestBody @Valid CreateArticleVO vo) {
+        return null;
+    }
+
     /**
      * 删除文章
      * @param articleId 文章id

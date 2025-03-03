@@ -9,6 +9,8 @@ import java.util.List;
 public interface ArticleMapper {
     @Insert("insert into article(title, summary, content, authorId) values(#{title}, #{summary}, #{content}, #{authorId})")
     int insertArticle(Article article);
+    @Insert("insert into article(title, summary, content, authorId, status) values(#{title}, #{summary}, #{content}, #{authorId}, #{status})")
+    int insertPendingReviewArticle(Article article);
     @Delete("delete from article where id = #{id} and status = 'draft'")
     int deleteDraftArticle(Integer id);
     @Delete("delete from article where id = #{id} and status = 'approved'")
