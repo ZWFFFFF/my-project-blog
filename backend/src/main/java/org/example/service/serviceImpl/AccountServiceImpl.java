@@ -22,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -142,6 +143,7 @@ public class AccountServiceImpl implements AccountService {
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
+    @Transactional
     public String registerAccount(EmailRegisterVO vo) {
         String email = vo.getEmail();
         String code = stringRedisTemplate.opsForValue().get(this.getCodeKey(email));
@@ -167,6 +169,7 @@ public class AccountServiceImpl implements AccountService {
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
+    @Transactional
     public String resetPassword(ResetPasswordVO vo) {
         String email = vo.getEmail();
         String code = stringRedisTemplate.opsForValue().get(this.getCodeKey(email));
@@ -193,6 +196,7 @@ public class AccountServiceImpl implements AccountService {
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
+    @Transactional
     public String changeUsername(Integer id, String newUsername) {
         if(!this.isCurrentUser(id)) return "非法操作";
 
@@ -252,6 +256,7 @@ public class AccountServiceImpl implements AccountService {
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
+    @Transactional
     public String deleteAccount(Integer userId, String username, String token) {
         if(!this.isCurrentUser(userId)) return "非法操作";
         Account account = accountMapper.getAccountById(userId);
@@ -274,6 +279,7 @@ public class AccountServiceImpl implements AccountService {
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
+    @Transactional
     public String changePassword(ChangePasswordVO vo) {
         Integer userId = vo.getId();
         String oldPassword = vo.getOldPassword();
@@ -295,6 +301,7 @@ public class AccountServiceImpl implements AccountService {
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
+    @Transactional
     public String banAccount(Integer userId) {
         int update = accountMapper.banAccountById(userId);
         if(update <= 0) return "用户不存在";
@@ -307,6 +314,7 @@ public class AccountServiceImpl implements AccountService {
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
+    @Transactional
     public String unbanAccount(Integer userId) {
         int update = accountMapper.unbanAccountById(userId);
         if(update <= 0) return "用户不存在";

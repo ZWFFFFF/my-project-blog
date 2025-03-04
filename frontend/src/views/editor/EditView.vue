@@ -2,7 +2,7 @@
 import { useRouter, useRoute } from 'vue-router'
 import {ArrowRight} from "@element-plus/icons-vue";
 import {ref, computed} from "vue";
-import {createArticle, updateArticle, updateDraft} from "@/net/article.js";
+import {createArticle, updateArticle, updateDraft, submitToReview} from "@/net/article.js";
 import {ElMessage} from "element-plus";
 import {useStore} from "vuex";
 
@@ -21,22 +21,28 @@ const pathTitle = computed(() => {
 })
 
 const submit = () => {
-  if(store.state.userId !== null) {
-    if(pathTitle.value === '新建文章') create()
-    if(pathTitle.value === '编辑文章') update('article')
-    if(pathTitle.value === '编辑草稿') update('draft')
-  } else {
-    ElMessage.warning('请先登录')
-  }
+  if(pathTitle.value === '新建文章') create('article')
+  if(pathTitle.value === '编辑文章') update('article')
+  if(pathTitle.value === '编辑草稿') update('article')
 }
 
 // 新建文章
-function create() {
+function create(type) {
   const article = {...editorRef.value.article, authorId: store.state.userId}
   if(article.title === '' || article.summary === '' || article.content === '') {
     ElMessage.warning('请填写完整信息')
-  } else {
-    createArticle(article, () => router.push('/writing'))
+    return;
+  }
+
+  switch (type) {
+    case 'draft':
+      createArticle(article, () => router.push('/writing'));
+      break;
+    case 'article':
+      submitToReview(article, () => router.push('/writing'));
+      break;
+    default:
+      ElMessage.warning('发生了一些错误，请联系管理员')
   }
 }
 
@@ -45,17 +51,18 @@ function update(type) {
   const article = editorRef.value.article
   if(article.title === '' || article.summary === '' || article.content === '') {
     ElMessage.warning('请填写完整信息')
-  } else {
-    switch (type) {
-      case 'article':
-        updateArticle(article, () => router.push('/writing'));
-        break;
-      case 'draft':
-        updateDraft(article, () => router.push('/writing'));
-        break;
-      default:
-        ElMessage.warning('发生了一些错误，请联系管理员')
-    }
+    return;
+  }
+
+  switch (type) {
+    case 'article':
+      updateArticle(article, () => router.push('/writing'));
+      break;
+    case 'draft':
+      updateDraft(article, () => router.push('/writing'));
+      break;
+    default:
+      ElMessage.warning('发生了一些错误，请联系管理员')
   }
 }
 </script>
@@ -72,7 +79,8 @@ function update(type) {
           </el-breadcrumb>
         </div>
         <div class="w-1/2 flex justify-end">
-          <el-button @click=""><span class="font-bold p-2">存为草稿</span></el-button>
+          <el-button v-if="pathTitle === '编辑草稿'" @click="update('draft')"><span class="font-bold p-2">保存草稿</span></el-button>
+          <el-button v-else @click="create('draft')"><span class="font-bold p-2">存为草稿</span></el-button>
           <el-button @click="submit"><span class="font-bold p-2">投稿审核</span></el-button>
         </div>
       </div>

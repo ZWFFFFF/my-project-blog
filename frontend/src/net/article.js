@@ -85,7 +85,7 @@ function updateArticle(article, success) {
         url: 'api/article/update-article',
         data: {...article},
         success: () => {
-            ElMessage.success('更新成功')
+            ElMessage.success('等待审核')
             success()
         }
     })
@@ -121,4 +121,19 @@ function deleteDraft(id, success) {
         }
     })
 }
-export {getArticleList, getArticle, getDraft, getUserArticles, getUserDrafts, searchArticleList, createArticle, updateArticle, updateDraft, deleteArticle, deleteDraft}
+
+function submitToReview(article, success) {
+    post({
+        url: 'api/article/submission-review',
+        data: {...article},
+        success: () => {
+            ElMessage.success('等待审核')
+            success()
+        }
+    })
+}
+export {
+    getArticleList, getArticle, getDraft, getUserArticles,
+    getUserDrafts, searchArticleList, createArticle, updateArticle,
+    updateDraft, deleteArticle, deleteDraft, submitToReview
+}

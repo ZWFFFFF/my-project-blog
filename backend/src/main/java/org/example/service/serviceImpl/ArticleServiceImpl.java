@@ -12,6 +12,7 @@ import org.example.service.ArticleService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +30,12 @@ public class ArticleServiceImpl implements ArticleService {
     /**
      * 新建文章(状态默认为草稿)
      * @param vo 新建草稿表单实体
+     * @param status 文章状态状态
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
-    public String createArticle(CreateArticleVO vo) {
+    @Transactional
+    public String createArticle(CreateArticleVO vo, String status) {
         String title = vo.getTitle();
         String summary = vo.getSummary();
         String content = vo.getContent();
@@ -40,30 +43,16 @@ public class ArticleServiceImpl implements ArticleService {
 
         if(!accountService.isCurrentUser(authorId)) return "非法操作";
         Article article = new Article(title, summary, content, authorId);
-        int insert = articleMapper.insertArticle(article);
 
+        int insert;
+        if(status.equals("draft")) {
+            insert = articleMapper.insertDraft(article);
+        } else {
+            article.setStatus(status);
+            insert = articleMapper.insertArticle(article);
+        }
         if(insert != 1) return "发生了一些错误，请联系管理员";
-        return null;
-    }
 
-    /**
-     * 投稿审核
-     * @param vo 表单实体
-     * @return 操作结果，null表示正常，否则为错误原因string
-     */
-    @Override
-    public String submitArticle(CreateArticleVO vo) {
-        String title = vo.getTitle();
-        String summary = vo.getSummary();
-        String content = vo.getContent();
-        Integer authorId = vo.getAuthorId();
-
-        if(!accountService.isCurrentUser(authorId)) return "非法操作";
-        Article article = new Article(title, summary, content, authorId);
-        article.setStatus("pending_review");
-
-        int insert = articleMapper.insertPendingReviewArticle(article);
-        if(insert != 1) return "发生了一些错误，请联系管理员";
         return null;
     }
 
@@ -73,6 +62,7 @@ public class ArticleServiceImpl implements ArticleService {
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
+    @Transactional
     public String deleteArticle(Integer articleId) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Integer userId = Integer.valueOf(user.getUsername());
@@ -91,6 +81,7 @@ public class ArticleServiceImpl implements ArticleService {
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
+    @Transactional
     public String deleteDraft(Integer articleId) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Integer userId = Integer.valueOf(user.getUsername());
@@ -105,11 +96,12 @@ public class ArticleServiceImpl implements ArticleService {
 
     /**
      * 更新文章
-     * @param type 文章类型，draft表示草稿，approved表示审核通过已发布
+     * @param type 文章类型，draft表示草稿，approved表示审核通过已发布的文章
      * @param vo 更新文章表单实体
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
+    @Transactional
     public String updateArticle(String type, UpdateArticleVO vo) {
         Integer userId = vo.getAuthorId();
         Integer articleId = vo.getId();
@@ -118,25 +110,17 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = articleMapper.getArticleById(articleId);
         if(article == null || !article.getAuthorId().equals(userId)) return "非法操作";
 
-        switch (type) {
-            case "draft" -> {
-                if(!article.getStatus().equals("draft")) return "非法操作";
-            }
-            case "approved" -> {
-                if(!article.getStatus().equals("approved")) return "非法操作";
-            }
-            default -> {
-                return "非法操作";
-            }
-        }
-
         String title = vo.getTitle();
         String summary = vo.getSummary();
         String content = vo.getContent();
+
+        if(type.equals("approved")) {
+            articleMapper.updateArticleStatusById(articleId, "pending_review");
+        }
+
         int update = articleMapper.updateArticleById(articleId, title, summary, content);
         if(update != 1) return "发生了一些错误，请联系管理员";
 
-        // 状态更新：
         return null;
     }
 

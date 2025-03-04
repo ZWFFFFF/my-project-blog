@@ -28,19 +28,24 @@ public class ArticleController {
 
     /**
      * 新建文章（默认状态为草稿）
-     * @param vo 新建文章表单实体
+     * @param vo 文章表单实体
      * @return 响应实体
      */
     @PostMapping("/create-article")
     @Operation(summary = "新建文章(存为草稿)")
     public RestBean<Void> createDraft(@RequestBody @Valid CreateArticleVO vo) {
-        return RestBean.messageHandler(() -> articleService.createArticle(vo));
+        return RestBean.messageHandler(() -> articleService.createArticle(vo, "draft"));
     }
 
+    /**
+     * 投稿审核
+     * @param vo 文章表单实体
+     * @return 响应实体
+     */
     @PostMapping("/submission-review")
     @Operation(summary = "投稿审核")
     public RestBean<Void> submission(@RequestBody @Valid CreateArticleVO vo) {
-        return null;
+        return RestBean.messageHandler(() -> articleService.createArticle(vo, "pending_review"));
     }
 
     /**
