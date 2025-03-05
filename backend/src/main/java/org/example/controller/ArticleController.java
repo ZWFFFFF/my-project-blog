@@ -165,4 +165,59 @@ public class ArticleController {
     public RestBean<List<ArticleVO>> searchArticleByTitle(@RequestParam @NotNull String keyword) {
         return articleService.getArticleByTitle(keyword);
     }
+
+    /**
+     * 获取审核的文章信息
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @GetMapping("/reviewing-article-info")
+    @Operation(summary = "获取审核的文章信息")
+    public RestBean<ArticleVO> getReviewingArticle(@RequestParam @NotNull Integer articleId) {
+        return articleService.getReviewingArticle(articleId);
+    }
+
+    /**
+     * 开始文章审核
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @GetMapping("/start-review")
+    @Operation(summary = "开始审核")
+    public RestBean<Void> startReview(@RequestParam @NotNull Integer articleId) {
+        return RestBean.messageHandler(() -> articleService.startReview(articleId));
+    }
+
+    /**
+     * 审核通过
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @GetMapping("/approve-review")
+    @Operation(summary = "审核通过")
+    public RestBean<Void> approveReview(@RequestParam @NotNull Integer articleId) {
+        return RestBean.messageHandler(() -> articleService.approveReview(articleId));
+    }
+
+    /**
+     * 审核不通过
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @GetMapping("/reject-review")
+    @Operation(summary = "审核不通过")
+    public RestBean<Void> rejectReview(@RequestParam @NotNull Integer articleId) {
+        return RestBean.messageHandler(() -> articleService.rejectReview(articleId));
+    }
+
+    /**
+     * 重置审核状态
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @GetMapping("/reset-reviewing")
+    @Operation(summary = "重置审核状态")
+    public RestBean<Void> resetReviewing(@RequestParam @NotNull Integer articleId) {
+        return RestBean.messageHandler(() -> articleService.resetReviewing(articleId));
+    }
 }

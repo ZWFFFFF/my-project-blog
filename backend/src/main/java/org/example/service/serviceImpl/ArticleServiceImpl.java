@@ -9,6 +9,8 @@ import org.example.entity.vo.response.ArticleVO;
 import org.example.mapper.ArticleMapper;
 import org.example.service.AccountService;
 import org.example.service.ArticleService;
+import org.example.utils.Const;
+import org.example.utils.FlowUtil;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ public class ArticleServiceImpl implements ArticleService {
     private AccountService accountService;
     @Resource
     private ArticleMapper articleMapper;
+    @Resource
+    private FlowUtil flowUtil;
 
     /**
      * 新建文章(状态默认为草稿)
@@ -161,16 +165,16 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 获取待审核文章信息
+     * 获取审核文章信息
      * @param articleId 文章id
      * @return 响应实体
      */
     @Override
-    public RestBean<ArticleVO> getPendingReviewArticle(Integer articleId) {
+    public RestBean<ArticleVO> getReviewingArticle(Integer articleId) {
         Article article = articleMapper.getArticleById(articleId);
         if(article == null) return RestBean.argumentNotValid("文章不存在");
-        if(!article.getStatus().equals("pending_review")) return RestBean.argumentNotValid("非法操作");
-        // 要修改
+        if(!article.getStatus().equals("reviewing")) return RestBean.argumentNotValid("非法操作");
+
         ArticleVO vo = this.toArticleVO(article);
         return RestBean.success(vo);
     }
@@ -274,6 +278,126 @@ public class ArticleServiceImpl implements ArticleService {
             voList.add(this.toArticleVO(article));
         }
         return RestBean.success(voList);
+    }
+
+    /**
+     * 管理员开始审核文章
+     * @param articleId 文章id
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    @Transactional
+    public String startReview(Integer articleId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int reviewerId = Integer.parseInt(user.getUsername());
+
+        String lockKey = Const.REVIEW_LIMIT + articleId;
+        String lockValue = Const.REVIEW_VALUE + reviewerId;
+
+        if(!flowUtil.tryLock(lockKey, lockValue, 60)) {
+            return "该文章正在被审核，请勿重复操作";
+        }
+
+        try {
+            Article article = articleMapper.getArticleById(articleId);
+            if(article == null) return "文章不存在";
+            if(!article.getStatus().equals("pending_review")) return "该文章不在待审核状态，无法开始审核";
+
+            articleMapper.updateArticleStatusById(articleId, "reviewing");
+            return null;
+        } finally {
+            flowUtil.releaseLock(lockKey, lockValue);
+        }
+    }
+
+    /**
+     * 文章审核通过
+     * @param articleId 文章id
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Transactional
+    @Override
+    public String approveReview(Integer articleId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int reviewerId = Integer.parseInt(user.getUsername());
+
+        String lockKey = Const.REVIEW_LIMIT + articleId;
+        String lockValue = Const.REVIEW_VALUE + reviewerId;
+
+        if(!flowUtil.tryLock(lockKey, lockValue, 60)) {
+            return "该文章正在被审核，请勿重复操作";
+        }
+
+        try {
+            Article article = articleMapper.getArticleById(articleId);
+            if(article == null) return "文章不存在";
+            if(!article.getStatus().equals("reviewing")) return "该文章不在审核状态，无法开始通过审核";
+
+            articleMapper.updateArticleStatusById(articleId, "approved");
+            return null;
+        } finally {
+            flowUtil.releaseLock(lockKey, lockValue);
+        }
+    }
+
+    /**
+     * 文章审核拒绝通过
+     * @param articleId 文章id
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    @Transactional
+    public String rejectReview(Integer articleId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int reviewerId = Integer.parseInt(user.getUsername());
+
+        String lockKey = Const.REVIEW_LIMIT + articleId;
+        String lockValue = Const.REVIEW_VALUE + reviewerId;
+
+        if(!flowUtil.tryLock(lockKey, lockValue, 60)) {
+            return "该文章正在被审核，请勿重复操作";
+        }
+
+        try {
+            Article article = articleMapper.getArticleById(articleId);
+            if(article == null) return "文章不存在";
+            if(!article.getStatus().equals("reviewing")) return "该文章不在审核状态，无法开始取消通过审核";
+
+            articleMapper.updateArticleStatusById(articleId, "draft");
+            return null;
+        } finally {
+            flowUtil.releaseLock(lockKey, lockValue);
+        }
+    }
+
+    /**
+     * 重置文章审核状态
+     * @param articleId 文章id
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    @Transactional
+    public String resetReviewing(Integer articleId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        int reviewerId = Integer.parseInt(user.getUsername());
+
+        String lockKey = Const.REVIEW_LIMIT + articleId;
+        String lockValue = Const.REVIEW_VALUE + reviewerId;
+
+        if(!flowUtil.tryLock(lockKey, lockValue, 60)) {
+            return "该文章正在被审核，请勿操作";
+        }
+
+        try {
+            Article article = articleMapper.getArticleById(articleId);
+            if(article == null) return "文章不存在";
+            if(!article.getStatus().equals("reviewing")) return "该文章不在审核状态，无法开始取消通过审核";
+
+            articleMapper.updateArticleStatusById(articleId, "pending_review");
+            return null;
+        } finally {
+            flowUtil.releaseLock(lockKey, lockValue);
+        }
     }
 
     /**

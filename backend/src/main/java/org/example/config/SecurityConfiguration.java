@@ -54,9 +54,21 @@ public class SecurityConfiguration {
         return http
                 .authorizeHttpRequests(conf -> conf
                         .requestMatchers("/api/auth/**", "/error").permitAll()
-                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers(
+                                "/api/admin/**",
+                                "api/article/reviewing-article-info",
+                                "api/article/start-review",
+                                "api/article/approve-review",
+                                "api/article/reject-review",
+                                "api/article/reset-reviewing"
+                        ).hasAuthority("ADMIN")
                         .requestMatchers("/api/user/user-info").permitAll()
-                        .requestMatchers("/api/article/article-info", "/api/article/article-list", "/api/article/user-articles", "api/article/search").permitAll()
+                        .requestMatchers(
+                                "/api/article/article-info",
+                                "/api/article/article-list",
+                                "/api/article/user-articles",
+                                "api/article/search"
+                        ).permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated() // 任何请求都需要验证才可以通过
                 )

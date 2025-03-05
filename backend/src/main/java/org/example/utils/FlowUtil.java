@@ -16,17 +16,25 @@ public class FlowUtil {
     private StringRedisTemplate stringRedisTemplate;
 
     /**
-     * 针对于单次频率限制，请求成功后，在锁定时间内不得再次进行请求，如3秒内不能再次发起请求
-     * @param key 根据ip生成的键
-     * @param blockTime ip锁定时间，单位为秒
-     * @return true表示请求成功进行限制，false表示请求失败
+     * 针对于单次频率限制，分布式锁
+     * @param key 键
+     * @param value 值
+     * @param blockTime 锁定时间，单位为秒
+     * @return true表示成功进行限制，false表示失败
      */
-    public boolean limitOnceCheck(String key, int blockTime) {
-        if(Boolean.TRUE.equals(stringRedisTemplate.hasKey(key))) {
-            return false;
-        } else {
-            stringRedisTemplate.opsForValue().set(key, "", blockTime, TimeUnit.SECONDS);
-            return true;
+    public boolean tryLock(String key, String value, int blockTime) {
+        return Boolean.TRUE.equals(stringRedisTemplate.opsForValue().setIfAbsent(key, value, blockTime, TimeUnit.SECONDS));
+    }
+
+    /**
+     * 释放锁
+     * @param key 键
+     * @param value 值
+     */
+    public void releaseLock(String key, String value) {
+        String valueInRedis = stringRedisTemplate.opsForValue().get(key);
+        if(valueInRedis != null && valueInRedis.equals(value)) {
+            stringRedisTemplate.delete(key);
         }
     }
 

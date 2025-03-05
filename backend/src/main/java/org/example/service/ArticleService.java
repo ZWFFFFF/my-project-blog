@@ -14,11 +14,15 @@ public interface ArticleService {
     String updateArticle(String type, UpdateArticleVO vo);
     RestBean<ArticleVO> getPublishedArticle(Integer articleId);
     RestBean<ArticleVO> getDraft(Integer articleId);
-    RestBean<ArticleVO> getPendingReviewArticle(Integer articleId);
+    RestBean<ArticleVO> getReviewingArticle(Integer articleId);
     RestBean<List<ArticleVO>> getAllPublishedArticle();
     RestBean<List<ArticleVO>> getAllPendingReviewArticles();
     RestBean<List<ArticleVO>> getUserDrafts();
     RestBean<List<ArticleVO>> getUserReviewArticles();
     RestBean<List<ArticleVO>> getPublishedArticleByAuthorId(Integer authorId);
     RestBean<List<ArticleVO>> getArticleByTitle(String title);
+    String startReview(Integer articleId);
+    String approveReview(Integer articleId);
+    String rejectReview(Integer articleId);
+    String resetReviewing(Integer articleId);
 }

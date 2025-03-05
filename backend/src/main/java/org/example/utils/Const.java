@@ -11,5 +11,7 @@ public class Const {
     public static final int FILTER_ORDER_FLOW_LIMIT = -101;
     public static final String FLOW_LIMIT_COUNTER = "flow:limit:count:";
     public static final String FLOW_LIMIT_BLOCK = "flow:limit:block:";
+    public static final String REVIEW_LIMIT = "review:limit:";
+    public static final String REVIEW_VALUE = "reviewer:";
 
 }

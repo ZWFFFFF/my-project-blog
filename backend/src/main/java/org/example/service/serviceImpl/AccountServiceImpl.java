@@ -374,7 +374,7 @@ public class AccountServiceImpl implements AccountService {
      */
     private boolean verifyEmailCodeLimit(String ip) {
         String key = Const.VERIFY_EMAIL_LIMIT + ip;
-        return flowUtil.limitOnceCheck(key, 60);
+        return flowUtil.tryLock(key, "", 60);
     }
 
     /**
