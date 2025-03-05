@@ -191,6 +191,21 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
+     * 获取所有待审核文章
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<List<ArticleVO>> getAllPendingReviewArticles() {
+        List<Article> articles = articleMapper.getAllPendingReviewArticles();
+
+        List<ArticleVO> voList = new ArrayList<>();
+        for(Article article: articles) {
+            voList.add(this.toArticleVO(article));
+        }
+        return RestBean.success(voList);
+    }
+
+    /**
      * 获取当前用户所有草稿
      * @return 响应实体
      */
@@ -214,12 +229,12 @@ public class ArticleServiceImpl implements ArticleService {
      * @return 响应实体
      */
     @Override
-    public RestBean<List<ArticleVO>> getUserPendingReviewArticles() {
+    public RestBean<List<ArticleVO>> getUserReviewArticles() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Integer userId = Integer.valueOf(user.getUsername());
 
         List<Article> articles = articleMapper.getArticleByAuthorId(userId);
-        articles.removeIf(article -> !article.getStatus().equals("pending_review"));
+        articles.removeIf(article -> !(article.getStatus().equals("pending_review") || article.getStatus().equals("reviewing")));
 
         List<ArticleVO> voList = new ArrayList<>();
         for(Article article: articles) {

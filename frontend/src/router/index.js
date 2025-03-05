@@ -94,6 +94,11 @@ const routes = [
                 path: 'published',
                 name: 'writing-published',
                 component: () => import('@/views/writing/pages/PublishedPage.vue')
+            },
+            {
+                path: 'reviewing',
+                name: 'writing-reviewing',
+                component: () => import('@/views/writing/pages/ReviewingPage.vue')
             }
         ]
     }, {

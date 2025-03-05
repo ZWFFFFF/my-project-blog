@@ -26,7 +26,16 @@ function getUserDrafts(success) {
         url: 'api/article/draft-list',
         success: (data) => {
             success(data)
-        },
+        }
+    })
+}
+
+function getUserReviewArticles(success) {
+    get({
+        url: 'api/article/user-review-list',
+        success: (data) => {
+            success(data)
+        }
     })
 }
 
@@ -134,6 +143,6 @@ function submitToReview(article, success) {
 }
 export {
     getArticleList, getArticle, getDraft, getUserArticles,
-    getUserDrafts, searchArticleList, createArticle, updateArticle,
+    getUserDrafts, getUserReviewArticles, searchArticleList, createArticle, updateArticle,
     updateDraft, deleteArticle, deleteDraft, submitToReview
 }

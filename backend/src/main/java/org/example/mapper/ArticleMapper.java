@@ -19,6 +19,8 @@ public interface ArticleMapper {
     Article getArticleById(Integer id);
     @Select("select id, title, summary, authorId, createdAt, updatedAt, status, view, `like` from article where status = 'approved'")
     List<Article> getAllPublishedArticles();
+    @Select("select id, title, summary, authorId, createdAt, updatedAt, status, view, `like` from article where status = 'pending_review'")
+    List<Article> getAllPendingReviewArticles();
     @Select("select id, title, summary, authorId, createdAt, updatedAt, status, view, `like` from article where title like concat('%', #{title}, '%') and status = 'approved'")
     List<Article> getArticleByTitle(@Param("title") String title);
     @Select("select id, title, summary, authorId, createdAt, updatedAt, status, view, `like` from article where authorId = #{authorId}")

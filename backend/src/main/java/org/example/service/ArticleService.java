@@ -16,8 +16,9 @@ public interface ArticleService {
     RestBean<ArticleVO> getDraft(Integer articleId);
     RestBean<ArticleVO> getPendingReviewArticle(Integer articleId);
     RestBean<List<ArticleVO>> getAllPublishedArticle();
+    RestBean<List<ArticleVO>> getAllPendingReviewArticles();
     RestBean<List<ArticleVO>> getUserDrafts();
-    RestBean<List<ArticleVO>> getUserPendingReviewArticles();
+    RestBean<List<ArticleVO>> getUserReviewArticles();
     RestBean<List<ArticleVO>> getPublishedArticleByAuthorId(Integer authorId);
     RestBean<List<ArticleVO>> getArticleByTitle(String title);
 }

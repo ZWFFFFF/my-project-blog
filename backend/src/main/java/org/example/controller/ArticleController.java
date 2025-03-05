@@ -125,6 +125,16 @@ public class ArticleController {
     }
 
     /**
+     * 获取当前用户审核文章列表
+     * @return 响应实体
+     */
+    @GetMapping("/user-review-list")
+    @Operation(summary = "获取用户审核文章列表")
+    public RestBean<List<ArticleVO>> getUserReviewList() {
+        return articleService.getUserReviewArticles();
+    }
+
+    /**
      * 获取用户文章列表
      * @param userId 用户id
      * @return 响应实体

@@ -42,12 +42,17 @@ function userLogout() {
           <ul class="flex justify-start gap-x-10">
             <li :class="{ 'border-black border-b-2' : route.path === '/writing/draft'  }">
               <router-link to="/writing/draft">
-                <span class="font-bold text-xl">草稿管理</span>
+                <span class="font-bold text-xl">草稿</span>
               </router-link>
             </li>
             <li :class="{ 'border-black border-b-2' : route.path === '/writing/published' }">
               <router-link to="/writing/published">
                 <span class="font-bold text-xl">投稿管理</span>
+              </router-link>
+            </li>
+            <li :class="{ 'border-black border-b-2' : route.path === '/writing/reviewing' }">
+              <router-link to="/writing/reviewing">
+                <span class="font-bold text-xl">审核</span>
               </router-link>
             </li>
           </ul>
