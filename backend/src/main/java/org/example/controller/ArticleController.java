@@ -167,6 +167,26 @@ public class ArticleController {
     }
 
     /**
+     * 获取待审核文章列表
+     * @return 响应实体
+     */
+    @GetMapping("/pending-review-list")
+    @Operation(summary = "获取待审核文章列表")
+    public RestBean<List<ArticleVO>> getPendingReviewList() {
+        return articleService.getAllPendingReviewArticles();
+    }
+
+    /**
+     * 获取审核中文章列表
+     * @return 响应实体
+     */
+    @GetMapping("/reviewing-list")
+    @Operation(summary = "获取审核中文章列表")
+    public RestBean<List<ArticleVO>> getReviewingList() {
+        return articleService.getAllReviewingArticles();
+    }
+
+    /**
      * 获取审核的文章信息
      * @param articleId 文章id
      * @return 响应实体

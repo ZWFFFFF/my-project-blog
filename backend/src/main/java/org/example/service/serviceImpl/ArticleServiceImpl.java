@@ -210,6 +210,21 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
+     * 获取所有审核中文章
+     * @return 响应实体
+     */
+    @Override
+    public RestBean<List<ArticleVO>> getAllReviewingArticles() {
+        List<Article> articles = articleMapper.getAllReviewingArticles();
+
+        List<ArticleVO> voList = new ArrayList<>();
+        for(Article article: articles) {
+            voList.add(this.toArticleVO(article));
+        }
+        return RestBean.success(voList);
+    }
+
+    /**
      * 获取当前用户所有草稿
      * @return 响应实体
      */
