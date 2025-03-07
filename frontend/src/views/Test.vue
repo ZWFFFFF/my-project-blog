@@ -1,23 +1,35 @@
-<script setup>
-import { onMounted } from 'vue'
-
-const test = () => {
-  let a = 1;
-  if(a === 1) {
-    console.log('a is 1')
-    return;
-  }
-  console.log('a is not 1')
-}
-
-onMounted(() => {
-  test()
-})
-</script>
-
 <template>
+  <div class="flex flex-1 items-center justify-center">
+    <div class="p-4">
+      <DropdownMenu
+          :options="options"
+          @option-selected="handleOptionSelected"
+      >
+        <span>select</span>
+      </DropdownMenu>
+    </div>
+  </div>
 </template>
 
-<style scoped>
+<script setup>
+import DropdownMenu from '@/components/DropdownMenu.vue';
+import {User} from "@element-plus/icons-vue";
+import router from "@/router/index.js";
 
-</style>
+const options = [
+  {
+    label: '个人中心',
+    icon: User,
+    onClick: () => { router.push('/') }
+  }, {
+    label: '退出',
+    icon: User,
+    onClick: () => {}
+  }
+]
+
+// Handle selected option
+const handleOptionSelected = (option) => {
+  option.onClick();
+};
+</script>

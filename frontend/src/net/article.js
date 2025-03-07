@@ -141,8 +141,99 @@ function submitToReview(article, success) {
         }
     })
 }
+
+function getPendingReviewList(success) {
+    get({
+        url: 'api/article/pending-review-list',
+        success: (data) => {
+            success(data)
+        }
+    })
+}
+
+function getReviewingList(success) {
+    get({
+        url: 'api/article/reviewing-list',
+        success: (data) => {
+            success(data)
+        }
+    })
+}
+
+function getReviewedArticle(id, success, failure = () => {}) {
+    get({
+        url: 'api/article/reviewing-article-info?articleId=' + id,
+        success: (data) => {
+            success(data)
+        },
+        failure: (message, code, url) => {
+            console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
+            ElMessage.warning(message)
+            failure()
+        }
+    })
+}
+
+function startReview(articleId, success, failure = () => {}) {
+    get({
+        url: 'api/article/start-review?articleId=' + articleId,
+        success: (data) => {
+            success(data)
+        },
+        failure: (message, code, url) => {
+            console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
+            ElMessage.warning(message)
+            failure()
+        }
+    })
+}
+
+function approveReview(articleId, success, failure = () => {}) {
+    get({
+        url: 'api/article/approve-review?articleId=' + articleId,
+        success: (data) => {
+            success(data)
+        },
+        failure: (message, code, url) => {
+            console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
+            ElMessage.warning(message)
+            failure()
+        }
+    })
+}
+
+function rejectReview(articleId, success, failure = () => {}) {
+    get({
+        url: 'api/article/reject-review?articleId=' + articleId,
+        success: (data) => {
+            success(data)
+        },
+        failure: (message, code, url) => {
+            console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
+            ElMessage.warning(message)
+            failure()
+        }
+    })
+}
+
+function resetReviewing(articleId, success, failure = () => {}) {
+    get({
+        url: 'api/article/reset-reviewing?articleId=' + articleId,
+        success: (data) => {
+            success(data)
+        },
+        failure: (message, code, url) => {
+            console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
+            ElMessage.warning(message)
+            failure()
+        }
+    })
+}
+
 export {
     getArticleList, getArticle, getDraft, getUserArticles,
-    getUserDrafts, getUserReviewArticles, searchArticleList, createArticle, updateArticle,
-    updateDraft, deleteArticle, deleteDraft, submitToReview
+    getUserDrafts, getUserReviewArticles, searchArticleList, createArticle,
+    updateArticle, updateDraft, deleteArticle, deleteDraft,
+    submitToReview, getPendingReviewList, getReviewingList, getReviewedArticle,
+    startReview, approveReview, rejectReview, resetReviewing
 }

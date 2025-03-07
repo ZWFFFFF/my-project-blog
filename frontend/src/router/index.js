@@ -102,6 +102,13 @@ const routes = [
             }
         ]
     }, {
+        path: '/manage',
+        name: 'manage',
+        component: () => import('@/views/manage/ManageView.vue'),
+        children: [
+
+        ]
+    }, {
         path: '/:pathMatch(.*)*',
         name: 'notfound',
         component: () => import('@/views/NotFoundView.vue')
