@@ -106,7 +106,11 @@ const routes = [
         name: 'manage',
         component: () => import('@/views/manage/ManageView.vue'),
         children: [
-
+            {
+                path: 'article/review',
+                name: 'manage-article-review',
+                component: () => import('@/views/manage/pages/ReviewPage.vue')
+            }
         ]
     }, {
         path: '/:pathMatch(.*)*',

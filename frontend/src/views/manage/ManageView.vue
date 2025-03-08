@@ -2,7 +2,7 @@
 import {DocumentChecked, DocumentDelete, Remove, User, UserFilled, SwitchButton} from "@element-plus/icons-vue";
 import {logout} from "@/net/auth.js";
 import {useStore} from "vuex";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {getUserInfo} from "@/net/user.js";
 import {onMounted, reactive} from "vue";
 import DropdownMenu from "@/components/DropdownMenu.vue";
@@ -10,6 +10,8 @@ import DropdownMenu from "@/components/DropdownMenu.vue";
 const store = useStore()
 
 const router = useRouter()
+
+const route = useRoute()
 
 const user = reactive({})
 
@@ -49,27 +51,18 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-100 flex">
+  <div class="h-screen bg-gray-100 flex">
     <!-- aside -->
     <aside class="w-56  text-gray-700 h-screen z-10 bg-[#fff] flex flex-col">
       <div class="p-4 mx-auto">
         <h2 class="text-xl font-bold">管理面板</h2>
       </div>
-      <div class="flex flex-col gap-2 px-2">
-        <div>
-          <div class="px-5 text-gray-500 h-9 flex items-center">用户管理</div>
-          <div class="mt-1 h-10 rounded border hover:bg-gray-100">
-            <router-link class="px-5 h-full flex items-center" to="">
-              <div class="mr-2 mt-1">
-                <el-icon><Remove /></el-icon>
-              </div>
-              <div class="text-sm"><span>封禁/解禁 用户</span></div>
-            </router-link>
-          </div>
-        </div>
-        <div>
+      <div class="flex flex-col gap-4 px-2">
+        <div class="flex flex-col gap-2">
           <div class="px-5 text-gray-500 h-9 flex items-center">文章管理</div>
-          <div class="mt-1 h-10 rounded border hover:bg-gray-100">
+          <div
+              :class="['h-10 rounded border hover:bg-gray-100 shadow-sm', route.name === 'manage-article-review' ? 'ring-1 ring-gray-300 bg-gray-100' : 'ring-transparent']"
+          >
             <router-link class="px-5 h-full flex items-center" to="">
               <div class="mr-2 mt-1">
                 <el-icon><DocumentChecked /></el-icon>
@@ -77,7 +70,7 @@ onMounted(() => {
               <div class="text-sm"><span>文章审核</span></div>
             </router-link>
           </div>
-          <div class="mt-1 h-10 rounded border hover:bg-gray-100">
+          <div class="h-10 rounded border hover:bg-gray-100 shadow-sm">
             <router-link class="px-5 h-full flex items-center" to="">
               <div class="mr-2 mt-1">
                 <el-icon ><DocumentDelete /></el-icon>
@@ -87,8 +80,19 @@ onMounted(() => {
           </div>
         </div>
         <div>
+          <div class="px-5 text-gray-500 h-9 flex items-center">用户管理</div>
+          <div class="mt-1 h-10 rounded border hover:bg-gray-100 shadow-sm">
+            <router-link class="px-5 h-full flex items-center" to="">
+              <div class="mr-2 mt-1">
+                <el-icon><Remove /></el-icon>
+              </div>
+              <div class="text-sm"><span>封禁/解禁 用户</span></div>
+            </router-link>
+          </div>
+        </div>
+        <div>
           <div class="px-5 text-gray-500 h-9 flex items-center">用户</div>
-          <div class="mt-1 h-10 rounded border hover:bg-gray-100">
+          <div class="mt-1 h-10 rounded border hover:bg-gray-100 shadow-sm">
             <router-link class="px-5 h-full flex items-center" to="">
               <div class="mr-2 mt-1">
                 <el-icon><User /></el-icon>
@@ -100,7 +104,10 @@ onMounted(() => {
       </div>
     </aside>
     <div class="flex flex-col flex-1">
-      <div id="header" class="w-full h-16 border flex justify-end items-center px-5 bg-[#fff]">
+      <div id="header" class="w-full h-16 border flex justify-between items-center px-5 bg-[#fff]">
+        <div>
+          <span>文章审核</span>
+        </div>
         <DropdownMenu
             :options="dropdownMenuOptions"
             @option-selected="handleOptionSelected"
@@ -111,11 +118,9 @@ onMounted(() => {
           </div>
         </DropdownMenu>
       </div>
-      <div id="content" class="flex-1">
-        <main class="h-full w-full p-4">
-          <div class="bg-[#fff] h-full w-full rounded-lg">
-            <router-view></router-view>
-          </div>
+      <div id="content" class="flex-1 flex flex-col overflow-hidden">
+        <main class="p-4 flex-1 overflow-auto">
+          <router-view></router-view>
         </main>
       </div>
     </div>

@@ -25,7 +25,7 @@
     >
       <div
           v-if="isOpen"
-          class="absolute left-1/2 -translate-x-1/2 mt-2 w-36 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
+          class="absolute left-1/2 -translate-x-1/2 mt-2 w-36 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
       >
         <div class="p-1">
           <div
