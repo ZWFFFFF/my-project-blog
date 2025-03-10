@@ -51,9 +51,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="h-screen bg-gray-100 flex">
+  <div class="container h-screen bg-gray-100 flex">
     <!-- aside -->
-    <aside class="w-56  text-gray-700 h-screen z-10 bg-[#fff] flex flex-col">
+    <aside class="w-56 text-gray-700 h-screen z-10 bg-[#fff] flex flex-col">
       <div class="p-4 mx-auto">
         <h2 class="text-xl font-bold">管理面板</h2>
       </div>
@@ -61,7 +61,7 @@ onMounted(() => {
         <div class="flex flex-col gap-2">
           <div class="px-5 text-gray-500 h-9 flex items-center">文章管理</div>
           <div
-              :class="['h-10 rounded border hover:bg-gray-100 shadow-sm', route.name === 'manage-article-review' ? 'ring-1 ring-gray-300 bg-gray-100' : 'ring-transparent']"
+              :class="['h-10 rounded border hover:bg-gray-100 shadow-sm', route.name.startsWith('manage-article-review') ? 'ring-1 ring-gray-300 bg-gray-100' : 'ring-transparent']"
           >
             <router-link class="px-5 h-full flex items-center" to="">
               <div class="mr-2 mt-1">
@@ -103,7 +103,7 @@ onMounted(() => {
         </div>
       </div>
     </aside>
-    <div class="flex flex-col flex-1">
+    <div class="container flex flex-col flex-1 overflow-auto">
       <div id="header" class="w-full h-16 border flex justify-between items-center px-5 bg-[#fff]">
         <div>
           <span>文章审核</span>

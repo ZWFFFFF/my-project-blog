@@ -160,72 +160,50 @@ function getReviewingList(success) {
     })
 }
 
-function getReviewedArticle(id, success, failure = () => {}) {
+function getReviewedArticle(id, success) {
     get({
         url: 'api/article/reviewing-article-info?articleId=' + id,
         success: (data) => {
             success(data)
-        },
-        failure: (message, code, url) => {
-            console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
-            ElMessage.warning(message)
-            failure()
         }
     })
 }
 
-function startReview(articleId, success, failure = () => {}) {
+function startReview(articleId, success) {
     get({
         url: 'api/article/start-review?articleId=' + articleId,
-        success: (data) => {
-            success(data)
-        },
-        failure: (message, code, url) => {
-            console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
-            ElMessage.warning(message)
-            failure()
+        success: () => {
+            success()
         }
     })
 }
 
-function approveReview(articleId, success, failure = () => {}) {
+function approveReview(articleId, success) {
     get({
         url: 'api/article/approve-review?articleId=' + articleId,
-        success: (data) => {
-            success(data)
-        },
-        failure: (message, code, url) => {
-            console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
-            ElMessage.warning(message)
-            failure()
+        success: () => {
+            ElMessage.success('审核成功')
+            success()
         }
     })
 }
 
-function rejectReview(articleId, success, failure = () => {}) {
+function rejectReview(articleId, success) {
     get({
         url: 'api/article/reject-review?articleId=' + articleId,
-        success: (data) => {
-            success(data)
-        },
-        failure: (message, code, url) => {
-            console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
-            ElMessage.warning(message)
-            failure()
+        success: () => {
+            ElMessage.success('审核成功')
+            success()
         }
     })
 }
 
-function resetReviewing(articleId, success, failure = () => {}) {
+function resetReviewing(articleId, success) {
     get({
         url: 'api/article/reset-reviewing?articleId=' + articleId,
-        success: (data) => {
-            success(data)
-        },
-        failure: (message, code, url) => {
-            console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
-            ElMessage.warning(message)
-            failure()
+        success: () => {
+            ElMessage.success('操作成功')
+            success()
         }
     })
 }

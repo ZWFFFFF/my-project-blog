@@ -1,8 +1,10 @@
 <script setup>
 import {ref, onMounted} from 'vue';
 import {convertToLocalTime, throttle} from "@/net/utils.js";
-import {getPendingReviewList, getReviewingList} from "@/net/article.js";
-import {DocumentChecked} from "@element-plus/icons-vue";
+import {getPendingReviewList, getReviewingList, resetReviewing, startReview} from "@/net/article.js";
+import {useRouter} from "vue-router";
+
+const router = useRouter()
 
 const tableData = ref([])
 
@@ -13,7 +15,6 @@ const fetchPendingReviewArticles = () => {
       createdAt: convertToLocalTime(item.createdAt),
       updatedAt: convertToLocalTime(item.updatedAt)
     }))
-    console.log(tableData.value)
   })
 }
 
@@ -53,6 +54,20 @@ const handleReviewing = () => {
   fetchReviewingArticles()
 };
 
+function reviewArticle(id) {
+  if(confirm('是否要审核该文章')) {
+    startReview(id, () => router.push('review/' + id))
+  }
+}
+
+function cancelReviewing(id) {
+  if(confirm('是否要取消该文章的审核'))  {
+    resetReviewing(id, () => {
+      fetchReviewingArticles()
+    })
+  }
+}
+
 onMounted(() => {
   fetchPendingReviewArticles()
 })
@@ -60,9 +75,9 @@ onMounted(() => {
 
 <template>
   <div class="h-full">
-    <div class="bg-white">
-      <div class="p-8">
-        <span class="text-2xl">文章审核</span>
+    <div class="bg-white py-8 rounded-md">
+      <div class="py-4 px-8">
+        <span class="text-xl">文章审核</span>
       </div>
       <div class="m-4">
         <div
@@ -88,8 +103,10 @@ onMounted(() => {
           <el-table-column prop="createdAt" label="创建于" width="280" />
           <el-table-column prop="updatedAt" label="修改于" width="280" />
           <el-table-column label="操作">
-            <span v-show="activeTab === 'pending'" class="text-base font-black cursor-pointer">审核</span>
-            <span v-show="activeTab === 'reviewing'" class="text-base font-black cursor-pointer">取消</span>
+            <template #default="scope">
+              <span v-show="activeTab === 'pending'" class="text-base font-black cursor-pointer" @click="reviewArticle(scope.row.id)">审核</span>
+              <span v-show="activeTab === 'reviewing'" class="text-base font-black cursor-pointer" @click="cancelReviewing(scope.row.id)">取消</span>
+            </template>
           </el-table-column>
         </el-table>
       </div>

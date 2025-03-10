@@ -107,9 +107,19 @@ const routes = [
         component: () => import('@/views/manage/ManageView.vue'),
         children: [
             {
+              path: '',
+              name: 'manage-index',
+              redirect: '/manage/article/review',
+            },
+            {
                 path: 'article/review',
                 name: 'manage-article-review',
                 component: () => import('@/views/manage/pages/ReviewPage.vue')
+            },
+            {
+                path: 'article/review/:id',
+                name: 'manage-article-review-info',
+                component: () => import('@/views/manage/pages/ReviewInfoPage.vue')
             }
         ]
     }, {
