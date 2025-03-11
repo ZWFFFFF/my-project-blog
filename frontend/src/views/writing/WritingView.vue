@@ -6,6 +6,7 @@ import store from "@/store/index.js";
 import DropdownMenu from "@/components/DropdownMenu.vue";
 import {getUserInfo} from "@/net/user.js";
 import {onMounted, reactive} from "vue";
+import {throttle} from "@/net/utils.js";
 const router = useRouter()
 const route = useRoute()
 const user = reactive({})
@@ -46,6 +47,13 @@ function userLogout() {
 onMounted(() => {
   fetchUserInfo(store.state.userId) // 信息更新后需要重新获取
 })
+
+function linkTo(path) {
+  router.push(path)
+}
+
+const throttledLinkTo = throttle(linkTo, 500)
+
 </script>
 
 <template>
@@ -74,19 +82,13 @@ onMounted(() => {
         <div class="container mx-auto w-2/3 mb-4">
           <ul class="flex justify-start gap-x-10">
             <li :class="{ 'border-black border-b-2' : route.path === '/writing/draft'  }">
-              <router-link to="/writing/draft">
-                <span class="font-bold text-xl">草稿</span>
-              </router-link>
+              <span class="font-bold text-xl cursor-pointer" @click="throttledLinkTo('/writing/draft')">草稿</span>
             </li>
             <li :class="{ 'border-black border-b-2' : route.path === '/writing/published' }">
-              <router-link to="/writing/published">
-                <span class="font-bold text-xl">投稿管理</span>
-              </router-link>
+              <span class="font-bold text-xl cursor-pointer" @click="throttledLinkTo('/writing/published')">投稿管理</span>
             </li>
             <li :class="{ 'border-black border-b-2' : route.path === '/writing/reviewing' }">
-              <router-link to="/writing/reviewing">
-                <span class="font-bold text-xl">审核</span>
-              </router-link>
+              <span class="font-bold text-xl cursor-pointer" @click="throttledLinkTo('/writing/reviewing')">审核</span>
             </li>
           </ul>
         </div>

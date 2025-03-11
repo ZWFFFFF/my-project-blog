@@ -58,7 +58,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-white pt-20 min-h-screen">
+  <div class="bg-white pt-20 h-full border-t">
     <div class="container mx-auto w-1/2">
       <div class="mb-20">
         <div class="mb-4 break-words"><h1 class="font-extrabold text-4xl">{{ article.title }}</h1></div>

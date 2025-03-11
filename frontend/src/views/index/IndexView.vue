@@ -58,7 +58,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="bg-gray-100 w-full min-h-screen">
+  <div class="bg-gray-100 w-full min-h-screen flex flex-col">
     <header>
       <div class="bg-white flex justify-between p-4 gap-4 items-center">
         <div class="w-1/2 flex gap-8">
@@ -85,8 +85,8 @@ onMounted(() => {
         </div>
       </div>
     </header>
-    <div>
-      <div class="w-full">
+    <div class="flex-1 flex">
+      <div class="w-full flex-1 overflow-auto">
         <router-view></router-view>
       </div>
     </div>

@@ -4,7 +4,7 @@ import {logout} from "@/net/auth.js";
 import {useStore} from "vuex";
 import {useRoute, useRouter} from "vue-router";
 import {getUserInfo} from "@/net/user.js";
-import {onMounted, reactive} from "vue";
+import {onMounted, reactive, computed} from "vue";
 import DropdownMenu from "@/components/DropdownMenu.vue";
 
 const store = useStore()
@@ -14,6 +14,10 @@ const router = useRouter()
 const route = useRoute()
 
 const user = reactive({})
+
+const title = computed(() => {
+  if (route.name.startsWith('manage-article-review')) return '文章审核'
+})
 
 const dropdownMenuOptions = [
   {
@@ -63,7 +67,7 @@ onMounted(() => {
           <div
               :class="['h-10 rounded border hover:bg-gray-100 shadow-sm', route.name.startsWith('manage-article-review') ? 'ring-1 ring-gray-300 bg-gray-100' : 'ring-transparent']"
           >
-            <router-link class="px-5 h-full flex items-center" to="">
+            <router-link class="px-5 h-full flex items-center" to="/manage/article/review">
               <div class="mr-2 mt-1">
                 <el-icon><DocumentChecked /></el-icon>
               </div>
@@ -106,7 +110,7 @@ onMounted(() => {
     <div class="container flex flex-col flex-1 overflow-auto">
       <div id="header" class="w-full h-16 border flex justify-between items-center px-5 bg-[#fff]">
         <div>
-          <span>文章审核</span>
+          <span>{{ title }}</span>
         </div>
         <DropdownMenu
             :options="dropdownMenuOptions"

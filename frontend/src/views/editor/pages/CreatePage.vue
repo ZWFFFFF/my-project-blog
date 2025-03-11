@@ -37,7 +37,7 @@ defineExpose({
           <textarea ref="summaryRef" v-model="article.summary" @input="updateTextareaHeight" maxlength="500" placeholder="输入摘要" class="px-4 w-full h-6 outline-none resize-none"></textarea>
         </div>
       </div>
-      <div class="my-8">
+      <div>
         <QuillEditor
             ref="editorRef"
             v-model:content="article.content"

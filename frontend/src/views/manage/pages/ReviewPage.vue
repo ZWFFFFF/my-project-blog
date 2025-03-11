@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onMounted} from 'vue';
+import {ref, onMounted, computed} from 'vue';
 import {convertToLocalTime, throttle} from "@/net/utils.js";
 import {getPendingReviewList, getReviewingList, resetReviewing, startReview} from "@/net/article.js";
 import {useRouter} from "vue-router";
@@ -7,6 +7,9 @@ import {useRouter} from "vue-router";
 const router = useRouter()
 
 const tableData = ref([])
+const searchKeyword = ref(''); // 搜索关键字
+const searchColumn = ref('id'); // 默认搜索列
+const activeTab = ref('pending');
 
 const fetchPendingReviewArticles = () => {
   getPendingReviewList((data) => {
@@ -27,8 +30,6 @@ const fetchReviewingArticles = () => {
     }))
   })
 }
-
-const activeTab = ref('pending');
 
 const toggleSwitch = () => {
   activeTab.value = activeTab.value === 'pending' ? 'reviewing' : 'pending';
@@ -68,6 +69,17 @@ function cancelReviewing(id) {
   }
 }
 
+// 根据搜索关键字和列过滤表格数据
+const filteredTableData = computed(() => {
+  if (!searchKeyword.value) {
+    return tableData.value; // 如果没有搜索关键字，返回全部数据
+  }
+  const keyword = searchKeyword.value.toLowerCase();
+  return tableData.value.filter((row) => {
+    return String(row[searchColumn.value]).toLowerCase().includes(keyword);
+  });
+});
+
 onMounted(() => {
   fetchPendingReviewArticles()
 })
@@ -77,7 +89,7 @@ onMounted(() => {
   <div class="h-full">
     <div class="bg-white py-8 rounded-md">
       <div class="py-4 px-8">
-        <span class="text-xl">文章审核</span>
+        <span class="text-xl font-bold">文章审核</span>
       </div>
       <div class="m-4">
         <div
@@ -97,7 +109,23 @@ onMounted(() => {
         </div>
       </div>
       <div class="px-4">
-        <el-table :data="tableData" style="width: 100%">
+        <!-- 搜索框和列选择器 -->
+        <div class="mb-5">
+          <el-select v-model="searchColumn" placeholder="请选择搜索列" style="width: 150px; margin-right: 10px;">
+            <el-option label="文章 ID" value="id" />
+            <el-option label="用户 ID" value="authorId" />
+            <el-option label="创建时间" value="createdAt" />
+            <el-option label="修改时间" value="updatedAt" />
+          </el-select>
+          <el-input
+              v-model="searchKeyword"
+              placeholder="请输入搜索关键字"
+              clearable
+              style="width: 300px;"
+          />
+        </div>
+        <!-- 表格 -->
+        <el-table :data="filteredTableData" style="width: 100%" empty-text="No Data">
           <el-table-column prop="id" label="文章id" width="200" />
           <el-table-column prop="authorId" label="用户id" width="200" />
           <el-table-column prop="createdAt" label="创建于" width="280" />
@@ -115,5 +143,4 @@ onMounted(() => {
 </template>
 
 <style scoped>
-
 </style>

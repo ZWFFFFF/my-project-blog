@@ -68,8 +68,8 @@ function update(type) {
 </script>
 
 <template>
-  <div class="mx-auto min-h-screen w-full">
-    <header class="w-full px-4">
+  <div class="mx-auto min-h-screen w-full flex flex-col">
+    <header class="w-full px-4 border-b">
       <div class="flex justify-between items-center py-4">
         <div class="flex items-center w-1/2 gap-8">
           <button class="font-extrabold text-2xl" @click="router.push('/')">Logo</button>
@@ -85,7 +85,7 @@ function update(type) {
         </div>
       </div>
     </header>
-    <div class="w-full mt-8">
+    <div class="w-full mt-8 mb-20 flex-1 flex overflow-auto">
       <router-view v-slot="{ Component }">
         <component :is="Component" ref="editorRef"/>
       </router-view>
