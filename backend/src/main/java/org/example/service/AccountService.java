@@ -14,7 +14,6 @@ import java.util.List;
 
 public interface AccountService extends UserDetailsService {
     Account findAccountByUsername(String username);
-    Account findAccountByEmail(String email);
     String emailVerifyCode(String type, String email, String ip);
     RestBean<AuthorizeVO> loginByVerifyCode(VerifyCodeLoginVO vo);
     String registerAccount(EmailRegisterVO vo);

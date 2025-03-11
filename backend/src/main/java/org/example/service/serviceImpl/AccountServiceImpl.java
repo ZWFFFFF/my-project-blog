@@ -75,16 +75,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
-     * 从数据库中通过邮箱查找用户
-     * @param email 邮箱
-     * @return 用户实例
-     */
-    @Override
-    public Account findAccountByEmail(String email) {
-        return accountMapper.getAccountByEmail(email);
-    }
-
-    /**
      * 生成注册验证码存入Redis中限时5分钟，并将邮件发送请求提交到消息队列等待监听器获取并发送邮件
      * @param type 邮件类型
      * @param email 邮箱

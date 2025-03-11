@@ -109,51 +109,53 @@ function userLogin() {
       <p class="text-gray-500 font-semibold">请选择邮箱验证码登录或密码登录</p>
     </div>
     <div class="pt-12 px-12">
-      <div v-show="active === 0">
-        <el-form ref="verifyCodeLoginFormRef" :model="verifyCodeLoginForm" :rules="rules">
-          <el-form-item prop="email">
-            <el-input v-model="verifyCodeLoginForm.email" type="text" maxlength="20" placeholder="邮箱" clearable>
-              <template #prefix>
-                <el-icon><Message/></el-icon>
-              </template>
-            </el-input>
-          </el-form-item>
-          <el-form-item prop="code">
-            <el-input v-model="verifyCodeLoginForm.code" type="text" maxlength="6" placeholder="邮箱验证码">
-              <template #append>
-                <el-button :disabled="!isEmailValid || coldTime !== 0" @click="askCode">
-                  {{ coldTime > 0 ? `已发送(${coldTime}s)` : '获取验证码' }}
-                </el-button>
-              </template>
-            </el-input>
-          </el-form-item>
-        </el-form>
-        <el-row justify="start">
-          <el-link @click="active++">密码登录</el-link>
-        </el-row>
-      </div>
-      <div v-show="active === 1">
-        <el-form ref="passwordLoginFormRef" :model="passwordLoginForm" :rules="rules">
-          <el-form-item prop="username">
-            <el-input v-model="passwordLoginForm.username" type="text" maxlength="20" placeholder="邮箱" clearable>
-              <template #prefix>
-                <el-icon><User/></el-icon>
-              </template>
-            </el-input>
-          </el-form-item>
-          <el-form-item prop="password">
-            <el-input v-model="passwordLoginForm.password" type="password" maxlength="20" placeholder="密码" show-password>
-              <template #prefix>
-                <el-icon><Lock/></el-icon>
-              </template>
-            </el-input>
-          </el-form-item>
-          <el-row justify="space-between">
-            <el-link @click="active--">验证码登录</el-link>
-            <el-link @click="router.push('/welcome/forget')">忘记密码</el-link>
+      <transition name="el-fade-in-linear" mode="out-in">
+        <div v-if="active === 0">
+          <el-form ref="verifyCodeLoginFormRef" :model="verifyCodeLoginForm" :rules="rules">
+            <el-form-item prop="email">
+              <el-input v-model="verifyCodeLoginForm.email" type="text" maxlength="20" placeholder="邮箱" clearable>
+                <template #prefix>
+                  <el-icon><Message/></el-icon>
+                </template>
+              </el-input>
+            </el-form-item>
+            <el-form-item prop="code">
+              <el-input v-model="verifyCodeLoginForm.code" type="text" maxlength="6" placeholder="邮箱验证码">
+                <template #append>
+                  <el-button :disabled="!isEmailValid || coldTime !== 0" @click="askCode">
+                    {{ coldTime > 0 ? `已发送(${coldTime}s)` : '获取验证码' }}
+                  </el-button>
+                </template>
+              </el-input>
+            </el-form-item>
+          </el-form>
+          <el-row justify="start">
+            <el-link @click="active++">密码登录</el-link>
           </el-row>
-        </el-form>
-      </div>
+        </div>
+        <div v-else>
+          <el-form ref="passwordLoginFormRef" :model="passwordLoginForm" :rules="rules">
+            <el-form-item prop="username">
+              <el-input v-model="passwordLoginForm.username" type="text" maxlength="20" placeholder="邮箱" clearable>
+                <template #prefix>
+                  <el-icon><User/></el-icon>
+                </template>
+              </el-input>
+            </el-form-item>
+            <el-form-item prop="password">
+              <el-input v-model="passwordLoginForm.password" type="password" maxlength="20" placeholder="密码" show-password>
+                <template #prefix>
+                  <el-icon><Lock/></el-icon>
+                </template>
+              </el-input>
+            </el-form-item>
+            <el-row justify="space-between">
+              <el-link @click="active--">验证码登录</el-link>
+              <el-link @click="router.push('/welcome/forget')">忘记密码</el-link>
+            </el-row>
+          </el-form>
+        </div>
+      </transition>
       <div class="pt-5">
         <el-button @click="userLogin" class="w-36">登录</el-button>
       </div>

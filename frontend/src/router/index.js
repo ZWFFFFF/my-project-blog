@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import {isAuthorized} from "@/net/auth.js";
+import {getAuthRole, isAuthorized} from "@/net/auth.js";
+import {ElMessage} from "element-plus";
 
 // vue路由：根据不同的url渲染不同的vue组件，所有组件只在单页面上渲染
 
@@ -142,10 +143,32 @@ const router = createRouter(
 )
 
 // 配置导航守卫
-router.beforeEach((to, from) => {
+router.beforeEach((to) => {
     const isAuthenticated = isAuthorized()
-    if(isAuthenticated && to.name.startsWith('welcome')) return { name: 'index-home' } // 已登录，却访问登录页面，返回主页面
+    const role = getAuthRole()
+
     if(!isAuthenticated && !to.name.startsWith('welcome')) return { name: 'welcome-login' } // 未登录，却访问非登录页面，返回登录页面
+
+    if(isAuthenticated && to.name.startsWith('welcome')) {
+        // 已登录，却访问登录页面，根据角色重定向
+        if (role === 'ADMIN') {
+            return { name: 'manage-index' } // 管理员跳转到管理页面
+        } else {
+            return { name: 'index-home' } // 普通用户跳转到主页面
+        }
+    }
+
+    // 管理员，登录后返回管理页面
+    if(role === 'ADMIN' && to.name.startsWith('index')) {
+        return { name: 'manage-index' }
+    }
+
+    // 普通用户，却访问管理员页面，返回主页面
+    if(role === 'USER' && to.name.startsWith('manage')) {
+        ElMessage.warning('非法操作')
+        return { name: 'index-home' }
+    }
+
     return true;
 })
 

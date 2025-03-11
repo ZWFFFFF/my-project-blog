@@ -49,7 +49,7 @@ function deleteWriting(id) {
   <div>
     <div class="container mx-auto w-2/3">
       <div class="flex flex-col gap-8">
-        <div v-for="(article, index) in articleList" :key="article.id" class="bg-white w-full min-h-72 p-8 flex flex-col justify-between gap-8">
+        <div v-for="article in articleList" :key="article.id" class="bg-white w-full min-h-72 p-8 flex flex-col justify-between gap-8 rounded-md shadow-md ring-1 ring-black ring-opacity-5">
           <div>
             <h3 class="mb-4 font-bold text-xl truncate">{{ article.title }}</h3>
             <p class="break-words">{{ article.summary }}</p>

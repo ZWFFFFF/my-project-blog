@@ -8,8 +8,8 @@ import keys from "@/net/const.js";
 const authItemName = keys.authItemName
 
 // access_token保存
-function storeAccessToken(token, expire, id) {
-    const authObj = { token: token, expire: expire, id: id}
+function storeAccessToken(token, expire, id, role) {
+    const authObj = { token: token, expire: expire, id: id, role: role}
     const strAuthObj = JSON.stringify(authObj)
     localStorage.setItem(authItemName, strAuthObj)
 }
@@ -17,6 +17,13 @@ function storeAccessToken(token, expire, id) {
 // 是否有权限校验（没有token返回false）
 function isAuthorized() {
     return takeAccessToken() !== null
+}
+
+function getAuthRole() {
+    const str = localStorage.getItem(authItemName)
+    if(str === null) return null
+    const authObj = JSON.parse(str)
+    return authObj.role
 }
 
 // 密码登录
@@ -32,7 +39,7 @@ function passwordLogin(username, password, success) {
             'Content-Type': 'application/x-www-form-urlencoded' // 数据以表单形式发送
         },
         success: (data) => {
-            storeAccessToken(data.token, data.expire, data.id)
+            storeAccessToken(data.token, data.expire, data.id, data.role)
             ElMessage.success(`登录成功，${data.username}`)
             success(data)
         },
@@ -49,7 +56,7 @@ function verifyCodeLogin(email, code, success) {
             code: code
         },
         success: (data) => {
-            storeAccessToken(data.token, data.expire, data.id)
+            storeAccessToken(data.token, data.expire, data.id, data.role)
             ElMessage.success(`登录成功，${data.username}`)
             success(data)
         },
@@ -103,4 +110,4 @@ function emailRegister(email, code, password, success) {
     })
 }
 
-export {passwordLogin, verifyCodeLogin, logout, isAuthorized, resetPassword, emailRegister}
+export {getAuthRole, passwordLogin, verifyCodeLogin, logout, isAuthorized, resetPassword, emailRegister}

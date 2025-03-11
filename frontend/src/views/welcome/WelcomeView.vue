@@ -13,7 +13,7 @@ import images from '@/assets/img';
       </div>
     </div>
     <div class="w-1/3">
-      <router-view v-slot="{ Component }"> <!-- Component是当前路由的组件， transition是vue提供的动画效果 -->
+      <router-view v-slot="{ Component }">
         <transition name="el-fade-in-linear" mode="out-in">
           <component :is="Component"/>
         </transition>
