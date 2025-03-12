@@ -31,4 +31,6 @@ public interface ArticleMapper {
     int updateArticleById(@Param("id") Integer id, @Param("title") String title, @Param("summary") String summary, @Param("content") String content);
     @Update("update article set status = #{status} where id = #{id}")
     int updateArticleStatusById(@Param("id") Integer id, @Param("status") String status);
+    @Select("select id, authorId, createdAt, updatedAt, status, view, `like` from article where status = 'take_down'")
+    List<Article> getAllTakeDownArticles();
 }

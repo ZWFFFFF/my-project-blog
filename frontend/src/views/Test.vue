@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-1 items-center justify-center">
+  <div class="flex flex-col flex-1 items-center justify-center">
     <div class="p-4">
       <DropdownMenu
           :options="options"
@@ -8,11 +8,13 @@
         <span>select</span>
       </DropdownMenu>
     </div>
+    <Button @click="console.log('hello')"><span>button</span></Button>
   </div>
 </template>
 
 <script setup>
 import DropdownMenu from '@/components/DropdownMenu.vue';
+import Button from '@/components/Button.vue';
 import {User} from "@element-plus/icons-vue";
 import router from "@/router/index.js";
 

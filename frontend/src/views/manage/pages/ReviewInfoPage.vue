@@ -62,7 +62,7 @@ onMounted(() => {
         <div class="mx-auto w-1/2 my-5">
           <div class="mb-2">
             <div class="mb-4 break-words"><h1 class="font-extrabold text-3xl">{{ article.title }}</h1></div>
-            <div class="mb-4 break-words"><p>summary</p></div>
+            <div class="mb-4 break-words"><p>{{ article.summary }}</p></div>
             <div class="flex items-center">
               <a class="flex items-center mr-8"><el-avatar :icon="UserFilled" class="mr-2"></el-avatar><span>{{ article.author }}</span></a>
               <span class="text-gray-400">{{ formatTimestamp(article.createdAt) }}</span>

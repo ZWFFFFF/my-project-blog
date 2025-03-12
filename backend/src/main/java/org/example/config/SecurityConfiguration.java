@@ -62,7 +62,10 @@ public class SecurityConfiguration {
                                 "/api/article/start-review",
                                 "/api/article/approve-review",
                                 "/api/article/reject-review",
-                                "/api/article/reset-reviewing"
+                                "/api/article/reset-reviewing",
+                                "/api/article/take-down",
+                                "/api/article/recover",
+                                "/api/article/take-down-list"
                         ).hasAuthority("ADMIN")
                         .requestMatchers("/api/user/user-info").permitAll()
                         .requestMatchers(

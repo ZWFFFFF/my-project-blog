@@ -26,4 +26,8 @@ public interface ArticleService {
     String approveReview(Integer articleId);
     String rejectReview(Integer articleId);
     String resetReviewing(Integer articleId);
+    String takeDownArticle(List<Integer> articleIds);
+    String recoverArticle(List<Integer> articleIds);
+    RestBean<List<ArticleVO>> getTakeDownArticleList();
+    RestBean<List<ArticleVO>> getUserTakeDownArticles();
 }

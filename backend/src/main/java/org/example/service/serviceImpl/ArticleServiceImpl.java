@@ -416,6 +416,68 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
+     * 文章下架
+     * @param articleIds 文章id列表
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    @Transactional
+    public String takeDownArticle(List<Integer> articleIds) {
+        for(Integer id: articleIds) {
+            articleMapper.updateArticleStatusById(id, "take_down");
+        }
+        return null;
+    }
+
+    /**
+     * 文章恢复
+     * @param articleIds 文章id列表
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    @Transactional
+    public String recoverArticle(List<Integer> articleIds) {
+        for(Integer id: articleIds) {
+            articleMapper.updateArticleStatusById(id, "approved");
+        }
+        return null;
+    }
+
+    /**
+     * 获取被下架文章列表
+     * @return 文章列表
+     */
+    @Override
+    public RestBean<List<ArticleVO>> getTakeDownArticleList() {
+        List<Article> articles = articleMapper.getAllTakeDownArticles();
+
+        List<ArticleVO> voList = new ArrayList<>();
+        for(Article article: articles) {
+            voList.add(this.toArticleVO(article));
+        }
+        return RestBean.success(voList);
+    }
+
+    /**
+     * 获取用户下架文章列表
+     * @return 文章列表
+     */
+    @Override
+    public RestBean<List<ArticleVO>> getUserTakeDownArticles() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = Integer.valueOf(user.getUsername());
+
+        List<Article> articles = articleMapper.getArticleByAuthorId(userId);
+        articles.removeIf(article -> !article.getStatus().equals("take_down"));
+
+        List<ArticleVO> voList = new ArrayList<>();
+        for(Article article: articles) {
+            voList.add(this.toArticleVO(article));
+        }
+        return RestBean.success(voList);
+    }
+
+    /**
      * 将文章实体转换为文章信息实体
      * @param article 文章实体
      * @return 文章信息实体

@@ -1,5 +1,5 @@
 <script setup>
-import {DocumentChecked, DocumentDelete, Remove, User, UserFilled, SwitchButton} from "@element-plus/icons-vue";
+import {DocumentChecked, DocumentDelete, Remove, User, UserFilled, SwitchButton, DataBoard} from "@element-plus/icons-vue";
 import {logout} from "@/net/auth.js";
 import {useStore} from "vuex";
 import {useRoute, useRouter} from "vue-router";
@@ -74,8 +74,10 @@ onMounted(() => {
               <div class="text-sm"><span>文章审核</span></div>
             </router-link>
           </div>
-          <div class="h-10 rounded border hover:bg-gray-100 shadow-sm">
-            <router-link class="px-5 h-full flex items-center" to="">
+          <div
+              :class="['h-10 rounded border hover:bg-gray-100 shadow-sm', route.name.startsWith('manage-article-takeDown') ? 'ring-1 ring-gray-300 bg-gray-100' : 'ring-transparent']"
+          >
+            <router-link class="px-5 h-full flex items-center" to="/manage/article/takeDown">
               <div class="mr-2 mt-1">
                 <el-icon ><DocumentDelete /></el-icon>
               </div>
@@ -102,6 +104,17 @@ onMounted(() => {
                 <el-icon><User /></el-icon>
               </div>
               <div class="text-sm"><span>个人中心</span></div>
+            </router-link>
+          </div>
+        </div>
+        <div>
+          <div class="px-5 text-gray-500 h-9 flex items-center">日志</div>
+          <div class="mt-1 h-10 rounded border hover:bg-gray-100 shadow-sm">
+            <router-link class="px-5 h-full flex items-center" to="">
+              <div class="mr-2 mt-1">
+                <el-icon><DataBoard /></el-icon>
+              </div>
+              <div class="text-sm"><span>操作记录</span></div>
             </router-link>
           </div>
         </div>

@@ -121,6 +121,11 @@ const routes = [
                 path: 'article/review/:id',
                 name: 'manage-article-review-info',
                 component: () => import('@/views/manage/pages/ReviewInfoPage.vue')
+            },
+            {
+                path: 'article/takeDown',
+                name: 'manage-article-takeDown',
+                component: () => import('@/views/manage/pages/TakeDownPage.vue')
             }
         ]
     }, {

@@ -208,10 +208,51 @@ function resetReviewing(articleId, success) {
     })
 }
 
+function getUserTakeDownList(success) {
+    get({
+        url: 'api/article/user-take-down-list',
+        success: (data) => {
+            success(data)
+        }
+    })
+}
+
+function getTakeDownList(success) {
+    get({
+        url: 'api/article/take-down-list',
+        success: (data) => {
+            success(data)
+        }
+    })
+}
+
+function takeDownArticle(articleIds, success) {
+    post({
+        url: 'api/article/take-down',
+        data: articleIds,
+        success: () => {
+            ElMessage.success('操作成功')
+            success()
+        }
+    })
+}
+
+function recoverArticle(articleIds, success) {
+    post({
+        url: 'api/article/recover',
+        data: articleIds,
+        success: () => {
+            ElMessage.success('操作成功')
+            success()
+        }
+    })
+}
+
 export {
     getArticleList, getArticle, getDraft, getUserArticles,
     getUserDrafts, getUserReviewArticles, searchArticleList, createArticle,
     updateArticle, updateDraft, deleteArticle, deleteDraft,
     submitToReview, getPendingReviewList, getReviewingList, getReviewedArticle,
-    startReview, approveReview, rejectReview, resetReviewing
+    startReview, approveReview, rejectReview, resetReviewing,
+    getUserTakeDownList, getTakeDownList, takeDownArticle, recoverArticle
 }

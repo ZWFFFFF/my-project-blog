@@ -18,7 +18,7 @@ public class Article {
     private Integer authorId;
     private Date createdAt;
     private Date updatedAt;
-    private String status; // 'draft'(default), 'pending_review', 'reviewing', 'approved'
+    private String status; // 'draft'(default), 'pending_review', 'reviewing', 'approved', 'take_down'
     private Integer view;
     private Integer like;
 

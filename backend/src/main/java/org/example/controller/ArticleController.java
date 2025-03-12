@@ -240,4 +240,46 @@ public class ArticleController {
     public RestBean<Void> resetReviewing(@RequestParam @NotNull Integer articleId) {
         return RestBean.messageHandler(() -> articleService.resetReviewing(articleId));
     }
+
+    /**
+     * 文章下架
+     * @param articleIds 文章id列表
+     * @return 响应实体
+     */
+    @PostMapping("/take-down")
+    @Operation(summary = "下架文章")
+    public RestBean<Void> takeDownArticle(@RequestBody List<Integer> articleIds) {
+        return RestBean.messageHandler(() -> articleService.takeDownArticle(articleIds));
+    }
+
+    /**
+     * 文章恢复
+     * @param articleIds 文章id列表
+     * @return 响应实体
+     */
+    @PostMapping("/recover")
+    @Operation(summary = "恢复文章")
+    public RestBean<Void> recoverArticle(@RequestBody List<Integer> articleIds) {
+        return RestBean.messageHandler(() -> articleService.recoverArticle(articleIds));
+    }
+
+    /**
+     * 获取下架文章列表
+     * @return 响应实体
+     */
+    @GetMapping("/take-down-list")
+    @Operation(summary = "获取下架文章列表")
+    public RestBean<List<ArticleVO>> getTakeDownList() {
+        return articleService.getTakeDownArticleList();
+    }
+
+    /**
+     * 获取用户下架文章列表
+     * @return 响应实体
+     */
+    @GetMapping("/user-take-down-list")
+    @Operation(summary = "获取用户下架文章列表")
+    public RestBean<List<ArticleVO>> getUserTakeDownList() {
+        return articleService.getUserTakeDownArticles();
+    }
 }
