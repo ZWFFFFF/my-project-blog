@@ -208,15 +208,6 @@ function resetReviewing(articleId, success) {
     })
 }
 
-function getUserTakeDownList(success) {
-    get({
-        url: 'api/article/user-take-down-list',
-        success: (data) => {
-            success(data)
-        }
-    })
-}
-
 function getTakeDownList(success) {
     get({
         url: 'api/article/take-down-list',
@@ -254,5 +245,5 @@ export {
     updateArticle, updateDraft, deleteArticle, deleteDraft,
     submitToReview, getPendingReviewList, getReviewingList, getReviewedArticle,
     startReview, approveReview, rejectReview, resetReviewing,
-    getUserTakeDownList, getTakeDownList, takeDownArticle, recoverArticle
+    getTakeDownList, takeDownArticle, recoverArticle
 }

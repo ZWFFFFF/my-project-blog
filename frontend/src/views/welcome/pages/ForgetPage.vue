@@ -127,7 +127,7 @@ function reset() {
           </el-form-item>
         </el-form>
         <div class="mt-10">
-          <el-button class="w-36" @click="reset">重置密码</el-button>
+          <Button class="w-36 text-sm" @click="reset">重置密码</Button>
         </div>
       </div>
     </div>

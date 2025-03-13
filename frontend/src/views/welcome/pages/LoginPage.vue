@@ -157,13 +157,13 @@ function userLogin() {
         </div>
       </transition>
       <div class="pt-5">
-        <el-button @click="userLogin" class="w-36">登录</el-button>
+        <Button @click="userLogin" class="w-36 text-sm">登录</Button>
       </div>
       <el-divider>
         <span class="text-sm text-gray-500 font-semibold">没有账号</span>
       </el-divider>
       <div>
-        <el-button @click="router.push('/welcome/register')" class="w-36">立即注册</el-button>
+        <Button @click="router.push('/welcome/register')" class="w-36 text-sm" :style="'grey'">立即注册</Button>
       </div>
     </div>
   </div>

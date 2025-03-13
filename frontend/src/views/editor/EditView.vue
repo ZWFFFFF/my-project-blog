@@ -78,10 +78,10 @@ function update(type) {
             <el-breadcrumb-item>{{ pathTitle }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
-        <div class="w-1/2 flex justify-end">
-          <el-button v-if="pathTitle === '编辑草稿'" @click="update('draft')"><span class="font-bold p-2">保存草稿</span></el-button>
-          <el-button v-else @click="create('draft')"><span class="font-bold p-2">存为草稿</span></el-button>
-          <el-button @click="submit"><span class="font-bold p-2">投稿审核</span></el-button>
+        <div class="w-1/2 flex justify-end gap-4">
+          <Button :styly="'grey'" class="text-sm" v-if="pathTitle === '编辑草稿'" @click="update('draft')"><span class="font-bold p-2">保存草稿</span></Button>
+          <Button :style="'grey'" class="text-sm" v-else @click="create('draft')"><span class="font-bold p-2">存为草稿</span></Button>
+          <Button class="text-sm" @click="submit"><span class="font-bold p-2">投稿审核</span></Button>
         </div>
       </div>
     </header>

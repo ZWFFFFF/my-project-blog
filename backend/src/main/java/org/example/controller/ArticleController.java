@@ -135,12 +135,12 @@ public class ArticleController {
     }
 
     /**
-     * 获取用户文章列表
+     * 获取用户文章列表(已发布和已下架)
      * @param userId 用户id
      * @return 响应实体
      */
     @GetMapping("/user-articles")
-    @Operation(summary = "获取用户文章列表")
+    @Operation(summary = "获取用户文章列表(已发布和已下架)")
     public RestBean<List<ArticleVO>> getUserArticles(@RequestParam @NotNull Integer userId)  {
         return articleService.getPublishedArticleByAuthorId(userId);
     }
@@ -271,15 +271,5 @@ public class ArticleController {
     @Operation(summary = "获取下架文章列表")
     public RestBean<List<ArticleVO>> getTakeDownList() {
         return articleService.getTakeDownArticleList();
-    }
-
-    /**
-     * 获取用户下架文章列表
-     * @return 响应实体
-     */
-    @GetMapping("/user-take-down-list")
-    @Operation(summary = "获取用户下架文章列表")
-    public RestBean<List<ArticleVO>> getUserTakeDownList() {
-        return articleService.getUserTakeDownArticles();
     }
 }

@@ -8,13 +8,9 @@ import DropdownMenu from "@/components/DropdownMenu.vue";
 import {getUserInfo} from "@/net/user.js";
 
 const store = useStore()
-
 const router = useRouter()
-
 const user = reactive({})
-
 const keyword = ref('');
-
 const dropdownMenuOptions = [
   {
     label: '个人中心',
@@ -72,7 +68,7 @@ onMounted(() => {
           </div>
         </div>
         <div class="flex w-1/2 justify-end items-center">
-          <el-button @click="router.push('/editor')">投稿</el-button>
+          <Button :style="'grey'" class="text-sm" @click="router.push('/editor')">投稿</Button>
           <DropdownMenu
               :options="dropdownMenuOptions"
               @option-selected="handleOptionSelected"

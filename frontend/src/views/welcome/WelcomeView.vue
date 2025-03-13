@@ -8,8 +8,8 @@ import images from '@/assets/img';
       <el-image class="w-full h-full" :src="images.welcome_page" fit="cover"/>
       <div class="absolute left-16 bottom-16 text-gray-200 flex flex-col gap-2 text-wrap">
         <p class="font-bold text-4xl">Welcome!</p>
-        <p class="font-semibold text-2xl">Lorem ipsum dolor sit amet.</p>
-        <p class="font-semibold text-2xl">Sint optio dignissimos, adipisci minus.</p>
+        <p class="font-semibold text-2xl">“This library has saved me countless hours of work and helped me</p>
+        <p class="font-semibold text-2xl">deliver stunning designs to my clients faster than ever before.”</p>
       </div>
     </div>
     <div class="w-1/3">

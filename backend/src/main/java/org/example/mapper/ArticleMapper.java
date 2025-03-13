@@ -13,7 +13,7 @@ public interface ArticleMapper {
     int insertArticle(Article article);
     @Delete("delete from article where id = #{id} and status = 'draft'")
     int deleteDraftArticle(Integer id);
-    @Delete("delete from article where id = #{id} and status = 'approved'")
+    @Delete("delete from article where id = #{id} and status in ('approved', 'take_down')")
     int deletePublishedArticle(Integer id);
     @Select("select * from article where id = #{id}")
     Article getArticleById(Integer id);

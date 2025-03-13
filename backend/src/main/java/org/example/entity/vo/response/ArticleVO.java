@@ -1,6 +1,5 @@
 package org.example.entity.vo.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Date;
@@ -20,4 +19,5 @@ public class ArticleVO {
     private Date updatedAt;
     private Integer view;
     private Integer like;
+    private String status;
 }

@@ -128,7 +128,7 @@ function register() {
         </el-form-item>
       </el-form>
       <div class="mt-5">
-        <el-button class="w-36" @click="register">立即注册</el-button>
+        <Button class="w-36 text-sm" @click="register">立即注册</Button>
       </div>
       <div class="mt-5">
         <span class="text-sm">已有帐号？</span>

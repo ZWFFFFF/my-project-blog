@@ -263,14 +263,14 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 根据作者id获取用户所有已发布的文章
+     * 根据作者id获取用户所有已发布和已下架的文章
      * @param authorId 作者id
      * @return 响应实体
      */
     @Override
     public RestBean<List<ArticleVO>> getPublishedArticleByAuthorId(Integer authorId) {
         List<Article> articles = articleMapper.getArticleByAuthorId(authorId);
-        articles.removeIf(article -> !article.getStatus().equals("approved"));
+        articles.removeIf(article -> !(article.getStatus().equals("approved") || article.getStatus().equals("take_down")));
 
         List<ArticleVO> voList = new ArrayList<>();
         for(Article article: articles) {
@@ -459,25 +459,6 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 获取用户下架文章列表
-     * @return 文章列表
-     */
-    @Override
-    public RestBean<List<ArticleVO>> getUserTakeDownArticles() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Integer userId = Integer.valueOf(user.getUsername());
-
-        List<Article> articles = articleMapper.getArticleByAuthorId(userId);
-        articles.removeIf(article -> !article.getStatus().equals("take_down"));
-
-        List<ArticleVO> voList = new ArrayList<>();
-        for(Article article: articles) {
-            voList.add(this.toArticleVO(article));
-        }
-        return RestBean.success(voList);
-    }
-
-    /**
      * 将文章实体转换为文章信息实体
      * @param article 文章实体
      * @return 文章信息实体
@@ -499,6 +480,7 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setAuthor(author);
         vo.setCreatedAt(article.getCreatedAt());
         vo.setUpdatedAt(article.getUpdatedAt());
+        vo.setStatus(article.getStatus());
         vo.setView(article.getView());
         vo.setLike(article.getLike());
         return vo;

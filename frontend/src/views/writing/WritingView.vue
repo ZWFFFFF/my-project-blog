@@ -64,7 +64,7 @@ const throttledLinkTo = throttle(linkTo, 500)
           <button class="font-extrabold text-2xl" @click="router.push('/')">Logo</button>
         </div>
         <div class="flex w-1/2 justify-end items-center">
-          <el-button @click="router.push('/editor')">投稿</el-button>
+          <Button class="text-sm" @click="router.push('/editor')">投稿</Button>
           <DropdownMenu
               :options="dropdownMenuOptions"
               @option-selected="handleOptionSelected"
