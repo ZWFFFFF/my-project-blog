@@ -23,8 +23,8 @@ const updateTextareaHeight = (event) => {
 }
 
 const handleInput = (event, field) => {
-  // 去除多余的回车符
-  article[field] = event.target.value.replace(/(\r\n|\n|\r){2,}/g, '\n')
+  // 去除回车符
+  article[field] = event.target.value.replace(/\n/g, '')
   updateTextareaHeight(event)
 }
 
@@ -38,10 +38,10 @@ defineExpose({
     <div class="w-full">
       <div class="mt-20">
         <div>
-          <textarea ref="titleRef" v-model="article.title" @input="(event) => handleInput(event, 'title')" maxlength="80" placeholder="输入标题" class="px-4 w-full h-12 outline-none resize-none font-bold text-3xl"/>
+          <textarea ref="titleRef" v-model="article.title" @input="(event) => handleInput(event, 'title')" maxlength="80" placeholder="输入标题" class="px-4 w-full h-12 outline-none resize-none font-bold text-3xl white-space: nowrap"/>
         </div>
         <div>
-          <textarea ref="summaryRef" v-model="article.summary" @input="(event) => handleInput(event, 'summary')" maxlength="500" placeholder="输入摘要" class="px-4 w-full h-6 outline-none resize-none"></textarea>
+          <textarea ref="summaryRef" v-model="article.summary" @input="(event) => handleInput(event, 'summary')" maxlength="500" placeholder="输入摘要" class="px-4 w-full h-6 outline-none resize-none white-space: nowrap"></textarea>
         </div>
       </div>
       <div class="mt-10">
