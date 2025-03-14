@@ -92,7 +92,10 @@ onMounted(() => {
       <div class="flex flex-col gap-8">
         <div v-for="article in articleList" :key="article.id" class="bg-white w-full min-h-72 p-8 flex flex-col justify-between gap-8 rounded-md shadow-md ring-1 ring-black ring-opacity-5">
           <div>
-            <h3 class="mb-4 font-bold text-xl truncate">{{ article.title }}</h3>
+            <div class="flex justify-between gap-2">
+              <h3 class="mb-4 font-bold text-xl truncate">{{ article.title }}</h3>
+              <span class="text-gray-400">投稿</span>
+            </div>
             <p class="break-words">{{ article.summary }}</p>
           </div>
           <div class="flex flex-col lg:flex-row lg:items-center justify-between items-start gap-2">
