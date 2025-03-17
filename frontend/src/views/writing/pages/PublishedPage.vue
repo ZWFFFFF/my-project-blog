@@ -98,7 +98,9 @@ onMounted(() => {
 
 function deleteWriting(id) {
   if(confirm("确定删除该内容吗？")) {
-    deleteArticle(id, () => fetchData())
+    deleteArticle(id, () => {
+      articleList.value = articleList.value.filter(article => article.id !== id)
+    })
   }
 }
 </script>

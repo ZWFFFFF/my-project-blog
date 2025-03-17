@@ -6,7 +6,6 @@ import {convertToLocalTime, throttle} from "@/net/utils.js";
 import Button from "@/components/Button.vue";
 
 const router = useRouter()
-
 const tableData = ref([])
 const searchKeyword = ref(''); // 搜索关键字
 const searchColumn = ref('id'); // 默认搜索列
@@ -88,7 +87,7 @@ const handleBatchRecover = () => {
 function takeDown(ids) {
   if(confirm("确定要下架吗？")){
     takeDownArticle(ids, () => {
-      fetchApprovedArticles()
+      tableData.value = tableData.value.filter((item) => !ids.includes(item.id));
     })
   }
 }
@@ -96,7 +95,7 @@ function takeDown(ids) {
 function recover(ids) {
   if(confirm("确定要恢复吗？")) {
     recoverArticle(ids, () => {
-      fetchTakeDownArticles()
+      tableData.value = tableData.value.filter((item) => !ids.includes(item.id));
     })
   }
 }

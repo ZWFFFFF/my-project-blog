@@ -64,7 +64,7 @@ function reviewArticle(id) {
 function cancelReviewing(id) {
   if(confirm('是否要取消该文章的审核'))  {
     resetReviewing(id, () => {
-      fetchReviewingArticles()
+      tableData.value = tableData.value.filter(item => item.id !== id)
     })
   }
 }

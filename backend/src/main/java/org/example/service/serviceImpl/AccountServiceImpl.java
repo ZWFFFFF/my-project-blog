@@ -354,6 +354,7 @@ public class AccountServiceImpl implements AccountService {
         vo.setEmail(account.getEmail());
         vo.setRole(account.getRole());
         vo.setRegisterTime(account.getRegisterTime());
+        vo.setActive(account.getActive() == 1);
         return vo;
     }
 

@@ -63,7 +63,9 @@ onMounted(() => {
 
 function deleteWriting(id) {
   if(confirm("确定删除该内容吗？")) {
-    deleteDraft(id, () => fetchData()) // 删除成功后重新获取数据
+    deleteDraft(id, () => {
+      articleList.value = articleList.value.filter(article => article.id !== id)
+    })
   }
 }
 </script>

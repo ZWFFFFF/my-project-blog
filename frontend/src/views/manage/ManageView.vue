@@ -17,6 +17,8 @@ const user = reactive({})
 
 const title = computed(() => {
   if (route.name.startsWith('manage-article-review')) return '文章审核'
+  if (route.name.startsWith('manage-article-takeDown')) return '文章下架'
+  if (route.name.startsWith('manage-user')) return '用户管理'
 })
 
 const dropdownMenuOptions = [
@@ -87,12 +89,14 @@ onMounted(() => {
         </div>
         <div>
           <div class="px-5 text-gray-500 h-9 flex items-center">用户管理</div>
-          <div class="mt-1 h-10 rounded border hover:bg-gray-100 shadow-sm">
-            <router-link class="px-5 h-full flex items-center" to="">
+          <div
+              :class="['h-10 rounded border hover:bg-gray-100 shadow-sm', route.name.startsWith('manage-user') ? 'ring-1 ring-gray-300 bg-gray-100' : 'ring-transparent']"
+          >
+            <router-link class="px-5 h-full flex items-center" to="/manage/user">
               <div class="mr-2 mt-1">
                 <el-icon><Remove /></el-icon>
               </div>
-              <div class="text-sm"><span>封禁/解禁 用户</span></div>
+              <div class="text-sm"><span>封禁用户</span></div>
             </router-link>
           </div>
         </div>

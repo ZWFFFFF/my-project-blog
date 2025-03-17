@@ -126,6 +126,11 @@ const routes = [
                 path: 'article/takeDown',
                 name: 'manage-article-takeDown',
                 component: () => import('@/views/manage/pages/TakeDownPage.vue')
+            },
+            {
+                path: 'user',
+                name: 'manage-user',
+                component: () => import('@/views/manage/pages/UserPage.vue')
             }
         ]
     }, {
