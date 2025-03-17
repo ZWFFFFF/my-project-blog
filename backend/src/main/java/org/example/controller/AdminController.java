@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
+import org.example.annotation.OperationLog;
 import org.example.entity.RestBean;
 import org.example.service.AccountService;
 import org.springframework.validation.annotation.Validated;
@@ -28,6 +29,7 @@ public class AdminController {
      * @param userId 用户id
      * @return 响应实体
      */
+    @OperationLog(operationType = "BAN_USER")
     @GetMapping("/ban-user")
     @Operation(summary = "封禁用户")
     public RestBean<Void> banUser(@RequestParam @NotNull Integer userId) {
@@ -39,6 +41,7 @@ public class AdminController {
      * @param userId 用户id
      * @return 响应实体
      */
+    @OperationLog(operationType = "UNBAN_USER")
     @GetMapping("/unban-user")
     @Operation(summary = "解封用户")
     public RestBean<Void> unbanUser(@RequestParam @NotNull Integer userId) {

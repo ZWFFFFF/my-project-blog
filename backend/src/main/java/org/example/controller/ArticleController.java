@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.example.annotation.OperationLog;
 import org.example.entity.RestBean;
 import org.example.entity.vo.request.CreateArticleVO;
 import org.example.entity.vo.request.UpdateArticleVO;
@@ -213,6 +214,7 @@ public class ArticleController {
      * @param articleId 文章id
      * @return 响应实体
      */
+    @OperationLog(operationType = "REVIEW_APPROVE_ARTICLE")
     @GetMapping("/approve-review")
     @Operation(summary = "审核通过")
     public RestBean<Void> approveReview(@RequestParam @NotNull Integer articleId) {
@@ -224,6 +226,7 @@ public class ArticleController {
      * @param articleId 文章id
      * @return 响应实体
      */
+    @OperationLog(operationType = "REVIEW_REJECT_ARTICLE")
     @GetMapping("/reject-review")
     @Operation(summary = "审核不通过")
     public RestBean<Void> rejectReview(@RequestParam @NotNull Integer articleId) {
@@ -246,6 +249,7 @@ public class ArticleController {
      * @param articleIds 文章id列表
      * @return 响应实体
      */
+    @OperationLog(operationType = "TAKE_DOWN_ARTICLE")
     @PostMapping("/take-down")
     @Operation(summary = "下架文章")
     public RestBean<Void> takeDownArticle(@RequestBody List<Integer> articleIds) {
@@ -253,12 +257,13 @@ public class ArticleController {
     }
 
     /**
-     * 文章恢复
+     * 将文章从下架恢复
      * @param articleIds 文章id列表
      * @return 响应实体
      */
+    @OperationLog(operationType = "RECOVER_ARTICLE")
     @PostMapping("/recover")
-    @Operation(summary = "恢复文章")
+    @Operation(summary = "恢复下架文章")
     public RestBean<Void> recoverArticle(@RequestBody List<Integer> articleIds) {
         return RestBean.messageHandler(() -> articleService.recoverArticle(articleIds));
     }

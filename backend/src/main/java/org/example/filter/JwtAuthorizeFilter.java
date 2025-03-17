@@ -26,6 +26,7 @@ import java.io.IOException;
 /**
  * Jwt校验过滤器，取出请求头中的jwt并校验
  */
+
 @Component
 public class JwtAuthorizeFilter extends OncePerRequestFilter {
     @Resource
