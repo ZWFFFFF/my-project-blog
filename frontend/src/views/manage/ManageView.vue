@@ -19,6 +19,8 @@ const title = computed(() => {
   if (route.name.startsWith('manage-article-review')) return '文章审核'
   if (route.name.startsWith('manage-article-takeDown')) return '文章下架'
   if (route.name.startsWith('manage-user')) return '用户管理'
+  if (route.name.startsWith('manage-hub')) return '用户'
+  if (route.name.startsWith('manage-log')) return '日志'
 })
 
 const dropdownMenuOptions = [
@@ -92,7 +94,7 @@ onMounted(() => {
           <div
               :class="['h-10 rounded border hover:bg-gray-100 shadow-sm', route.name.startsWith('manage-user') ? 'ring-1 ring-gray-300 bg-gray-100' : 'ring-transparent']"
           >
-            <router-link class="px-5 h-full flex items-center" to="/manage/user">
+            <router-link class="px-5 h-full flex items-center" to="/manage/ban">
               <div class="mr-2 mt-1">
                 <el-icon><Remove /></el-icon>
               </div>
@@ -102,8 +104,10 @@ onMounted(() => {
         </div>
         <div>
           <div class="px-5 text-gray-500 h-9 flex items-center">用户</div>
-          <div class="mt-1 h-10 rounded border hover:bg-gray-100 shadow-sm">
-            <router-link class="px-5 h-full flex items-center" to="">
+          <div
+              :class="['h-10 rounded border hover:bg-gray-100 shadow-sm', route.name.startsWith('manage-hub') ? 'ring-1 ring-gray-300 bg-gray-100' : 'ring-transparent']"
+          >
+            <router-link class="px-5 h-full flex items-center" to="/manage/hub">
               <div class="mr-2 mt-1">
                 <el-icon><User /></el-icon>
               </div>
@@ -113,8 +117,10 @@ onMounted(() => {
         </div>
         <div>
           <div class="px-5 text-gray-500 h-9 flex items-center">日志</div>
-          <div class="mt-1 h-10 rounded border hover:bg-gray-100 shadow-sm">
-            <router-link class="px-5 h-full flex items-center" to="">
+          <div
+              :class="['h-10 rounded border hover:bg-gray-100 shadow-sm', route.name.startsWith('manage-log') ? 'ring-1 ring-gray-300 bg-gray-100' : 'ring-transparent']"
+          >
+            <router-link class="px-5 h-full flex items-center" to="/manage/log">
               <div class="mr-2 mt-1">
                 <el-icon><DataBoard /></el-icon>
               </div>

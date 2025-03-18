@@ -128,9 +128,19 @@ const routes = [
                 component: () => import('@/views/manage/pages/TakeDownPage.vue')
             },
             {
-                path: 'user',
-                name: 'manage-user',
+                path: 'ban',
+                name: 'manage-user-ban',
+                component: () => import('@/views/manage/pages/BanUserPage.vue')
+            },
+            {
+                path: 'hub',
+                name: 'manage-hub',
                 component: () => import('@/views/manage/pages/UserPage.vue')
+            },
+            {
+                path: 'log',
+                name: 'manage-log',
+                component: () => import('@/views/manage/pages/OperationLogPage.vue')
             }
         ]
     }, {

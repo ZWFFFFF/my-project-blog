@@ -6,15 +6,19 @@ import jakarta.annotation.Resource;
 import jakarta.validation.constraints.NotNull;
 import org.example.annotation.OperationLog;
 import org.example.entity.RestBean;
+import org.example.entity.vo.response.OperationLogVO;
 import org.example.service.AccountService;
+import org.example.service.OperationLogService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
- * 管理员相关Controller，包含封禁用户、解锁用户、审核投稿等功能
+ * 管理员相关Controller，包含封禁用户、审核投稿等功能
  */
 @Validated
 @RestController
@@ -23,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminController {
     @Resource
     private AccountService accountService;
+    @Resource
+    private OperationLogService operationLogService;
 
     /**
      * 封禁用户
@@ -46,5 +52,15 @@ public class AdminController {
     @Operation(summary = "解封用户")
     public RestBean<Void> unbanUser(@RequestParam @NotNull Integer userId) {
         return RestBean.messageHandler(() -> accountService.unbanAccount(userId));
+    }
+
+    /**
+     * 获取操作日志
+     * @return 响应实体
+     */
+    @GetMapping("/get-operation-log")
+    @Operation(summary = "获取操作日志")
+    public RestBean<List<OperationLogVO>> getOperationLog() {
+        return operationLogService.getLogs();
     }
 }

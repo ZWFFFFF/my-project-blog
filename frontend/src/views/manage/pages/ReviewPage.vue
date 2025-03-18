@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onMounted, computed} from 'vue';
+import {ref, onMounted, computed, watch} from 'vue';
 import {convertToLocalTime, throttle} from "@/net/utils.js";
 import {getPendingReviewList, getReviewingList, resetReviewing, startReview} from "@/net/article.js";
 import {useRouter} from "vue-router";
@@ -10,14 +10,34 @@ const tableData = ref([])
 const searchKeyword = ref(''); // 搜索关键字
 const searchColumn = ref('id'); // 默认搜索列
 const activeTab = ref('pending');
+const sortSelectValue = ref('createdAtDesc')
+const sortSelectOptions = [
+  {
+    value: 'createdAtAsc',
+    label: '按最早创建时间',
+  },
+  {
+    value: 'createdAtDesc',
+    label: '按最近创建时间',
+  },
+  {
+    value: 'updatedAtAsc',
+    label: '按最早修改时间',
+  },
+  {
+    value: 'updatedAtDesc',
+    label: '按最近修改时间',
+  }
+]
 
 const fetchPendingReviewArticles = () => {
   getPendingReviewList((data) => {
     tableData.value = data.map(item => ({
       ...item,
-      createdAt: convertToLocalTime(item.createdAt),
-      updatedAt: convertToLocalTime(item.updatedAt)
+      formattedCreatedAt: convertToLocalTime(item.createdAt),
+      formattedUpdatedAt: convertToLocalTime(item.updatedAt)
     }))
+    sortData()
   })
 }
 
@@ -25,9 +45,10 @@ const fetchReviewingArticles = () => {
   getReviewingList((data) => {
     tableData.value = data.map(item => ({
       ...item,
-      createdAt: convertToLocalTime(item.createdAt),
-      updatedAt: convertToLocalTime(item.updatedAt)
+      formattedCreatedAt: convertToLocalTime(item.createdAt),
+      formattedUpdatedAt: convertToLocalTime(item.updatedAt)
     }))
+    sortData()
   })
 }
 
@@ -80,6 +101,27 @@ const filteredTableData = computed(() => {
   });
 });
 
+const sortData = () => {
+  switch (sortSelectValue.value) {
+    case 'createdAtAsc':
+      tableData.value.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      break;
+    case 'createdAtDesc':
+      tableData.value.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      break;
+    case 'updatedAtAsc':
+      tableData.value.sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt));
+      break;
+    case 'updatedAtDesc':
+      tableData.value.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      break;
+  }
+}
+
+watch(sortSelectValue, () => {
+  sortData()
+});
+
 onMounted(() => {
   fetchPendingReviewArticles()
 })
@@ -110,26 +152,47 @@ onMounted(() => {
       </div>
       <div class="px-4">
         <!-- 搜索框和列选择器 -->
-        <div class="mb-5">
-          <el-select v-model="searchColumn" placeholder="请选择搜索列" style="width: 150px; margin-right: 10px;">
-            <el-option label="文章 ID" value="id" />
-            <el-option label="用户 ID" value="authorId" />
-            <el-option label="创建时间" value="createdAt" />
-            <el-option label="修改时间" value="updatedAt" />
-          </el-select>
-          <el-input
-              v-model="searchKeyword"
-              placeholder="请输入搜索关键字"
-              clearable
-              style="width: 300px;"
-          />
+        <div class="mb-5 flex items-center gap-3">
+          <div>
+            <el-select v-model="searchColumn" placeholder="请选择搜索列" style="width: 150px; margin-right: 10px;">
+              <el-option label="文章 ID" value="id" />
+              <el-option label="用户 ID" value="authorId" />
+              <el-option label="创建时间" value="formattedCreatedAt" />
+              <el-option label="修改时间" value="formattedUpdatedAt" />
+            </el-select>
+            <el-input
+                v-model="searchKeyword"
+                placeholder="请输入搜索关键字"
+                clearable
+                style="width: 300px;"
+            />
+          </div>
+          <div>
+            <el-select
+                v-model="sortSelectValue"
+                clearable
+                placeholder="排序方式"
+                style="width: 240px"
+            >
+              <template #label="{ label }">
+                <span class="text-gray-400">排序方式：</span>
+                <span>{{ label }}</span>
+              </template>
+              <el-option
+                  v-for="item in sortSelectOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+              />
+            </el-select>
+          </div>
         </div>
         <!-- 表格 -->
         <el-table :data="filteredTableData" style="width: 100%" empty-text="No Data">
           <el-table-column prop="id" label="文章id" width="200" />
           <el-table-column prop="authorId" label="用户id" width="200" />
-          <el-table-column prop="createdAt" label="创建于" width="280" />
-          <el-table-column prop="updatedAt" label="修改于" width="280" />
+          <el-table-column prop="formattedCreatedAt" label="创建于" width="280" />
+          <el-table-column prop="formattedUpdatedAt" label="修改于" width="280" />
           <el-table-column label="操作">
             <template #default="scope">
               <span v-show="activeTab === 'pending'" class="text-base font-black cursor-pointer" @click="reviewArticle(scope.row.id)">审核</span>

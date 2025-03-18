@@ -1,4 +1,5 @@
-import {get} from "@/net/index.js";
+import {get, post} from "@/net/index.js";
+import {ElMessage} from "element-plus";
 function getUserInfo(id, success) {
     get({
         url: 'api/user/user-info?id=' + id,
@@ -35,4 +36,18 @@ function unbanUser(id, success) {
     })
 }
 
-export {getUserInfo, getUserList, banUser, unbanUser}
+function changePassword(id, oldPassword, newPassword, success) {
+    post({
+        url: 'api/user/change-password',
+        data: {
+            id: id,
+            oldPassword: oldPassword,
+            newPassword: newPassword
+        },
+        success: () => {
+            success()
+        }
+    })
+}
+
+export {getUserInfo, getUserList, banUser, unbanUser, changePassword}
