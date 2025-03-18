@@ -27,7 +27,7 @@ const dropdownMenuOptions = [
   {
     label: '个人中心',
     icon: User,
-    onClick: () => {}
+    onClick: () => { router.push('/manage/hub') }
   }, {
     label: '退出',
     icon: SwitchButton,
@@ -69,7 +69,7 @@ onMounted(() => {
         <div class="flex flex-col gap-2">
           <div class="px-5 text-gray-500 h-9 flex items-center">文章管理</div>
           <div
-              :class="['h-10 rounded border hover:bg-gray-100 shadow-sm', route.name.startsWith('manage-article-review') ? 'ring-1 ring-gray-300 bg-gray-100' : 'ring-transparent']"
+              :class="['h-10 rounded border hover:bg-gray-100 shadow-sm transition ease-in-out', route.name.startsWith('manage-article-review') ? 'ring-1 ring-gray-300 bg-gray-100' : 'ring-transparent']"
           >
             <router-link class="px-5 h-full flex items-center" to="/manage/article/review">
               <div class="mr-2 mt-1">
@@ -147,7 +147,11 @@ onMounted(() => {
       </div>
       <div id="content" class="flex-1 flex flex-col overflow-hidden">
         <main class="p-4 flex-1 overflow-auto">
-          <router-view></router-view>
+          <router-view v-slot="{ Component }">
+            <transition name="el-fade-in-linear" mode="out-in">
+              <component :is="Component"/>
+            </transition>
+          </router-view>
         </main>
       </div>
     </div>

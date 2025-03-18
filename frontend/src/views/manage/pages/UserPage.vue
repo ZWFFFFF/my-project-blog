@@ -6,6 +6,7 @@ import Button from "@/components/Button.vue";
 import {ElMessage} from "element-plus";
 import {changePassword} from "@/net/user.js";
 import {useStore} from "vuex";
+import {throttle} from "@/net/utils.js";
 
 const router = useRouter()
 const store = useStore()
@@ -53,6 +54,8 @@ const changePwd = () => {
   })
 }
 
+const handlePasswordChange = throttle(changePwd, 1000)
+
 </script>
 
 <template>
@@ -91,7 +94,7 @@ const changePwd = () => {
           </el-form-item>
         </el-form>
         <div>
-          <Button class="text-sm" @click="changePwd">确认修改</Button>
+          <Button class="text-sm" @click="handlePasswordChange">确认修改</Button>
         </div>
       </div>
     </div>

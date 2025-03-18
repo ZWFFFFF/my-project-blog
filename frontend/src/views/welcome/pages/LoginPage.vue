@@ -6,6 +6,7 @@ import {passwordLogin, verifyCodeLogin} from "@/net/auth.js";
 import {ElMessage} from "element-plus";
 import {get} from "@/net"
 import {useStore} from "vuex";
+import {throttle} from "@/net/utils.js";
 
 const router = useRouter()
 
@@ -100,6 +101,8 @@ function userLogin() {
     })
   }
 }
+
+const handleLogin = throttle(userLogin, 1000)
 </script>
 
 <template>
@@ -157,7 +160,7 @@ function userLogin() {
         </div>
       </transition>
       <div class="pt-5">
-        <Button @click="userLogin" class="w-36 text-sm">登录</Button>
+        <Button @click="handleLogin" class="w-36 text-sm">登录</Button>
       </div>
       <el-divider>
         <span class="text-sm text-gray-500 font-semibold">没有账号</span>

@@ -5,6 +5,7 @@ import {ref, computed} from "vue";
 import {createArticle, updateArticle, updateDraft, submitToReview} from "@/net/article.js";
 import {ElMessage} from "element-plus";
 import {useStore} from "vuex";
+import {throttle} from "@/net/utils.js";
 
 const store = useStore()
 
@@ -65,6 +66,10 @@ function update(type) {
       ElMessage.warning('发生了一些错误，请联系管理员')
   }
 }
+
+const handleUpdate = throttle(update, 1000)
+const handleCreate = throttle(create, 1000)
+const handleSubmit = throttle(submit, 1000)
 </script>
 
 <template>
@@ -79,9 +84,9 @@ function update(type) {
           </el-breadcrumb>
         </div>
         <div class="w-1/2 flex justify-end gap-4">
-          <Button :styly="'grey'" class="text-sm" v-if="pathTitle === '编辑草稿'" @click="update('draft')"><span class="font-bold p-2">保存草稿</span></Button>
-          <Button :style="'grey'" class="text-sm" v-else @click="create('draft')"><span class="font-bold p-2">存为草稿</span></Button>
-          <Button class="text-sm" @click="submit"><span class="font-bold p-2">投稿审核</span></Button>
+          <Button :style="'grey'" class="text-sm" v-if="pathTitle === '编辑草稿'" @click="handleUpdate('draft')"><span class="font-bold p-2">保存草稿</span></Button>
+          <Button :style="'grey'" class="text-sm" v-else @click="handleCreate('draft')"><span class="font-bold p-2">存为草稿</span></Button>
+          <Button class="text-sm" @click="handleSubmit"><span class="font-bold p-2">投稿审核</span></Button>
         </div>
       </div>
     </header>

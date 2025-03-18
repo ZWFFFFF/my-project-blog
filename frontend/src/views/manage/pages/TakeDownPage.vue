@@ -94,16 +94,16 @@ const handleSelectionChange = (selection) => {
 };
 
 // 批量下架
-const handleBatchTakeDown = () => {
+const handleBatchTakeDown = throttle(() => {
   const ids = selectedRows.value.map(row => row.id);
   takeDown(ids)
-};
+}, 500)
 
 // 批量恢复
-const handleBatchRecover = () => {
+const handleBatchRecover = throttle(() => {
   const ids = selectedRows.value.map(row => row.id);
   recover(ids)
-};
+}, 500)
 
 function takeDown(ids) {
   if(confirm("确定要下架吗？")){

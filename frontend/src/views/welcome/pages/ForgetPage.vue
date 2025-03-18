@@ -5,6 +5,7 @@ import {get} from "@/net/index.js";
 import {ElMessage} from "element-plus";
 import {Lock, Message} from "@element-plus/icons-vue";
 import {resetPassword} from "@/net/auth.js";
+import {throttle} from "@/net/utils.js";
 
 const router = useRouter()
 
@@ -86,6 +87,8 @@ function reset() {
     }
   })
 }
+
+const handleReset = throttle(reset, 1000)
 </script>
 
 <template>
@@ -127,7 +130,7 @@ function reset() {
           </el-form-item>
         </el-form>
         <div class="mt-10">
-          <Button class="w-36 text-sm" @click="reset">重置密码</Button>
+          <Button class="w-36 text-sm" @click="handleReset">重置密码</Button>
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import {get} from "@/net/index.js";
 import {ElMessage} from "element-plus";
 import {Lock, Message} from "@element-plus/icons-vue";
 import {emailRegister} from "@/net/auth.js";
+import {throttle} from "@/net/utils.js";
 
 const router = useRouter()
 
@@ -86,6 +87,8 @@ function register() {
     }
   })
 }
+
+const handleRegister = throttle(register, 1000)
 </script>
 
 <template>
@@ -128,7 +131,7 @@ function register() {
         </el-form-item>
       </el-form>
       <div class="mt-5">
-        <Button class="w-36 text-sm" @click="register">立即注册</Button>
+        <Button class="w-36 text-sm" @click="handleRegister">立即注册</Button>
       </div>
       <div class="mt-5">
         <span class="text-sm">已有帐号？</span>
