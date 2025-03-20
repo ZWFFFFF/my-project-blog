@@ -14,9 +14,3 @@
 - 采用TailwindCss作为css框架，进行自定义UI设计
 - 采用Axios作为异步请求框架
 - 采用Element-Plus作为Vue组件库
-
-## 代办事项：
-- EditView页面的按钮设计
-- 管理员审核文章功能
-
-## bug:
