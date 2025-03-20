@@ -7,10 +7,12 @@ import org.example.entity.vo.request.CreateArticleVO;
 import org.example.entity.vo.request.UpdateArticleVO;
 import org.example.entity.vo.response.ArticleVO;
 import org.example.mapper.ArticleMapper;
+import org.example.mapper.CommentMapper;
 import org.example.service.AccountService;
 import org.example.service.ArticleService;
 import org.example.utils.Const;
 import org.example.utils.FlowUtil;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文章管理相关服务
@@ -29,7 +32,11 @@ public class ArticleServiceImpl implements ArticleService {
     @Resource
     private ArticleMapper articleMapper;
     @Resource
+    private CommentMapper commentMapper;
+    @Resource
     private FlowUtil flowUtil;
+    @Resource
+    private AmqpTemplate amqpTemplate;
 
     /**
      * 新建文章(状态默认为草稿)
@@ -74,6 +81,10 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = articleMapper.getArticleById(articleId);
         if(article == null || !article.getAuthorId().equals(userId)) return "非法操作";
 
+        // 删除文章对应的评论
+        commentMapper.deleteCommentsByArticleId(articleId);
+
+        // 删除文章
         int delete = articleMapper.deletePublishedArticle(articleId);
         if(delete != 1) return "发生了一些错误，请联系管理员";
         return null;
@@ -456,6 +467,23 @@ public class ArticleServiceImpl implements ArticleService {
             voList.add(this.toArticleVO(article));
         }
         return RestBean.success(voList);
+    }
+
+    /**
+     * 点赞文章
+     * @param articleId 文章id
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    public String likeArticle(Integer articleId) {
+        Article article = articleMapper.getArticleById(articleId);
+        if(article == null) return "文章不存在";
+        if(!article.getStatus().equals("approved")) return "非法操作";
+
+        // 点赞请求放入消息队列中，由消息队列异步处理点赞
+        Map<String, Object> msg = Map.of("type", "article", "id", articleId);
+        amqpTemplate.convertAndSend("like", msg);
+        return null;
     }
 
     /**

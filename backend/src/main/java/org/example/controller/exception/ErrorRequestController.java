@@ -2,6 +2,7 @@ package org.example.controller.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.entity.RestBean;
+import org.example.exception.BusinessException;
 import org.springframework.boot.autoconfigure.web.servlet.error.AbstractErrorController;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
@@ -33,6 +34,10 @@ public class ErrorRequestController extends AbstractErrorController {
     public RestBean<Void> error(HttpServletRequest request) {
         HttpStatus status = this.getStatus(request);
         Map<String, Object> errorAttributes = this.getErrorAttributes(request, this.getAttributeOptions());
+
+        if (errorAttributes.get("exception").equals(BusinessException.class.getName())) {
+            return RestBean.failure(status.value(), errorAttributes.get("message").toString());
+        }
 
         return this.convertErrorMessage(status)
                 .orElse(RestBean.failure(status.value(), errorAttributes.get("message").toString()));

@@ -277,4 +277,15 @@ public class ArticleController {
     public RestBean<List<ArticleVO>> getTakeDownList() {
         return articleService.getTakeDownArticleList();
     }
+
+    /**
+     * 点赞文章
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @GetMapping("/like-article")
+    @Operation(summary = "点赞文章")
+    public RestBean<Void> likeArticle(@RequestParam @NotNull Integer articleId) {
+        return RestBean.messageHandler(() -> articleService.likeArticle(articleId));
+    }
 }
