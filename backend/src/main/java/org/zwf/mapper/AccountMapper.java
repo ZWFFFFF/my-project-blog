@@ -29,4 +29,8 @@ public interface AccountMapper {
     Integer banAccountById(Integer id);
     @Update("update account set active = 1 where id = #{id}")
     Integer unbanAccountById(Integer id);
+    @Update("update account set avatar = #{avatar} where id = #{id}")
+    void updateAvatar(@Param("id") Integer id, @Param("avatar") String avatar);
+    @Select("select avatar from account where id = #{id}")
+    String getAvatarById(Integer id);
 }

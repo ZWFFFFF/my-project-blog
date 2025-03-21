@@ -17,6 +17,7 @@ public class Account {
     private String email;
     private String role;
     private Date registerTime;
+    private String avatar;
     private int active; // 0:不可使用 1:可使用
 
     public Account(String password, String email) {

@@ -153,7 +153,7 @@ public class CommentServiceImpl implements CommentService {
         accountVO.setId(account.getId());
         accountVO.setUsername(account.getUsername());
         accountVO.setEmail(account.getEmail());
-        // 还需要添加Avatar
+        accountVO.setAvatar(account.getAvatar());
 
         // 封装评论信息VO
         CommentVO commentVO = new CommentVO();

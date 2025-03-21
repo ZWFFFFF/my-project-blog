@@ -38,5 +38,6 @@ my-config:
       key: 'h9J@*2&^zQ148' # 密钥
       expire: 72 # 令牌持续时间，单位为小时
   resource:
+    project-domain: http://localhost:8080
     upload:
-      avatar: ../uploads/avatars # 上传头像文件存储路径
+      avatar: C:/Users/feng/IdeaProjects/my-project-blog/resource/uploads/avatars # 上传头像文件存储路径

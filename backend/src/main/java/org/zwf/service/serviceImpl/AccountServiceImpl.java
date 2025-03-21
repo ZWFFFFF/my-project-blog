@@ -53,6 +53,8 @@ public class AccountServiceImpl implements AccountService {
     private PasswordEncoder encoder;
     @Value("${my-config.resource.upload.avatar}")
     private String uploadAvatarPath;
+    @Value("${my-config.resource.project-domain}")
+    private String projectDomain;
 
     /**
      * 从数据库中通过邮箱查找用户详细信息（用户登录表单信息校验）
@@ -364,6 +366,7 @@ public class AccountServiceImpl implements AccountService {
         vo.setRole(account.getRole());
         vo.setRegisterTime(account.getRegisterTime());
         vo.setActive(account.getActive() == 1);
+        vo.setAvatar(account.getAvatar());
         return vo;
     }
 
@@ -375,7 +378,6 @@ public class AccountServiceImpl implements AccountService {
     @Override
     @Transactional
     public RestBean<Map<String, String>> saveAvatar(MultipartFile file) {
-        System.out.println(file);
         if (file.isEmpty()) {
             throw new BusinessException("文件不能为空");
         }
@@ -397,13 +399,14 @@ public class AccountServiceImpl implements AccountService {
             file.transferTo(filePath.toFile());
 
             // 生成文件的访问 URL
-            String fileUrl = "/avatar/" + uniqueFileName;
+            String fileUrl = projectDomain + "/avatar/" + uniqueFileName;
 
-            // 更新用户数据库中的 avatar 字段
+            // 更新用户数据库中的 avatar 字段，并删除原来的头像文件
+            updateUserAvatar(fileUrl);
 
             return RestBean.success(Map.of("url", fileUrl));
         } catch (IOException e) {
-            throw new BusinessException("文件保存失败");
+            throw new BusinessException("文件保存失败"+e.getMessage());
         }
     }
 
@@ -451,5 +454,32 @@ public class AccountServiceImpl implements AccountService {
      */
     private boolean addAccount(Account account) {
         return accountMapper.insertAccount(account) == 1;
+    }
+
+    /**
+     * 更新用户数据库中avatar
+     * @param fileUrl avatar的url
+     */
+    private void updateUserAvatar(String fileUrl) throws IOException {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = Integer.valueOf(user.getUsername());
+
+        String avatar = accountMapper.getAvatarById(userId);
+        // 如果原来的头像文件存在，删除它
+        if(avatar != null) {
+            // 从 URL 中提取文件名
+            String oldFileName = avatar.substring(avatar.lastIndexOf("/") + 1);
+
+            // 拼接文件路径
+            Path oldFilePath = Paths.get(uploadAvatarPath, oldFileName);
+
+            // 删除旧的头像文件
+            if (Files.exists(oldFilePath)) {
+                Files.delete(oldFilePath);
+            }
+        }
+
+        // 更新用户数据库中的 avatar 字段
+        accountMapper.updateAvatar(userId, fileUrl);
     }
 }

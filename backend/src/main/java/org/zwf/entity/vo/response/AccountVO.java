@@ -15,4 +15,5 @@ public class AccountVO {
     private String role;
     private Date registerTime;
     private Boolean active;
+    private String avatar;
 }

@@ -50,4 +50,15 @@ function changePassword(id, oldPassword, newPassword, success) {
     })
 }
 
-export {getUserInfo, getUserList, banUser, unbanUser, changePassword}
+function uploadAvatar(file, success) {
+    post({
+        url: 'api/user/upload-avatar',
+        data: file,
+        success: (data) => {
+            ElMessage.success("头像上传成功")
+            success(data)
+        }
+    })
+}
+
+export {getUserInfo, getUserList, banUser, unbanUser, changePassword, uploadAvatar}

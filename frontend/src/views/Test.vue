@@ -1,25 +1,32 @@
 <template>
   <el-upload
       class="avatar-uploader"
-      action="http://localhost8080/api/user/upload-avatar"
       :show-file-list="false"
-      :on-success="handleAvatarSuccess"
       :before-upload="beforeAvatarUpload"
+      :http-request="handleUpload"
   >
     <img v-if="imageUrl" :src="imageUrl" class="avatar"  alt=""/>
     <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
   </el-upload>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import { uploadAvatar } from '@/net/user.js'
 
 const imageUrl = ref('')
 
-const handleAvatarSuccess = (response) => {
-  imageUrl.value = response.data.url
+const handleUpload = (options) => {
+  const { file } = options
+  const formData = new FormData()
+  formData.append('file', file)
+
+  uploadAvatar(formData, (data) => {
+    console.log(data)
+    imageUrl.value = data.url
+  })
 }
 
 const beforeAvatarUpload = (rawFile) => {
