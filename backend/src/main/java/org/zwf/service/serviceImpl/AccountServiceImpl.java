@@ -1,6 +1,8 @@
 package org.zwf.service.serviceImpl;
 
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
 import org.zwf.entity.RestBean;
 import org.zwf.entity.dto.Account;
 import org.zwf.entity.vo.request.ChangePasswordVO;
@@ -9,6 +11,7 @@ import org.zwf.entity.vo.request.ResetPasswordVO;
 import org.zwf.entity.vo.request.VerifyCodeLoginVO;
 import org.zwf.entity.vo.response.AccountVO;
 import org.zwf.entity.vo.response.AuthorizeVO;
+import org.zwf.exception.BusinessException;
 import org.zwf.mapper.AccountMapper;
 import org.zwf.service.AccountService;
 import org.zwf.utils.Const;
@@ -24,6 +27,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -44,6 +51,8 @@ public class AccountServiceImpl implements AccountService {
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private PasswordEncoder encoder;
+    @Value("${my-config.resource.upload.avatar}")
+    private String uploadAvatarPath;
 
     /**
      * 从数据库中通过邮箱查找用户详细信息（用户登录表单信息校验）
@@ -356,6 +365,46 @@ public class AccountServiceImpl implements AccountService {
         vo.setRegisterTime(account.getRegisterTime());
         vo.setActive(account.getActive() == 1);
         return vo;
+    }
+
+    /**
+     * 保存用户头像文件
+     * @param file 头像文件
+     * @return 相应实体
+     */
+    @Override
+    @Transactional
+    public RestBean<Map<String, String>> saveAvatar(MultipartFile file) {
+        System.out.println(file);
+        if (file.isEmpty()) {
+            throw new BusinessException("文件不能为空");
+        }
+
+        try {
+            // 生成唯一的文件名
+            String originalFilename = file.getOriginalFilename();
+            String fileExtension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf(".")) : "";
+            String uniqueFileName = UUID.randomUUID() + fileExtension;
+
+            // 创建目标文件路径
+            Path uploadPath = Paths.get(uploadAvatarPath);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            // 保存文件到指定路径
+            Path filePath = uploadPath.resolve(uniqueFileName);
+            file.transferTo(filePath.toFile());
+
+            // 生成文件的访问 URL
+            String fileUrl = "/avatar/" + uniqueFileName;
+
+            // 更新用户数据库中的 avatar 字段
+
+            return RestBean.success(Map.of("url", fileUrl));
+        } catch (IOException e) {
+            throw new BusinessException("文件保存失败");
+        }
     }
 
     /**

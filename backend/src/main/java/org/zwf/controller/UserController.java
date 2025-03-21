@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import org.springframework.web.multipart.MultipartFile;
 import org.zwf.entity.RestBean;
 import org.zwf.entity.vo.request.ChangePasswordVO;
 import org.zwf.entity.vo.response.AccountVO;
@@ -16,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户相关Controller，包含用户信息查询、修改等操作
@@ -86,5 +88,16 @@ public class UserController {
     @Operation(summary = "修改密码")
     public RestBean<Void> changePassword(@RequestBody @Valid ChangePasswordVO vo) {
         return RestBean.messageHandler(() -> accountService.changePassword(vo));
+    }
+
+    /**
+     * 上传头像
+     * @param file 头像文件
+     * @return 响应实体
+     */
+    @PostMapping("/upload-avatar")
+    @Operation(summary = "上传头像")
+    public RestBean<Map<String, String>> uploadAvatar(@RequestParam @NotNull MultipartFile file) {
+        return accountService.saveAvatar(file);
     }
 }

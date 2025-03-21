@@ -37,3 +37,6 @@ my-config:
     jwt:
       key: 'h9J@*2&^zQ148' # 密钥
       expire: 72 # 令牌持续时间，单位为小时
+  resource:
+    upload:
+      avatar: ../uploads/avatars # 上传头像文件存储路径

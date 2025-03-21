@@ -1,5 +1,6 @@
 package org.zwf.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import org.zwf.entity.RestBean;
 import org.zwf.entity.dto.Account;
 import org.zwf.entity.vo.request.ChangePasswordVO;
@@ -11,6 +12,7 @@ import org.zwf.entity.vo.response.AuthorizeVO;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
+import java.util.Map;
 
 public interface AccountService extends UserDetailsService {
     Account findAccountByUsername(String username);
@@ -29,4 +31,5 @@ public interface AccountService extends UserDetailsService {
     boolean isAccountBanned(Integer userId);
     boolean isAccountExistById(Integer userId);
     String getUsernameById(Integer userId);
+    RestBean<Map<String, String>> saveAvatar(MultipartFile file);
 }
