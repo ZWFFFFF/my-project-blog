@@ -31,16 +31,28 @@ public class LikeQueueListener {
     @Transactional
     public void handleLike(Map<String, Object> msg) {
         try {
+            String action = (String) msg.get("action");
             String type = (String) msg.get("type");
             Integer id = (Integer) msg.get("id");
 
-            switch (type) {
-                case "comment":
-                    commentMapper.likeComment(id);
-                    break;
-                case "article":
-                    articleMapper.likeArticle(id);
-                    break;
+            if(action.equals("like")) {
+                switch (type) {
+                    case "comment":
+                        commentMapper.likeComment(id);
+                        break;
+                    case "article":
+                        articleMapper.likeArticle(id);
+                        break;
+                }
+            } else if(action.equals("dislike")) {
+                switch (type) {
+                    case "comment":
+                        commentMapper.dislikeComment(id);
+                        break;
+                    case "article":
+                        articleMapper.dislikeArticle(id);
+                        break;
+                }
             }
         } catch (Exception e) {
             log.warn("Resolve [{}: {}]", e.getClass().getName(), e.getMessage());

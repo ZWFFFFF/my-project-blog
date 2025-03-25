@@ -111,7 +111,7 @@ const handleLogin = throttle(userLogin, 1000)
       <h1 class="text-4xl font-bold py-4">登录</h1>
       <p class="text-gray-500 font-semibold">请选择邮箱验证码登录或密码登录</p>
     </div>
-    <div class="pt-12 px-12">
+    <div class="mt-12 mx-auto max-w-80">
       <transition name="el-fade-in-linear" mode="out-in">
         <div v-if="active === 0">
           <el-form ref="verifyCodeLoginFormRef" :model="verifyCodeLoginForm" :rules="rules">

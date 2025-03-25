@@ -96,7 +96,7 @@ const handleReset = throttle(reset, 1000)
     <div class="text-4xl font-bold">重置密码</div>
     <div class="pt-10">
       <div class="text-gray-500 font-semibold">请输入需要重置密码的信息</div>
-      <div class="pt-12 px-12">
+      <div class="pt-12 mx-auto max-w-80">
         <el-form ref="formRef" :model="form" :rules="rules">
           <el-form-item prop="email">
             <el-input v-model="form.email" type="text" placeholder="邮箱" maxlength="20" clearable>

@@ -154,6 +154,9 @@ const currentPageArticles = computed(() => {
       />
     </div>
   </div>
+  <div v-if="articleList.length === 0" class="flex justify-center items-center">
+    <p class="font-extrabold text-xl text-zinc-400">没有相关内容哦</p>
+  </div>
 </div>
 </template>
 

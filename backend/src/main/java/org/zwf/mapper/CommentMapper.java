@@ -28,4 +28,6 @@ public interface CommentMapper {
     void deleteCommentsByArticleId(Integer articleId);
     @Update("update comment set `like` = `like` + 1 where id = #{id}")
     void likeComment(Integer id);
+    @Update("update comment set `like` = `like` - 1 where id = #{id}")
+    void dislikeComment(Integer id);
 }

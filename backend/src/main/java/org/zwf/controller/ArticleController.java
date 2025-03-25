@@ -288,4 +288,15 @@ public class ArticleController {
     public RestBean<Void> likeArticle(@RequestParam @NotNull Integer articleId) {
         return RestBean.messageHandler(() -> articleService.likeArticle(articleId));
     }
+
+    /**
+     * 取消点赞文章
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @GetMapping("/dislike-article")
+    @Operation(summary = "取消点赞文章")
+    public RestBean<Void> dislikeArticle(@RequestParam @NotNull Integer articleId) {
+        return RestBean.messageHandler(() -> articleService.dislikeArticle(articleId));
+    }
 }

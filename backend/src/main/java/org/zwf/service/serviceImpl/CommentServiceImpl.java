@@ -136,7 +136,23 @@ public class CommentServiceImpl implements CommentService {
         if(comment == null) return "评论不存在";
 
         // 点赞请求放入消息队列中，由消息队列异步处理点赞
-        Map<String, Object> msg = Map.of("type", "comment", "id", commentId);
+        Map<String, Object> msg = Map.of("action", "like", "type", "comment", "id", commentId);
+        amqpTemplate.convertAndSend("like", msg);
+        return null;
+    }
+
+    /**
+     * 取消点赞评论
+     * @param commentId 评论id
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    public String dislikeComment(Integer commentId) {
+        Comment comment = commentMapper.selectCommentById(commentId);
+        if(comment == null) return "评论不存在";
+
+        // 点赞请求放入消息队列中，由消息队列异步处理点赞
+        Map<String, Object> msg = Map.of("action", "dislike", "type", "comment", "id", commentId);
         amqpTemplate.convertAndSend("like", msg);
         return null;
     }

@@ -481,7 +481,24 @@ public class ArticleServiceImpl implements ArticleService {
         if(!article.getStatus().equals("approved")) return "非法操作";
 
         // 点赞请求放入消息队列中，由消息队列异步处理点赞
-        Map<String, Object> msg = Map.of("type", "article", "id", articleId);
+        Map<String, Object> msg = Map.of("action", "like", "type", "article", "id", articleId);
+        amqpTemplate.convertAndSend("like", msg);
+        return null;
+    }
+
+    /**
+     * 取消点赞文章
+     * @param articleId 文章id
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    public String dislikeArticle(Integer articleId) {
+        Article article = articleMapper.getArticleById(articleId);
+        if(article == null) return "文章不存在";
+        if(!article.getStatus().equals("approved")) return "非法操作";
+
+        // 点赞请求放入消息队列中，由消息队列异步处理点赞
+        Map<String, Object> msg = Map.of("action", "dislike", "type", "article", "id", articleId);
         amqpTemplate.convertAndSend("like", msg);
         return null;
     }

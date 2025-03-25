@@ -96,6 +96,7 @@ const handleSubmit = throttle(submit, 1000)
       </router-view>
     </div>
   </div>
+  <el-backtop :right="100" :bottom="100" />
 </template>
 
 <style scoped>

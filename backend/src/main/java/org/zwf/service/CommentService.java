@@ -11,4 +11,5 @@ public interface CommentService {
     RestBean<List<CommentVO>> getComments(Integer articleId);
     String deleteComment(Integer commentId);
     String likeComment(Integer commentId);
+    String dislikeComment(Integer commentId);
 }

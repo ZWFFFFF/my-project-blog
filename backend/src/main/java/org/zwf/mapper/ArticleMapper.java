@@ -35,4 +35,6 @@ public interface ArticleMapper {
     List<Article> getAllTakeDownArticles();
     @Update("update article set `like` = `like` + 1 where id = #{id}")
     void likeArticle(Integer id);
+    @Update("update article set `like` = `like` - 1 where id = #{id}")
+    void dislikeArticle(Integer id);
 }

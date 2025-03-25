@@ -97,7 +97,7 @@ const handleRegister = throttle(register, 1000)
       <div class="text-4xl font-bold py-4">注册新用户</div>
       <div class="text-gray-500 font-semibold">请在下方填写相关信息</div>
     </div>
-    <div class="pt-12 px-12">
+    <div class="pt-12 mx-auto max-w-80">
       <el-form ref="formRef" :model="form" :rules="rules">
         <el-form-item prop="email">
           <el-input v-model="form.email" type="text" placeholder="邮箱" maxlength="20" clearable>

@@ -127,7 +127,7 @@ const currentPageArticles = computed(() => {
           </div>
         </div>
       </div>
-      <div class="mb-10 flex justify-center items-center">
+      <div class="flex justify-center items-center">
         <el-pagination
             layout="prev, pager, next"
             @current-change="handleCurrentChange"
