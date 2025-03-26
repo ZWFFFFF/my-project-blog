@@ -57,9 +57,9 @@ const throttledLinkTo = throttle(linkTo, 500)
 </script>
 
 <template>
-  <div class="bg-gray-100 w-full min-h-screen">
+  <div class="bg-[#FFFFFF] w-full min-h-screen">
     <header>
-      <div class="bg-white flex justify-between p-4 gap-4 items-center">
+      <div class="bg-[#FFFFFF] flex justify-between p-4 gap-4 items-center border-b">
         <div class="w-1/2">
           <button class="font-extrabold text-2xl" @click="router.push('/')">Logo</button>
         </div>
@@ -99,6 +99,11 @@ const throttledLinkTo = throttle(linkTo, 500)
         </router-view>
       </div>
     </div>
+    <footer>
+      <div class="mx-20 flex justify-center items-center py-10 border-t border-zinc-300">
+        <p>© 2025 ZWF, Inc. All rights reserved.</p>
+      </div>
+    </footer>
   </div>
 </template>
 

@@ -124,9 +124,11 @@ const currentPageArticles = computed(() => {
         <div class="p-8 m-2 h-[300px] rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
           <div class="h-full">
             <div class="h-3/4">
-              <div class="truncate mb-4" @click="router.push('/article/approved/' +article.id)">
-                <span class="cursor-pointer text-xl font-bold">{{ article.title }}</span>
-              </div>
+              <router-link :to="'/article/approved/' + article.id">
+                <div class="truncate mb-4">
+                  <span class="cursor-pointer text-xl font-bold">{{ article.title }}</span>
+                </div>
+              </router-link>
               <div class="border-t-2">
                 <p class="line-clamp-3 break-words">{{ article.summary }}</p>
               </div>

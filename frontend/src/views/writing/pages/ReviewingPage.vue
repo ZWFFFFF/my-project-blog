@@ -112,7 +112,7 @@ onMounted(() => {
         </div>
       </div>
       <div class="flex flex-col gap-8">
-        <div v-for="article in filteredData" :key="article.id" class="bg-white w-full min-h-72 p-8 flex flex-col justify-between gap-8 rounded-md shadow-md ring-1 ring-black ring-opacity-5">
+        <div v-for="article in filteredData" :key="article.id" class="bg-white w-full min-h-72 p-8 flex flex-col justify-between gap-8 rounded-md shadow ring-2 ring-black ring-opacity-5">
           <div>
             <div class="flex justify-between gap-2">
               <h3 class="mb-4 font-bold text-xl truncate">{{ article.title }}</h3>
