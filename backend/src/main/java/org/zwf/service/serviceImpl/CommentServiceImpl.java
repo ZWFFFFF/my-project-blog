@@ -168,7 +168,6 @@ public class CommentServiceImpl implements CommentService {
         AccountVO accountVO = new AccountVO();
         accountVO.setId(account.getId());
         accountVO.setUsername(account.getUsername());
-        accountVO.setEmail(account.getEmail());
         accountVO.setAvatar(account.getAvatar());
 
         // 封装评论信息VO

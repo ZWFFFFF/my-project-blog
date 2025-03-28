@@ -2,13 +2,14 @@
 import { onMounted, ref, reactive} from 'vue'
 import { useRoute, useRouter } from "vue-router";
 import {disLikeArticle, getArticle, getDraft, likeArticle} from "@/net/article.js";
-import {UserFilled} from "@element-plus/icons-vue";
+import {ArrowDown, ArrowUp, UserFilled} from "@element-plus/icons-vue";
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 import { QuillEditor } from '@vueup/vue-quill'
 import {ElMessage} from "element-plus";
 import {formatTimestamp, throttle} from "@/net/utils.js";
 import {useStore} from "vuex";
 import Button from "@/components/Button.vue";
+import {dislikeComment, getComments, likeComment} from "@/net/comment.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -28,17 +29,32 @@ const article = reactive({
   view: null,
   like: null
 })
-const isLiked = ref(false)
+const isArticleLiked = ref(false)
 const isCollected = ref(false)
 const isCommentInputExpanded = ref(false);
 const commentText = ref('');
 const commentContainer = ref(null);
+const comments = ref([])
 
 const fetchData = () => {
   if(articleType.value === 'approved') {
+    // 获取文章信息
     getArticle(articleId.value, (data) => {
       Object.assign(article, data)
       // 不需要检测userId，因为任何人都可以看已发布的文章
+    })
+    // 获取评论信息
+    getComments(articleId.value, (data) => {
+      // 递归函数添加属性
+      const addProperty = (comments) => comments.map(comment => ({
+        ...comment,
+        isLiked: false,
+        showReplies: false,
+        replies: comment.replies ? addProperty(comment.replies) : []
+      }))
+
+      comments.value = addProperty(data)
+      console.log(comments.value)
     })
   } else if(articleType.value === 'draft') {
     getDraft(articleId.value, (data) => {
@@ -52,23 +68,23 @@ const fetchData = () => {
   }
 }
 
-const Like = () => {
+const articleLike = () => {
   if(articleType.value === 'approved') {
-    if(isLiked.value === false) {
-      isLiked.value = true
+    if(isArticleLiked.value === false) {
       likeArticle(articleId.value, () => {
+        isArticleLiked.value = true
         article.like++
       })
     } else {
-      isLiked.value = false
       disLikeArticle(articleId.value, () => {
+        isArticleLiked.value = false
         article.like--
       })
     }
   }
 }
 
-const handleLike = throttle(Like, 500)
+const handleArticleLike = throttle(articleLike, 500)
 
 const Collect = () => {
   if(articleType.value === 'approved') {
@@ -91,6 +107,56 @@ const share = () => {
 
 const handleShare = throttle(share, 1000)
 
+const expandCommentTextarea = () => isCommentInputExpanded.value = true;
+
+const collapseCommentTextarea = () => {
+  if (isCommentInputExpanded.value) {
+    commentText.value = '';
+    isCommentInputExpanded.value = false;
+  }
+};
+
+// 显示评论的回复信息
+const handleShowReplies = (commentId) => {
+  const comment = comments.value.find((comment) => comment.id === commentId);
+  if (comment) {
+    comment.showReplies = !comment.showReplies;
+  }
+}
+
+const commentLike = (commentId, isLiked) => {
+  if(isLiked === false) {
+    likeComment(commentId, () => {
+      updateCommentLikeProperty(commentId, comments.value)
+    })
+  } else {
+    dislikeComment(commentId, () => {
+      updateCommentLikeProperty(commentId, comments.value)
+    })
+  }
+}
+
+const handleCommentLike = throttle(commentLike, 500)
+
+function updateCommentLikeProperty(commentId, comments) {
+  for(const comment of comments)  {
+    if(comment.id === commentId) {
+      comment.isLiked = !comment.isLiked
+      if (comment.isLiked) {
+        comment.like++
+      } else {
+        comment.like--
+      }
+      return true // 找到并修改成功
+    }
+    if (comment.replies?.length > 0) {
+      const found = updateCommentLikeProperty(commentId, comment.replies);
+      if(found) return true // 如果在子回复中找到，提前终止搜索
+    }
+  }
+  return false // 未找到该评论
+}
+
 onMounted(() => {
   fetchData()
   // 点击外部区域收起评论输入框
@@ -101,64 +167,6 @@ onMounted(() => {
   });
 })
 
-const expandCommentTextarea = () => isCommentInputExpanded.value = true;
-
-const collapseCommentTextarea = () => {
-  if (isCommentInputExpanded.value) {
-    commentText.value = '';
-    isCommentInputExpanded.value = false;
-  }
-};
-
-// 示例评论数据
-const comments = ref([
-  {
-    id: 1,
-    author: "张三",
-    avatar: "",
-    content: "这篇文章写得非常好，解决了我很多困惑！",
-    likes: 24,
-    dislikes: 2,
-    createdAt: "2023-05-15T10:30:00Z",
-    showReply: false,
-    replies: [
-      {
-        id: 101,
-        author: "李四",
-        avatar: "",
-        content: "我也觉得很有帮助！",
-        likes: 5,
-        createdAt: "2023-05-15T11:15:00Z"
-      }
-    ],
-    replyCount: 3
-  },
-  {
-    id: 2,
-    author: "王五",
-    avatar: "",
-    content: "有几个地方不太明白，能否详细解释一下？",
-    likes: 8,
-    dislikes: 0,
-    createdAt: "2023-05-14T09:20:00Z",
-    showReply: false,
-    replies: [],
-    replyCount: 0
-  }
-]);
-
-// 格式化时间为"X分钟前"等格式
-const formatTimeAgo = (timestamp) => {
-  const now = new Date();
-  const date = new Date(timestamp);
-  const diffInSeconds = Math.floor((now - date) / 1000);
-
-  if (diffInSeconds < 60) return "刚刚";
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}分钟前`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}小时前`;
-  if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}天前`;
-  return date.toLocaleDateString();
-};
 </script>
 
 <template>
@@ -199,14 +207,14 @@ const formatTimeAgo = (timestamp) => {
             >
               <button
                   class="flex items-center justify-center gap-2"
-                  @click="handleLike"
+                  @click="handleArticleLike"
               >
-                <span v-show="isLiked === false" class="text-zinc-500 hover:text-zinc-950 transition">
+                <span v-show="isArticleLiked === false" class="text-zinc-500 hover:text-zinc-950 transition">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke-width="1.5" stroke="currentColor" class="size-5">
                     <path d="M1 8.25a1.25 1.25 0 1 1 2.5 0v7.5a1.25 1.25 0 1 1-2.5 0v-7.5ZM11 3V1.7c0-.268.14-.526.395-.607A2 2 0 0 1 14 3c0 .995-.182 1.948-.514 2.826-.204.54.166 1.174.744 1.174h2.52c1.243 0 2.261 1.01 2.146 2.247a23.864 23.864 0 0 1-1.341 5.974C17.153 16.323 16.072 17 14.9 17h-3.192a3 3 0 0 1-1.341-.317l-2.734-1.366A3 3 0 0 0 6.292 15H5V8h.963c.685 0 1.258-.483 1.612-1.068a4.011 4.011 0 0 1 2.166-1.73c.432-.143.853-.386 1.011-.814.16-.432.248-.9.248-1.388Z" />
                   </svg>
                 </span>
-                <span v-show="isLiked">
+                <span v-show="isArticleLiked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
                     <path d="M1 8.25a1.25 1.25 0 1 1 2.5 0v7.5a1.25 1.25 0 1 1-2.5 0v-7.5ZM11 3V1.7c0-.268.14-.526.395-.607A2 2 0 0 1 14 3c0 .995-.182 1.948-.514 2.826-.204.54.166 1.174.744 1.174h2.52c1.243 0 2.261 1.01 2.146 2.247a23.864 23.864 0 0 1-1.341 5.974C17.153 16.323 16.072 17 14.9 17h-3.192a3 3 0 0 1-1.341-.317l-2.734-1.366A3 3 0 0 0 6.292 15H5V8h.963c.685 0 1.258-.483 1.612-1.068a4.011 4.011 0 0 1 2.166-1.73c.432-.143.853-.386 1.011-.814.16-.432.248-.9.248-1.388Z" />
                   </svg>
@@ -263,7 +271,7 @@ const formatTimeAgo = (timestamp) => {
         <div class="flex flex-col items-start">
           <div class="mb-4 flex items-center gap-2">
             <el-avatar :icon="UserFilled" :size="40"></el-avatar>
-            <span>username</span>
+            <span>{{ article.author }}</span>
           </div>
           <!-- 评论输入框 -->
           <div class="w-full" ref="commentContainer">
@@ -288,7 +296,7 @@ const formatTimeAgo = (timestamp) => {
           <!-- 评论排序 -->
           <div class="w-full flex justify-between items-center mt-10 py-5 border-b">
             <div>
-              <span class="font-bold">共0条评论</span>
+              <span class="font-bold">共{{ comments.length }}条评论</span>
             </div>
             <div class="flex gap-4">
               <button><span class="font-bold">热门</span></button>
@@ -296,8 +304,93 @@ const formatTimeAgo = (timestamp) => {
             </div>
           </div>
           <!- 评论列表 -->
-          <div>
-
+          <div class="space-y-6 my-10 w-full">
+            <div
+                v-for="comment in comments"
+                :key="comment.id"
+                class="flex gap-4 w-full"
+            >
+              <el-avatar :icon="UserFilled" :size="40"></el-avatar>
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="font-medium text-sm">{{ comment.user.username }}</span>
+                  <span class="text-xs text-gray-500">{{ formatTimestamp(comment.createTime) }}</span>
+                </div>
+                <div class="mb-4">
+                  <p class="text-sm">{{ comment.content }}</p>
+                </div>
+                <div class="flex items-center gap-4">
+                  <button
+                      class="flex items-center justify-center gap-2"
+                      @click="handleCommentLike(comment.id, comment.isLiked)"
+                  >
+                    <span v-show="comment.isLiked === false" class="text-zinc-500 hover:text-zinc-950 transition">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke="currentColor" class="size-4">
+                        <path d="M2.09 15a1 1 0 0 0 1-1V8a1 1 0 1 0-2 0v6a1 1 0 0 0 1 1ZM5.765 13H4.09V8c.663 0 1.218-.466 1.556-1.037a4.02 4.02 0 0 1 1.358-1.377c.478-.292.907-.706.989-1.26V4.32a9.03 9.03 0 0 0 0-2.642c-.028-.194.048-.394.224-.479A2 2 0 0 1 11.09 3c0 .812-.08 1.605-.235 2.371a.521.521 0 0 0 .502.629h1.733c1.104 0 2.01.898 1.901 1.997a19.831 19.831 0 0 1-1.081 4.788c-.27.747-.998 1.215-1.793 1.215H9.414c-.215 0-.428-.035-.632-.103l-2.384-.794A2.002 2.002 0 0 0 5.765 13Z" />
+                      </svg>
+                    </span>
+                    <span v-show="comment.isLiked" class="text-zinc-500 hover:text-zinc-950 transition">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4">
+                        <path d="M2.09 15a1 1 0 0 0 1-1V8a1 1 0 1 0-2 0v6a1 1 0 0 0 1 1ZM5.765 13H4.09V8c.663 0 1.218-.466 1.556-1.037a4.02 4.02 0 0 1 1.358-1.377c.478-.292.907-.706.989-1.26V4.32a9.03 9.03 0 0 0 0-2.642c-.028-.194.048-.394.224-.479A2 2 0 0 1 11.09 3c0 .812-.08 1.605-.235 2.371a.521.521 0 0 0 .502.629h1.733c1.104 0 2.01.898 1.901 1.997a19.831 19.831 0 0 1-1.081 4.788c-.27.747-.998 1.215-1.793 1.215H9.414c-.215 0-.428-.035-.632-.103l-2.384-.794A2.002 2.002 0 0 0 5.765 13Z" />
+                      </svg>
+                    </span>
+                    <span class="text-sm text-zinc-500">{{ comment.like }}</span>
+                  </button>
+                  <button class="text-zinc-500 text-sm">回复</button>
+                </div>
+                <!-- 回复表单 (默认隐藏) -->
+                <div v-if="false">
+                </div>
+                <div
+                    v-if="comment.replies && comment.replies.length !== 0"
+                    class="mt-2"
+                >
+                  <button
+                      class="flex items-center gap-2 text-zinc-500 text-sm py-2 px-4 hover:bg-zinc-100 rounded-2xl"
+                      @click="handleShowReplies(comment.id)"
+                  >
+                    <el-icon v-show="comment.showReplies === false"><ArrowDown /></el-icon>
+                    <el-icon v-show="comment.showReplies"><ArrowUp /></el-icon>
+                    <span>{{ comment.replies.length }}条回复</span>
+                  </button>
+                  <div
+                      v-if="comment.showReplies"
+                      v-for="reply in comment.replies"
+                  >
+                    <div class="flex gap-4 w-full mt-2">
+                      <el-avatar :icon="UserFilled" :size="40"></el-avatar>
+                      <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                          <span class="font-medium text-sm">{{ reply.user.username }}</span>
+                          <span class="text-xs text-gray-500">{{ formatTimestamp(reply.createTime) }}</span>
+                        </div>
+                        <div class="mb-4">
+                          <p class="text-sm">{{ reply.content }}</p>
+                        </div>
+                        <div class="flex items-center">
+                          <button
+                              @click="handleCommentLike(reply.id, reply.isLiked)"
+                              class="flex items-center justify-center gap-2"
+                          >
+                            <span v-show="reply.isLiked === false" class="text-zinc-500 hover:text-zinc-950 transition">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                <path d="M2.09 15a1 1 0 0 0 1-1V8a1 1 0 1 0-2 0v6a1 1 0 0 0 1 1ZM5.765 13H4.09V8c.663 0 1.218-.466 1.556-1.037a4.02 4.02 0 0 1 1.358-1.377c.478-.292.907-.706.989-1.26V4.32a9.03 9.03 0 0 0 0-2.642c-.028-.194.048-.394.224-.479A2 2 0 0 1 11.09 3c0 .812-.08 1.605-.235 2.371a.521.521 0 0 0 .502.629h1.733c1.104 0 2.01.898 1.901 1.997a19.831 19.831 0 0 1-1.081 4.788c-.27.747-.998 1.215-1.793 1.215H9.414c-.215 0-.428-.035-.632-.103l-2.384-.794A2.002 2.002 0 0 0 5.765 13Z" />
+                              </svg>
+                            </span>
+                            <span v-show="reply.isLiked" class="text-zinc-500 hover:text-zinc-950 transition">
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4">
+                                <path d="M2.09 15a1 1 0 0 0 1-1V8a1 1 0 1 0-2 0v6a1 1 0 0 0 1 1ZM5.765 13H4.09V8c.663 0 1.218-.466 1.556-1.037a4.02 4.02 0 0 1 1.358-1.377c.478-.292.907-.706.989-1.26V4.32a9.03 9.03 0 0 0 0-2.642c-.028-.194.048-.394.224-.479A2 2 0 0 1 11.09 3c0 .812-.08 1.605-.235 2.371a.521.521 0 0 0 .502.629h1.733c1.104 0 2.01.898 1.901 1.997a19.831 19.831 0 0 1-1.081 4.788c-.27.747-.998 1.215-1.793 1.215H9.414c-.215 0-.428-.035-.632-.103l-2.384-.794A2.002 2.002 0 0 0 5.765 13Z" />
+                              </svg>
+                            </span>
+                            <span class="text-sm text-zinc-500">{{ reply.like }}</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
