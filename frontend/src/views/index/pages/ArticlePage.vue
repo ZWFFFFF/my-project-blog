@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, reactive} from 'vue'
+import { onMounted, ref, reactive, computed } from 'vue'
 import { useRoute, useRouter } from "vue-router";
 import {disLikeArticle, getArticle, getDraft, likeArticle} from "@/net/article.js";
 import {ArrowDown, ArrowUp, UserFilled} from "@element-plus/icons-vue";
@@ -9,7 +9,7 @@ import {ElMessage} from "element-plus";
 import {formatTimestamp, throttle} from "@/net/utils.js";
 import {useStore} from "vuex";
 import Button from "@/components/Button.vue";
-import {dislikeComment, getComments, likeComment} from "@/net/comment.js";
+import {creatComment, deleteComment, dislikeComment, getComments, likeComment} from "@/net/comment.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -35,6 +35,25 @@ const isCommentInputExpanded = ref(false);
 const commentText = ref('');
 const commentContainer = ref(null);
 const comments = ref([])
+const activeReplyForms = ref({}) // 存储当前激活的回复表单, eg.{ 123: true, 456: false }
+const replyTexts = ref({}) // 存储回复内容, eg.{ 123: '回复内容', 456: '回复内容' }
+const sortOption = ref('hot') // 评论排序 'latest' 或 'hot'
+const sortedComments = computed(() => {
+  // 分离新评论和普通评论
+  const newComments = comments.value.filter(c => c.isNewComment)
+  const normalComments = comments.value.filter(c => !c.isNewComment)
+
+  // 只对普通评论排序
+  const sortedNormalComments = [...normalComments]
+  if (sortOption.value === 'latest') {
+    sortedNormalComments.sort((a, b) => new Date(b.createTime) - new Date(a.createTime))
+  } else {
+    sortedNormalComments.sort((a, b) => b.initialLike - a.initialLike)
+  }
+
+  // 新评论在前，后面是排序后的普通评论
+  return [...newComments, ...sortedNormalComments]
+})
 
 const fetchData = () => {
   if(articleType.value === 'approved') {
@@ -50,11 +69,11 @@ const fetchData = () => {
         ...comment,
         isLiked: false,
         showReplies: false,
+        initialLike: comment.like, // 保存初始点赞数用于排序
         replies: comment.replies ? addProperty(comment.replies) : []
       }))
 
       comments.value = addProperty(data)
-      console.log(comments.value)
     })
   } else if(articleType.value === 'draft') {
     getDraft(articleId.value, (data) => {
@@ -86,7 +105,7 @@ const articleLike = () => {
 
 const handleArticleLike = throttle(articleLike, 500)
 
-const Collect = () => {
+const collect = () => {
   if(articleType.value === 'approved') {
     if(isCollected.value === false) {
       isCollected.value = true
@@ -98,7 +117,7 @@ const Collect = () => {
   }
 }
 
-const handleCollect = throttle(Collect, 500)
+const handleCollect = throttle(collect, 500)
 
 const share = () => {
   navigator.clipboard.writeText(window.location.href)
@@ -115,6 +134,40 @@ const collapseCommentTextarea = () => {
     isCommentInputExpanded.value = false;
   }
 };
+
+const submitComment = () => {
+  if (!commentText.value || commentText.value.trim() === '') {
+    ElMessage.warning('评论内容不能为空')
+    return
+  }
+
+  if(!confirm("确定要发送该评论吗？")) {
+    return
+  }
+
+  const comment = {
+    articleId: Number(articleId.value),
+    userId: store.state.userId,
+    content: commentText.value
+  }
+
+  creatComment(comment, (data) => {
+    // 添加新评论到前端状态
+    comments.value.unshift({
+      ...data,
+      isLiked: false,
+      showReplies: false,
+      replies: [],
+      isNewComment: true // 用于标记新评论顶置
+    })
+
+    // 清空输入框
+    commentText.value = ''
+    isCommentInputExpanded.value = false
+  })
+}
+
+const handleCommentSubmit = throttle(submitComment, 500)
 
 // 显示评论的回复信息
 const handleShowReplies = (commentId) => {
@@ -138,6 +191,7 @@ const commentLike = (commentId, isLiked) => {
 
 const handleCommentLike = throttle(commentLike, 500)
 
+// 更新前端点赞数显示
 function updateCommentLikeProperty(commentId, comments) {
   for(const comment of comments)  {
     if(comment.id === commentId) {
@@ -156,6 +210,96 @@ function updateCommentLikeProperty(commentId, comments) {
   }
   return false // 未找到该评论
 }
+
+// 切换回复表单显示状态的函数
+const toggleReplyForm = (commentId) => {
+  activeReplyForms.value[commentId] = !activeReplyForms.value[commentId]
+  replyTexts.value[commentId] = '' // 清空回复内容
+}
+
+// 提交评论的函数
+const submitReply = (commentId) => {
+
+  const content = replyTexts.value[commentId]
+  if (!content || content.trim() === '') {
+    ElMessage.warning('回复内容不能为空')
+    return
+  }
+
+  if(!confirm("确定要回复该评论吗？")) {
+    return
+  }
+
+  const comment = {
+    parentId: commentId,
+    articleId: Number(articleId.value),
+    userId: store.state.userId,
+    content: content
+  }
+
+  creatComment(comment, (data) => {
+    // 更新数据显示
+    // 找到父评论并添加回复
+    const parentComment = findCommentById(comments.value, commentId)
+    if (parentComment) {
+      if (!parentComment.replies) {
+        parentComment.replies = []
+      }
+      parentComment.replies.unshift({
+        ...data,
+        isLiked: false
+      })
+
+      // 自动展开回复区域
+      parentComment.showReplies = true
+
+      // 清空回复表单
+      replyTexts.value[commentId] = ''
+      activeReplyForms.value[commentId] = false
+    }
+  })
+}
+
+// 辅助函数：递归查找评论
+function findCommentById(comments, id) {
+  for (const comment of comments) {
+    if (comment.id === id) return comment
+    if (comment.replies?.length > 0) {
+      const found = findCommentById(comment.replies, id)
+      if (found) return found
+    }
+  }
+  return null
+}
+
+const handleReplySubmit = throttle(submitReply, 500)
+
+const deleteMyComment = (commentId) => {
+  if(confirm("确定要删除该评论吗？")) {
+    deleteComment(commentId, () => {
+      // 从前端状态中移除评论
+      removeCommentFromState(comments.value, commentId)
+    })
+  }
+}
+
+// 辅助函数：递归删除评论
+function removeCommentFromState(comments, id) {
+  for (let i = 0; i < comments.length; i++) {
+    if (comments[i].id === id) {
+      comments.splice(i, 1)
+      return true
+    }
+    if (comments[i].replies?.length > 0) {
+      if (removeCommentFromState(comments[i].replies, id)) {
+        return true
+      }
+    }
+  }
+  return false
+}
+
+const handleDeleteMyComment = throttle(deleteMyComment, 500)
 
 onMounted(() => {
   fetchData()
@@ -283,13 +427,19 @@ onMounted(() => {
                   placeholder="有什么想说的..."
                   v-model="commentText"
                   @click="expandCommentTextarea"
+                  maxlength="300"
               />
               <div
                   class="flex justify-end transition-opacity duration-300 ease-in-out"
                   :class="{ 'opacity-0': !isCommentInputExpanded, 'opacity-100': isCommentInputExpanded }"
                   v-show="isCommentInputExpanded"
               >
-                <button class="bg-zinc-300 rounded-3xl py-2 px-4 text-white transition-colors">发送</button>
+                <button
+                    class="bg-zinc-300 rounded-3xl py-2 px-4 text-white transition-colors"
+                    @click="handleCommentSubmit"
+                >
+                  发送
+                </button>
               </div>
             </div>
           </div>
@@ -299,14 +449,24 @@ onMounted(() => {
               <span class="font-bold">共{{ comments.length }}条评论</span>
             </div>
             <div class="flex gap-4">
-              <button><span class="font-bold">热门</span></button>
-              <button><span class="font-bold">最新</span></button>
+              <button
+                  @click="sortOption = 'hot'"
+                  :class="[sortOption === 'hot' ? 'text-zinc-800' : 'text-zinc-400']"
+              >
+                <span class="font-bold">热门</span>
+              </button>
+              <button
+                  @click="sortOption = 'latest'"
+                  :class="[sortOption === 'latest' ? 'text-zinc-800' : 'text-zinc-400']"
+              >
+                <span class="font-bold">最新</span>
+              </button>
             </div>
           </div>
           <!- 评论列表 -->
           <div class="space-y-6 my-10 w-full">
             <div
-                v-for="comment in comments"
+                v-for="comment in sortedComments"
                 :key="comment.id"
                 class="flex gap-4 w-full"
             >
@@ -336,10 +496,45 @@ onMounted(() => {
                     </span>
                     <span class="text-sm text-zinc-500">{{ comment.like }}</span>
                   </button>
-                  <button class="text-zinc-500 text-sm">回复</button>
+                  <button
+                      class="text-zinc-500 text-sm"
+                      @click="toggleReplyForm(comment.id)"
+                  >
+                    回复
+                  </button>
+                  <button
+                      v-if="article.authorId === store.state.userId || comment.user.id === store.state.userId"
+                      class="text-zinc-500 text-sm"
+                      @click="handleDeleteMyComment(comment.id)"
+                  >
+                    删除
+                  </button>
                 </div>
                 <!-- 回复表单 (默认隐藏) -->
-                <div v-if="false">
+                <div class="w-full mt-4" v-if="activeReplyForms[comment.id]">
+                  <div class="flex flex-col gap-4 p-4 rounded-xl bg-[#F6F6F6]">
+                    <textarea
+                        class="w-full bg-[#F6F6F6] leading-6 outline-none resize-none break-words h-[100px]"
+                        type="text"
+                        placeholder="有什么想说的..."
+                        v-model="replyTexts[comment.id]"
+                        maxlength="300"
+                    />
+                    <div class="flex justify-end gap-2">
+                      <button
+                          class="rounded-3xl py-2 px-4 text-gray-400 transition-colors hover:bg-gray-200"
+                          @click="toggleReplyForm(comment.id)"
+                      >
+                        取消
+                      </button>
+                      <button
+                          class="bg-zinc-300 rounded-3xl py-2 px-4 text-white transition-colors"
+                          @click="handleReplySubmit(comment.id)"
+                      >
+                        发送
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 <div
                     v-if="comment.replies && comment.replies.length !== 0"
@@ -367,7 +562,7 @@ onMounted(() => {
                         <div class="mb-4">
                           <p class="text-sm">{{ reply.content }}</p>
                         </div>
-                        <div class="flex items-center">
+                        <div class="flex items-center gap-2">
                           <button
                               @click="handleCommentLike(reply.id, reply.isLiked)"
                               class="flex items-center justify-center gap-2"
@@ -384,12 +579,23 @@ onMounted(() => {
                             </span>
                             <span class="text-sm text-zinc-500">{{ reply.like }}</span>
                           </button>
+                          <button
+                              v-if="article.authorId === store.state.userId || reply.user.id === store.state.userId"
+                              class="text-zinc-500 text-sm"
+                              @click="handleDeleteMyComment(reply.id)"
+                          >
+                            删除
+                          </button>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
+            </div>
+            <div class="text-center">
+              <span v-if="comments.length > 0" class="font-bold text-zinc-400">没有更多评论了</span>
+              <span v-else class="font-bold text-zinc-400">还没有评论哦</span>
             </div>
           </div>
         </div>

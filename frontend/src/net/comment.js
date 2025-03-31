@@ -25,6 +25,7 @@ function deleteComment(id, success) {
     get({
         url: 'api/comment/delete-comment?commentId=' + id,
         success: () => {
+            ElMessage.success('删除成功')
             success()
         }
     })
