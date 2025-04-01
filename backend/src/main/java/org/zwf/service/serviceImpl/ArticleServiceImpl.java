@@ -3,9 +3,12 @@ package org.zwf.service.serviceImpl;
 import jakarta.annotation.Resource;
 import org.zwf.entity.RestBean;
 import org.zwf.entity.dto.Article;
+import org.zwf.entity.dto.ArticleCollect;
 import org.zwf.entity.vo.request.CreateArticleVO;
 import org.zwf.entity.vo.request.UpdateArticleVO;
+import org.zwf.entity.vo.response.ArticleCollectVo;
 import org.zwf.entity.vo.response.ArticleVO;
+import org.zwf.mapper.ArticleCollectMapper;
 import org.zwf.mapper.ArticleMapper;
 import org.zwf.mapper.CommentMapper;
 import org.zwf.service.AccountService;
@@ -17,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zwf.utils.AuthUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +37,8 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleMapper articleMapper;
     @Resource
     private CommentMapper commentMapper;
+    @Resource
+    private ArticleCollectMapper articleCollectMapper;
     @Resource
     private FlowUtil flowUtil;
     @Resource
@@ -83,6 +89,8 @@ public class ArticleServiceImpl implements ArticleService {
 
         // 删除文章对应的评论
         commentMapper.deleteCommentsByArticleId(articleId);
+        // 删除文章对应的收藏
+        articleCollectMapper.deleteArticleCollectByArticleId(articleId);
 
         // 删除文章
         int delete = articleMapper.deletePublishedArticle(articleId);
@@ -151,6 +159,16 @@ public class ArticleServiceImpl implements ArticleService {
         if(!article.getStatus().equals("approved")) return RestBean.argumentNotValid("非法操作");
 
         ArticleVO vo = this.toArticleVO(article);
+        // 判断当前用户是否收藏和点赞了该文章
+        // 判断用户是否登录
+        if (AuthUtil.isLoggedIn()) {
+            Integer userId = AuthUtil.getCurrentUserId();
+            boolean isCollected = articleCollectMapper.isCollected(userId, articleId);
+            vo.setIsCollected(isCollected);
+        } else {
+            // 未登录用户
+            vo.setIsCollected(false);
+        }
         return RestBean.success(vo);
     }
 
@@ -504,6 +522,50 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
+     * 收藏/取消收藏文章
+     * @param articleId 文章id
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    @Transactional
+    public String toggleCollect(Integer articleId) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = Integer.valueOf(user.getUsername());
+
+        boolean isCollected = articleCollectMapper.isCollected(userId, articleId);
+
+        if(isCollected) {
+            // 取消收藏
+            articleCollectMapper.cancelCollectArticle(userId, articleId);
+        } else {
+            // 收藏
+            articleCollectMapper.collectArticle(userId, articleId);
+        }
+        return null;
+    }
+
+    /**
+     * 获取收藏的文章列表
+     * @return 文章列表
+     */
+    @Override
+    public RestBean<List<ArticleCollectVo>> getCollectedArticles() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Integer userId = Integer.valueOf(user.getUsername());
+
+        List<ArticleCollect> collects = articleCollectMapper.getUserCollectArticles(userId);
+
+        // 将非发布状态的文章过滤掉
+        collects.removeIf(collect -> !collect.getStatus().equals("approved"));
+
+        List<ArticleCollectVo> collectVos = new ArrayList<>();
+        for(ArticleCollect collect: collects) {
+            collectVos.add(this.toArticleCollectVO(collect));
+        }
+        return RestBean.success(collectVos);
+    }
+
+    /**
      * 将文章实体转换为文章信息实体
      * @param article 文章实体
      * @return 文章信息实体
@@ -528,6 +590,33 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setStatus(article.getStatus());
         vo.setView(article.getView());
         vo.setLike(article.getLike());
+        return vo;
+    }
+
+    /**
+     * 将文章收藏实体转换为文章收藏信息实体
+     * @param collect 文章收藏实体
+     * @return 文章收藏信息实体
+     */
+    private ArticleCollectVo toArticleCollectVO(ArticleCollect collect) {
+        Integer authorId = collect.getAuthorId();
+        String author = accountService.getUsernameById(authorId);
+        if(author == null) {
+            author = "账号已注销";
+            authorId = null;
+        }
+
+        ArticleCollectVo vo = new ArticleCollectVo();
+        vo.setId(collect.getId());
+        vo.setTitle(collect.getTitle());
+        vo.setSummary(collect.getSummary());
+        vo.setAuthorId(authorId);
+        vo.setAuthor(author);
+        vo.setCreatedAt(collect.getCreatedAt());
+        vo.setStatus(collect.getStatus());
+        vo.setView(collect.getView());
+        vo.setLike(collect.getLike());
+        vo.setCollectedTime(collect.getCollectedTime());
         return vo;
     }
 }

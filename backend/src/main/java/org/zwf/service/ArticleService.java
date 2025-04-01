@@ -3,6 +3,7 @@ package org.zwf.service;
 import org.zwf.entity.RestBean;
 import org.zwf.entity.vo.request.CreateArticleVO;
 import org.zwf.entity.vo.request.UpdateArticleVO;
+import org.zwf.entity.vo.response.ArticleCollectVo;
 import org.zwf.entity.vo.response.ArticleVO;
 
 import java.util.List;
@@ -31,4 +32,6 @@ public interface ArticleService {
     RestBean<List<ArticleVO>> getTakeDownArticleList();
     String likeArticle(Integer articleId);
     String dislikeArticle(Integer articleId);
+    String toggleCollect(Integer articleId);
+    RestBean<List<ArticleCollectVo>> getCollectedArticles();
 }

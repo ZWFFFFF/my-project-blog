@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref, reactive, computed } from 'vue'
 import { useRoute, useRouter } from "vue-router";
-import {disLikeArticle, getArticle, getDraft, likeArticle} from "@/net/article.js";
+import {collectArticleToggle, disLikeArticle, getArticle, getDraft, likeArticle} from "@/net/article.js";
 import {ArrowDown, ArrowUp, UserFilled} from "@element-plus/icons-vue";
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 import { QuillEditor } from '@vueup/vue-quill'
@@ -27,10 +27,10 @@ const article = reactive({
   createdAt: '',
   updatedAt: '',
   view: null,
-  like: null
+  like: null,
+  isCollected: null,
 })
 const isArticleLiked = ref(false)
-const isCollected = ref(false)
 const isCommentInputExpanded = ref(false);
 const commentText = ref('');
 const commentContainer = ref(null);
@@ -89,7 +89,7 @@ const fetchData = () => {
 
 const articleLike = () => {
   if(articleType.value === 'approved') {
-    if(isArticleLiked.value === false) {
+    if(!isArticleLiked.value) {
       likeArticle(articleId.value, () => {
         isArticleLiked.value = true
         article.like++
@@ -107,12 +107,14 @@ const handleArticleLike = throttle(articleLike, 500)
 
 const collect = () => {
   if(articleType.value === 'approved') {
-    if(isCollected.value === false) {
-      isCollected.value = true
-      console.log('collect')
+    if(!article.isCollected) {
+      collectArticleToggle(articleId.value, () => {
+        article.isCollected = true
+      })
     } else {
-      isCollected.value = false
-      console.log('no-collect')
+      collectArticleToggle(articleId.value, () => {
+        article.isCollected = false
+      })
     }
   }
 }
@@ -120,8 +122,10 @@ const collect = () => {
 const handleCollect = throttle(collect, 500)
 
 const share = () => {
-  navigator.clipboard.writeText(window.location.href)
-  ElMessage.success('链接已复制到剪贴板')
+  if(articleType.value === 'approved') {
+    navigator.clipboard.writeText(window.location.href)
+    ElMessage.success('链接已复制到剪贴板')
+  }
 }
 
 const handleShare = throttle(share, 1000)
@@ -136,6 +140,8 @@ const collapseCommentTextarea = () => {
 };
 
 const submitComment = () => {
+  if(articleType.value !== 'approved') return
+
   if (!commentText.value || commentText.value.trim() === '') {
     ElMessage.warning('评论内容不能为空')
     return
@@ -178,6 +184,8 @@ const handleShowReplies = (commentId) => {
 }
 
 const commentLike = (commentId, isLiked) => {
+  if(articleType.value !== 'approved') return
+
   if(isLiked === false) {
     likeComment(commentId, () => {
       updateCommentLikeProperty(commentId, comments.value)
@@ -219,6 +227,7 @@ const toggleReplyForm = (commentId) => {
 
 // 提交评论的函数
 const submitReply = (commentId) => {
+  if(articleType.value !== 'approved') return;
 
   const content = replyTexts.value[commentId]
   if (!content || content.trim() === '') {
@@ -275,6 +284,8 @@ function findCommentById(comments, id) {
 const handleReplySubmit = throttle(submitReply, 500)
 
 const deleteMyComment = (commentId) => {
+  if(articleType.value !== 'approved') return
+
   if(confirm("确定要删除该评论吗？")) {
     deleteComment(commentId, () => {
       // 从前端状态中移除评论
@@ -376,12 +387,12 @@ onMounted(() => {
                   class="flex items-center justify-center"
                   @click="handleCollect"
               >
-                <span v-show="isCollected === false" class="text-zinc-500 hover:text-zinc-950 transition">
+                <span v-show="!article.isCollected" class="text-zinc-500 hover:text-zinc-950 transition">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke-width="1.5" stroke="currentColor" class="size-5">
                     <path fill-rule="evenodd" d="M10 2c-1.716 0-3.408.106-5.07.31C3.806 2.45 3 3.414 3 4.517V17.25a.75.75 0 0 0 1.075.676L10 15.082l5.925 2.844A.75.75 0 0 0 17 17.25V4.517c0-1.103-.806-2.068-1.93-2.207A41.403 41.403 0 0 0 10 2Z" clip-rule="evenodd" />
                   </svg>
                 </span>
-                <span v-show="isCollected">
+                <span v-show="article.isCollected">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
                     <path fill-rule="evenodd" d="M10 2c-1.716 0-3.408.106-5.07.31C3.806 2.45 3 3.414 3 4.517V17.25a.75.75 0 0 0 1.075.676L10 15.082l5.925 2.844A.75.75 0 0 0 17 17.25V4.517c0-1.103-.806-2.068-1.93-2.207A41.403 41.403 0 0 0 10 2Z" clip-rule="evenodd" />
                   </svg>

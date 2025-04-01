@@ -11,7 +11,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { uploadAvatar } from '@/net/user.js'
@@ -39,6 +39,8 @@ const beforeAvatarUpload = (rawFile) => {
   }
   return true
 }
+onMounted(() => {
+})
 </script>
 
 <style scoped>

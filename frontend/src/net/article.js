@@ -6,8 +6,7 @@ function getArticleList(success) {
         url: 'api/article/article-list',
         success: (data) => {
             success(data)
-        },
-        withToken: false
+        }
     })
 }
 
@@ -16,8 +15,7 @@ function getUserArticles(id, success) {
         url: 'api/article/user-articles?userId=' + id,
         success: (data) => {
             success(data)
-        },
-        withToken: false
+        }
     })
 }
 
@@ -49,8 +47,7 @@ function getArticle(id, success, failure = () => {}) {
             console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
             ElMessage.warning(message)
             failure()
-        },
-        withToken: false
+        }
     })
 }
 
@@ -73,8 +70,7 @@ function searchArticleList(keyword, success) {
         url: 'api/article/search?keyword=' + keyword,
         success: (data) => {
             success(data)
-        },
-        withToken: false
+        }
     })
 }
 
@@ -257,6 +253,24 @@ function disLikeArticle(articleId, success) {
     })
 }
 
+function collectArticleToggle(articleId, success) {
+    get({
+        url: 'api/article/collect-toggle?articleId=' + articleId,
+        success: () => {
+            success()
+        }
+    })
+}
+
+function getUserArticleCollects(success) {
+    get({
+        url: 'api/article/collect-list',
+        success: (data) => {
+            success(data)
+        }
+    })
+}
+
 export {
     getArticleList, getArticle, getDraft, getUserArticles,
     getUserDrafts, getUserReviewArticles, searchArticleList, createArticle,
@@ -264,5 +278,5 @@ export {
     submitToReview, getPendingReviewList, getReviewingList, getReviewedArticle,
     startReview, approveReview, rejectReview, resetReviewing,
     getTakeDownList, takeDownArticle, recoverArticle, likeArticle,
-    disLikeArticle
+    disLikeArticle, collectArticleToggle, getUserArticleCollects
 }

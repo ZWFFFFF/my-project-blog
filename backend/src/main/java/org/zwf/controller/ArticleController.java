@@ -9,6 +9,7 @@ import org.zwf.annotation.OperationLog;
 import org.zwf.entity.RestBean;
 import org.zwf.entity.vo.request.CreateArticleVO;
 import org.zwf.entity.vo.request.UpdateArticleVO;
+import org.zwf.entity.vo.response.ArticleCollectVo;
 import org.zwf.entity.vo.response.ArticleVO;
 import org.zwf.service.ArticleService;
 import org.springframework.validation.annotation.Validated;
@@ -298,5 +299,26 @@ public class ArticleController {
     @Operation(summary = "取消点赞文章")
     public RestBean<Void> dislikeArticle(@RequestParam @NotNull Integer articleId) {
         return RestBean.messageHandler(() -> articleService.dislikeArticle(articleId));
+    }
+
+    /**
+     * 收藏/取消收藏文章
+     * @param articleId 文章id
+     * @return 响应实体
+     */
+    @GetMapping("/collect-toggle")
+    @Operation(summary = "收藏/取消收藏文章")
+    public RestBean<Void> articleCollectToggle(@RequestParam @NotNull Integer articleId) {
+        return RestBean.messageHandler(() -> articleService.toggleCollect(articleId));
+    }
+
+    /**
+     * 获取收藏文章列表
+     * @return 响应实体
+     */
+    @GetMapping("/collect-list")
+    @Operation(summary = "获取收藏文章列表")
+    public RestBean<List<ArticleCollectVo>> getCollectList() {
+        return articleService.getCollectedArticles();
     }
 }

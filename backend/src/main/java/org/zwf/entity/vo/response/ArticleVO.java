@@ -20,4 +20,5 @@ public class ArticleVO {
     private Integer view;
     private Integer like;
     private String status;
+    private Boolean isCollected; // 用户是否收藏了该文章
 }
