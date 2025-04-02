@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref, reactive, computed } from 'vue'
 import { useRoute, useRouter } from "vue-router";
-import {collectArticleToggle, disLikeArticle, getArticle, getDraft, likeArticle} from "@/net/article.js";
+import {collectArticleToggle, getArticle, getDraft, likeArticleToggle} from "@/net/article.js";
 import {ArrowDown, ArrowUp, UserFilled} from "@element-plus/icons-vue";
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 import { QuillEditor } from '@vueup/vue-quill'
@@ -9,7 +9,7 @@ import {ElMessage} from "element-plus";
 import {formatTimestamp, throttle} from "@/net/utils.js";
 import {useStore} from "vuex";
 import Button from "@/components/Button.vue";
-import {creatComment, deleteComment, dislikeComment, getComments, likeComment} from "@/net/comment.js";
+import {creatComment, deleteComment, cancelLikeComment, getComments, likeComment} from "@/net/comment.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -29,8 +29,8 @@ const article = reactive({
   view: null,
   like: null,
   isCollected: null,
+  isLiked: null
 })
-const isArticleLiked = ref(false)
 const isCommentInputExpanded = ref(false);
 const commentText = ref('');
 const commentContainer = ref(null);
@@ -88,15 +88,19 @@ const fetchData = () => {
 }
 
 const articleLike = () => {
+  if(!store.state.userId) {
+    ElMessage.warning('请先登录')
+  }
+
   if(articleType.value === 'approved') {
-    if(!isArticleLiked.value) {
-      likeArticle(articleId.value, () => {
-        isArticleLiked.value = true
+    if(!article.isLiked) {
+      likeArticleToggle(articleId.value, () => {
+        article.isLiked = true
         article.like++
       })
     } else {
-      disLikeArticle(articleId.value, () => {
-        isArticleLiked.value = false
+      likeArticleToggle(articleId.value, () => {
+        article.isLiked = false
         article.like--
       })
     }
@@ -106,6 +110,10 @@ const articleLike = () => {
 const handleArticleLike = throttle(articleLike, 500)
 
 const collect = () => {
+  if(!store.state.userId) {
+    ElMessage.warning('请先登录')
+  }
+
   if(articleType.value === 'approved') {
     if(!article.isCollected) {
       collectArticleToggle(articleId.value, () => {
@@ -140,6 +148,10 @@ const collapseCommentTextarea = () => {
 };
 
 const submitComment = () => {
+  if(!store.state.userId) {
+    ElMessage.warning('请先登录')
+  }
+
   if(articleType.value !== 'approved') return
 
   if (!commentText.value || commentText.value.trim() === '') {
@@ -184,6 +196,10 @@ const handleShowReplies = (commentId) => {
 }
 
 const commentLike = (commentId, isLiked) => {
+  if(!store.state.userId) {
+    ElMessage.warning('请先登录')
+  }
+
   if(articleType.value !== 'approved') return
 
   if(isLiked === false) {
@@ -191,7 +207,7 @@ const commentLike = (commentId, isLiked) => {
       updateCommentLikeProperty(commentId, comments.value)
     })
   } else {
-    dislikeComment(commentId, () => {
+    cancelLikeComment(commentId, () => {
       updateCommentLikeProperty(commentId, comments.value)
     })
   }
@@ -227,6 +243,10 @@ const toggleReplyForm = (commentId) => {
 
 // 提交评论的函数
 const submitReply = (commentId) => {
+  if(!store.state.userId) {
+    ElMessage.warning('请先登录')
+  }
+
   if(articleType.value !== 'approved') return;
 
   const content = replyTexts.value[commentId]
@@ -364,12 +384,12 @@ onMounted(() => {
                   class="flex items-center justify-center gap-2"
                   @click="handleArticleLike"
               >
-                <span v-show="isArticleLiked === false" class="text-zinc-500 hover:text-zinc-950 transition">
+                <span v-show="!article.isLiked" class="text-zinc-500 hover:text-zinc-950 transition">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke-width="1.5" stroke="currentColor" class="size-5">
                     <path d="M1 8.25a1.25 1.25 0 1 1 2.5 0v7.5a1.25 1.25 0 1 1-2.5 0v-7.5ZM11 3V1.7c0-.268.14-.526.395-.607A2 2 0 0 1 14 3c0 .995-.182 1.948-.514 2.826-.204.54.166 1.174.744 1.174h2.52c1.243 0 2.261 1.01 2.146 2.247a23.864 23.864 0 0 1-1.341 5.974C17.153 16.323 16.072 17 14.9 17h-3.192a3 3 0 0 1-1.341-.317l-2.734-1.366A3 3 0 0 0 6.292 15H5V8h.963c.685 0 1.258-.483 1.612-1.068a4.011 4.011 0 0 1 2.166-1.73c.432-.143.853-.386 1.011-.814.16-.432.248-.9.248-1.388Z" />
                   </svg>
                 </span>
-                <span v-show="isArticleLiked">
+                <span v-show="article.isLiked">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
                     <path d="M1 8.25a1.25 1.25 0 1 1 2.5 0v7.5a1.25 1.25 0 1 1-2.5 0v-7.5ZM11 3V1.7c0-.268.14-.526.395-.607A2 2 0 0 1 14 3c0 .995-.182 1.948-.514 2.826-.204.54.166 1.174.744 1.174h2.52c1.243 0 2.261 1.01 2.146 2.247a23.864 23.864 0 0 1-1.341 5.974C17.153 16.323 16.072 17 14.9 17h-3.192a3 3 0 0 1-1.341-.317l-2.734-1.366A3 3 0 0 0 6.292 15H5V8h.963c.685 0 1.258-.483 1.612-1.068a4.011 4.011 0 0 1 2.166-1.73c.432-.143.853-.386 1.011-.814.16-.432.248-.9.248-1.388Z" />
                   </svg>

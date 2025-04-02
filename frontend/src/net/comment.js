@@ -40,9 +40,9 @@ function likeComment(id, success) {
     })
 }
 
-function dislikeComment(id, success) {
+function cancelLikeComment(id, success) {
     get({
-        url: 'api/comment/dislike-comment?commentId=' + id,
+        url: 'api/comment/cancelLike-comment?commentId=' + id,
         success: () => {
             success()
         }
@@ -51,5 +51,5 @@ function dislikeComment(id, success) {
 
 export {
     creatComment, getComments, deleteComment,
-    likeComment, dislikeComment
+    likeComment, cancelLikeComment
 }

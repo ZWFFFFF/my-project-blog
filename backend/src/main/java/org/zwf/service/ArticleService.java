@@ -30,8 +30,7 @@ public interface ArticleService {
     String takeDownArticle(List<Integer> articleIds);
     String recoverArticle(List<Integer> articleIds);
     RestBean<List<ArticleVO>> getTakeDownArticleList();
-    String likeArticle(Integer articleId);
-    String dislikeArticle(Integer articleId);
+    String toggleLikeArticle(Integer articleId);
     String toggleCollect(Integer articleId);
     RestBean<List<ArticleCollectVo>> getCollectedArticles();
 }

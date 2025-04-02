@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.zwf.utils.AuthUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -135,8 +136,10 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentMapper.selectCommentById(commentId);
         if(comment == null) return "评论不存在";
 
+        Integer userId = AuthUtil.getCurrentUserId();
+        if (userId == null) return "请登录后再进行操作";
         // 点赞请求放入消息队列中，由消息队列异步处理点赞
-        Map<String, Object> msg = Map.of("action", "like", "type", "comment", "id", commentId);
+        Map<String, Object> msg = Map.of("action", "like", "type", "comment", "id", commentId, "userId", userId);
         amqpTemplate.convertAndSend("like", msg);
         return null;
     }
@@ -147,12 +150,14 @@ public class CommentServiceImpl implements CommentService {
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
-    public String dislikeComment(Integer commentId) {
+    public String cancelLikeComment(Integer commentId) {
         Comment comment = commentMapper.selectCommentById(commentId);
         if(comment == null) return "评论不存在";
 
+        Integer userId = AuthUtil.getCurrentUserId();
+        if (userId == null) return "请登录后再进行操作";
         // 点赞请求放入消息队列中，由消息队列异步处理点赞
-        Map<String, Object> msg = Map.of("action", "dislike", "type", "comment", "id", commentId);
+        Map<String, Object> msg = Map.of("action", "cancelLike", "type", "comment", "id", commentId, "userId", userId);
         amqpTemplate.convertAndSend("like", msg);
         return null;
     }

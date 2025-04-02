@@ -74,9 +74,9 @@ public class CommentController {
      * @param commentId 评论id
      * @return 响应实体
      */
-    @GetMapping("/dislike-comment")
+    @GetMapping("/cancelLike-comment")
     @Operation(summary = "取消点赞评论")
-    public RestBean<Void> dislikeComment(@RequestParam @NotNull Integer commentId) {
-        return RestBean.messageHandler(() -> commentService.dislikeComment(commentId));
+    public RestBean<Void> cancelLikeComment(@RequestParam @NotNull Integer commentId) {
+        return RestBean.messageHandler(() -> commentService.cancelLikeComment(commentId));
     }
 }

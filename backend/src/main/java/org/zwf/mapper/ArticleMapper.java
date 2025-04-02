@@ -36,5 +36,5 @@ public interface ArticleMapper {
     @Update("update article set `like` = `like` + 1 where id = #{id}")
     void likeArticle(Integer id);
     @Update("update article set `like` = `like` - 1 where id = #{id}")
-    void dislikeArticle(Integer id);
+    void cancelLikeArticle(Integer id);
 }

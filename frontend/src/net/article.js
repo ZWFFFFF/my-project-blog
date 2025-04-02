@@ -235,18 +235,9 @@ function recoverArticle(articleIds, success) {
     })
 }
 
-function likeArticle(articleId, success) {
+function likeArticleToggle(articleId, success) {
     get({
-        url: 'api/article/like-article?articleId=' + articleId,
-        success: () => {
-            success();
-        }
-    })
-}
-
-function disLikeArticle(articleId, success) {
-    get({
-        url: 'api/article/dislike-article?articleId=' + articleId,
+        url: 'api/article/like-toggle?articleId=' + articleId,
         success: () => {
             success();
         }
@@ -277,6 +268,6 @@ export {
     updateArticle, updateDraft, deleteArticle, deleteDraft,
     submitToReview, getPendingReviewList, getReviewingList, getReviewedArticle,
     startReview, approveReview, rejectReview, resetReviewing,
-    getTakeDownList, takeDownArticle, recoverArticle, likeArticle,
-    disLikeArticle, collectArticleToggle, getUserArticleCollects
+    getTakeDownList, takeDownArticle, recoverArticle, likeArticleToggle,
+    collectArticleToggle, getUserArticleCollects
 }

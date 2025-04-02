@@ -9,6 +9,7 @@ import org.zwf.entity.vo.request.UpdateArticleVO;
 import org.zwf.entity.vo.response.ArticleCollectVo;
 import org.zwf.entity.vo.response.ArticleVO;
 import org.zwf.mapper.ArticleCollectMapper;
+import org.zwf.mapper.ArticleLikeMapper;
 import org.zwf.mapper.ArticleMapper;
 import org.zwf.mapper.CommentMapper;
 import org.zwf.service.AccountService;
@@ -39,6 +40,8 @@ public class ArticleServiceImpl implements ArticleService {
     private CommentMapper commentMapper;
     @Resource
     private ArticleCollectMapper articleCollectMapper;
+    @Resource
+    private ArticleLikeMapper articleLikeMapper;
     @Resource
     private FlowUtil flowUtil;
     @Resource
@@ -164,10 +167,13 @@ public class ArticleServiceImpl implements ArticleService {
         if (AuthUtil.isLoggedIn()) {
             Integer userId = AuthUtil.getCurrentUserId();
             boolean isCollected = articleCollectMapper.isCollected(userId, articleId);
+            boolean isLiked = articleLikeMapper.isLiked(userId, articleId);
             vo.setIsCollected(isCollected);
+            vo.setIsLiked(isLiked);
         } else {
             // 未登录用户
             vo.setIsCollected(false);
+            vo.setIsLiked(false);
         }
         return RestBean.success(vo);
     }
@@ -493,31 +499,26 @@ public class ArticleServiceImpl implements ArticleService {
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
-    public String likeArticle(Integer articleId) {
+    public String toggleLikeArticle(Integer articleId) {
         Article article = articleMapper.getArticleById(articleId);
         if(article == null) return "文章不存在";
         if(!article.getStatus().equals("approved")) return "非法操作";
 
-        // 点赞请求放入消息队列中，由消息队列异步处理点赞
-        Map<String, Object> msg = Map.of("action", "like", "type", "article", "id", articleId);
-        amqpTemplate.convertAndSend("like", msg);
-        return null;
-    }
+        Integer userId = AuthUtil.getCurrentUserId();
+        if (userId == null) return "请登录后再进行操作";
+        boolean isLiked = articleLikeMapper.isLiked(userId, articleId);
 
-    /**
-     * 取消点赞文章
-     * @param articleId 文章id
-     * @return 操作结果，null表示正常，否则为错误原因string
-     */
-    @Override
-    public String dislikeArticle(Integer articleId) {
-        Article article = articleMapper.getArticleById(articleId);
-        if(article == null) return "文章不存在";
-        if(!article.getStatus().equals("approved")) return "非法操作";
-
-        // 点赞请求放入消息队列中，由消息队列异步处理点赞
-        Map<String, Object> msg = Map.of("action", "dislike", "type", "article", "id", articleId);
-        amqpTemplate.convertAndSend("like", msg);
+        Map<String, Object> msg;
+        if(isLiked) {
+            // 点赞请求放入消息队列中，由消息队列异步处理点赞
+            // 取消点赞
+            msg = Map.of("action", "cancelLike", "type", "article", "id", articleId, "userId", userId);
+            amqpTemplate.convertAndSend("like", msg);
+        } else {
+            // 点赞
+            msg = Map.of("action", "like", "type", "article", "id", articleId, "userId", userId);
+            amqpTemplate.convertAndSend("like", msg);
+        }
         return null;
     }
 
@@ -529,9 +530,12 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     @Transactional
     public String toggleCollect(Integer articleId) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Integer userId = Integer.valueOf(user.getUsername());
+        Article article = articleMapper.getArticleById(articleId);
+        if(article == null) return "文章不存在";
+        if(!article.getStatus().equals("approved")) return "非法操作";
 
+        Integer userId = AuthUtil.getCurrentUserId();
+        if (userId == null) return "请登录后再进行操作";
         boolean isCollected = articleCollectMapper.isCollected(userId, articleId);
 
         if(isCollected) {
