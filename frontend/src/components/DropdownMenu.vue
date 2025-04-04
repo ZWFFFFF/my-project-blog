@@ -1,8 +1,8 @@
 <template>
   <div
+      ref="dropdownRef"
       class="inline-block relative"
-      @mouseenter="openDropdown"
-      @mouseleave="closeDropdown"
+      @click="toggleDropdown"
   >
     <!-- Dropdown Button -->
     <button
@@ -25,20 +25,28 @@
     >
       <div
           v-if="isOpen"
-          class="absolute left-1/2 -translate-x-1/2 mt-2 w-36 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+          class="min-w-[220px] absolute right-0 mt-2 w-36 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
       >
         <div class="p-1">
-          <div
-              v-for="option in options"
-              :key="option.label"
-              @click="selectOption(option)"
-              class="text-gray-700 px-4 py-2 text-sm hover:bg-gray-100 rounded flex items-center cursor-pointer"
-          >
-            <span>
-              <component :is="option.icon" class="w-4 h-4 mr-4" />
-            </span>
-            <span>{{ option.label }}</span>
-          </div>
+          <header class="border-b">
+            <slot name="header"></slot>
+          </header>
+          <main class="py-2 border-b">
+            <router-link
+                v-for="option in options"
+                :key="option.label"
+                class="text-gray-700 p-2 text-sm hover:bg-gray-100 rounded flex items-center"
+                :to="option.link"
+            >
+              <span>
+                <component :is="option.icon" class="w-4 h-4 mr-2" />
+              </span>
+              <span>{{ option.label }}</span>
+            </router-link>
+          </main>
+          <footer>
+            <slot name="footer"></slot>
+          </footer>
         </div>
       </div>
     </transition>
@@ -46,7 +54,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
+
+const dropdownRef = ref(null);
 
 // Props
 const props = defineProps({
@@ -56,27 +66,26 @@ const props = defineProps({
   },
 });
 
-// Emits
-const emit = defineEmits(['option-selected']);
-
 // State
 const isOpen = ref(false);
 
-// Open dropdown on hover
-const openDropdown = () => {
-  isOpen.value = true;
+const toggleDropdown = () => {
+  isOpen.value = !isOpen.value;
 };
 
-// Close dropdown when mouse leaves
-const closeDropdown = () => {
-  isOpen.value = false;
+const handleClickOutside = (event) => {
+  if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
+    isOpen.value = false
+  }
 };
 
-// Select an option
-const selectOption = (option) => {
-  emit('option-selected', option);
-  closeDropdown(); // Close dropdown after selection
-};
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>

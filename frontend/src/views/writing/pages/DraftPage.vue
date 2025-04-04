@@ -85,8 +85,8 @@ function deleteWriting(id) {
 
 <template>
   <div>
-    <div class="container mx-auto w-2/3">
-      <div class="mb-4 flex items-center gap-2 justify-end">
+    <div class="container mx-auto w-1/2">
+      <div class="mb-10 flex items-center gap-2 justify-start">
         <div>
           <el-input v-model="searchTitleKeyword" type="text" placeholder="请输入标题关键字">
             <template #prefix>
@@ -114,21 +114,30 @@ function deleteWriting(id) {
           </el-select>
         </div>
       </div>
-      <div class="flex flex-col gap-8">
-        <div v-for="article in filteredData" :key="article.id" class="bg-[#FFFFFF] w-full min-h-72 p-8 flex flex-col justify-between gap-8 rounded-md shadow ring-2 ring-black ring-opacity-5">
-          <div>
-            <div class="flex justify-between gap-2">
-              <h3 class="mb-4 font-bold text-xl truncate">{{ article.title }}</h3>
-              <span class="text-gray-400">草稿</span>
+      <div class="flex flex-col gap-10">
+        <div v-for="article in filteredData"
+             :key="article.id"
+             class="w-full pb-8 flex flex-col justify-between border-b-2"
+        >
+          <div class="flex space-x-10 mb-10">
+            <div class="flex-1 overflow-auto">
+              <div>
+                <h3 class="mb-4 font-bold text-xl truncate">{{ article.title }}</h3>
+                <p class="break-words">{{ article.summary }}</p>
+              </div>
             </div>
-            <p class="break-words">{{ article.summary }}</p>
+            <div>
+              <span class="font-bold text-gray-400">草稿</span>
+            </div>
           </div>
-          <div class="flex flex-col lg:flex-row lg:items-center justify-between items-start gap-2">
-            <div class="text-sm"><span>{{ formatTimestamp(article.createdAt) }}创建</span><span class="ml-4">于{{ formatTimestamp(article.updatedAt) }}有过修改</span></div>
-            <div class="flex gap-4">
-              <Button class="text-sm" @click="router.push('/article/draft/' + article.id)">预览</Button>
-              <Button class="text-sm" @click="router.push('/editor/update/draft/' + article.id)">编辑</Button>
-              <Button class="text-sm" @click="deleteWriting(article.id)">删除</Button>
+          <div>
+            <div class="flex flex-row items-end justify-between gap-2">
+              <div class="text-sm text-zinc-400"><span>{{ formatTimestamp(article.createdAt) }}创建</span><span class="ml-4">于{{ formatTimestamp(article.updatedAt) }}有过修改</span></div>
+              <div class="flex gap-4">
+                <Button class="text-sm" @click="router.push('/article/draft/' + article.id)">预览</Button>
+                <Button class="text-sm" @click="router.push('/editor/update/draft/' + article.id)">编辑</Button>
+                <Button class="text-sm" @click="deleteWriting(article.id)">删除</Button>
+              </div>
             </div>
           </div>
         </div>

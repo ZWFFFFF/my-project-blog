@@ -76,8 +76,8 @@ const handleSubmit = throttle(submit, 1000)
   <div class="mx-auto min-h-screen w-full flex flex-col">
     <header class="w-full px-4 border-b">
       <div class="flex justify-between items-center py-4">
-        <div class="flex items-center w-1/2 gap-8">
-          <button class="font-extrabold text-2xl" @click="router.push('/')">Logo</button>
+        <div class="flex items-center w-1/2 gap-8 pl-4">
+          <router-link to="/"><span class="font-extrabold font-serif text-2xl">Logo</span></router-link>
           <el-breadcrumb :separator-icon="ArrowRight">
             <el-breadcrumb-item :to="{ path: '/writing' }">投稿管理</el-breadcrumb-item>
             <el-breadcrumb-item>{{ pathTitle }}</el-breadcrumb-item>

@@ -1,35 +1,34 @@
 <script setup>
-import {Search, SwitchButton, User, UserFilled, Setting} from "@element-plus/icons-vue";
-import {onMounted, reactive, ref} from 'vue'
+import {Search, User, UserFilled, Setting, Edit, Tickets, Collection} from "@element-plus/icons-vue";
+import {ref} from 'vue'
 import {useRouter} from "vue-router";
 import {logout} from "@/net/auth.js";
 import {useStore} from "vuex";
 import DropdownMenu from "@/components/DropdownMenu.vue";
-import {getUserInfo} from "@/net/user.js";
+import {throttle} from "@/net/utils.js";
 
 const store = useStore()
 const router = useRouter()
-const user = reactive({})
 const keyword = ref('');
 const dropdownMenuOptions = [
   {
     label: '个人中心',
     icon: User,
-    onClick: () => {}
+    link: ''
   }, {
+    label: '我的收藏',
+    icon: Collection,
+    link: ''
+  }, {
+    label: '作品管理',
+    icon: Tickets,
+    link: '/writing/draft'
+  },{
     label: '设置',
     icon: Setting,
-    onClick: () => {}
-  }, {
-    label: '退出',
-    icon: SwitchButton,
-    onClick: () => { userLogout() }
+    link: ''
   }
 ]
-
-const handleOptionSelected = (option) => {
-  option.onClick();
-};
 
 function searchArticle() {
   router.push({ path: '/search', query: { keyword: keyword.value } })
@@ -42,23 +41,15 @@ function userLogout() {
   })
 }
 
-function fetchUserInfo(id) {
-  getUserInfo(id, (data) => {
-    Object.assign(user, data)
-  })
-}
-
-onMounted(() => {
-  fetchUserInfo(store.state.userId) // 信息更新后需要重新获取
-})
+const handleUserLogout = throttle(userLogout, 1000)
 </script>
 
 <template>
   <div class="bg-[#FFFFFF] w-full min-h-screen flex flex-col">
     <header>
-      <div class="bg-[#FFFFFF] flex justify-between p-4 gap-4 items-center border-b">
-        <div class="w-1/2 flex gap-8">
-          <router-link to="/"><span class="font-extrabold text-2xl">Logo</span></router-link>
+      <div class="bg-[#FFFFFF] flex justify-between py-2 px-4 gap-4 items-center border-b">
+        <div class="w-1/2 flex gap-8 pl-4">
+          <router-link to="/"><span class="font-extrabold font-serif text-2xl">Logo</span></router-link>
           <div>
             <el-input v-model="keyword" type="text" placeholder="搜索" @keyup.enter="searchArticle">
               <template #prefix>
@@ -67,16 +58,49 @@ onMounted(() => {
             </el-input>
           </div>
         </div>
-        <div class="flex w-1/2 justify-end items-center">
-          <Button :style="'grey'" class="text-sm" @click="router.push('/editor')">投稿</Button>
+        <div class="flex w-1/2 justify-end items-center space-x-4">
+          <button
+              class="flex items-center gap-1 text-zinc-400 hover:text-zinc-500 transition-colors"
+              @click="router.push('/editor')"
+          >
+            <el-icon :size="25"><Edit /></el-icon>
+            <span>投稿</span>
+          </button>
+          <button
+              class="flex items-center gap-1 text-zinc-400 hover:text-zinc-500 transition-colors"
+              @click=""
+          >
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+              </svg>
+            </span>
+            <span>消息</span>
+          </button>
           <DropdownMenu
               :options="dropdownMenuOptions"
-              @option-selected="handleOptionSelected"
           >
-            <div class="flex items-center gap-4">
+            <template #header>
+              <div class="p-2">
+                <span class="font-bold">我的账号</span>
+              </div>
+            </template>
+            <template #default>
               <el-avatar :icon="UserFilled"></el-avatar>
-              <span class="text-base font-bold">{{ user.username }}</span>
-            </div>
+            </template>
+            <template #footer>
+              <button
+                  class="flex items-center px-2 py-4 text-sm text-zinc-500 hover:text-zinc-800 transition-colors"
+                  @click="handleUserLogout"
+              >
+                <span class="pr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4">
+                    <path fill-rule="evenodd" d="M2 4.75A2.75 2.75 0 0 1 4.75 2h3a2.75 2.75 0 0 1 2.75 2.75v.5a.75.75 0 0 1-1.5 0v-.5c0-.69-.56-1.25-1.25-1.25h-3c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h3c.69 0 1.25-.56 1.25-1.25v-.5a.75.75 0 0 1 1.5 0v.5A2.75 2.75 0 0 1 7.75 14h-3A2.75 2.75 0 0 1 2 11.25v-6.5Zm9.47.47a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1 0 1.06l-2.25 2.25a.75.75 0 1 1-1.06-1.06l.97-.97H5.25a.75.75 0 0 1 0-1.5h7.19l-.97-.97a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+                <span>退出登录</span>
+              </button>
+            </template>
           </DropdownMenu>
         </div>
       </div>

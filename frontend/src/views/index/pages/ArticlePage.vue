@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, reactive, computed } from 'vue'
+import { onMounted, onUnmounted, ref, reactive, computed } from 'vue'
 import { useRoute, useRouter } from "vue-router";
 import {collectArticleToggle, getArticle, getDraft, likeArticleToggle} from "@/net/article.js";
 import {ArrowDown, ArrowUp, UserFilled} from "@element-plus/icons-vue";
@@ -146,6 +146,12 @@ const collapseCommentTextarea = () => {
     isCommentInputExpanded.value = false;
   }
 };
+
+const handleClickCommentTextareaOutside = (e) => {
+  if (commentContainer.value && !commentContainer.value.contains(e.target)) {
+    collapseCommentTextarea();
+  }
+}
 
 const submitComment = () => {
   if(!store.state.userId) {
@@ -335,11 +341,11 @@ const handleDeleteMyComment = throttle(deleteMyComment, 500)
 onMounted(() => {
   fetchData()
   // 点击外部区域收起评论输入框
-  document.addEventListener('click', (e) => {
-    if (commentContainer.value && !commentContainer.value.contains(e.target)) {
-      collapseCommentTextarea();
-    }
-  });
+  document.addEventListener('click', handleClickCommentTextareaOutside);
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickCommentTextareaOutside);
 })
 
 </script>

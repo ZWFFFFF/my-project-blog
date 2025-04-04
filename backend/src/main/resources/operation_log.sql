@@ -18,3 +18,6 @@ INSERT INTO `my-project-blog`.operation_log (id, operation_time, operatorId, ope
 INSERT INTO `my-project-blog`.operation_log (id, operation_time, operatorId, operation_type, operation_detail, operation_result) VALUES (57, '2025-03-18 22:26:02', 1, 'UNBAN_USER', '[15]', 'SUCCESS');
 INSERT INTO `my-project-blog`.operation_log (id, operation_time, operatorId, operation_type, operation_detail, operation_result) VALUES (58, '2025-03-18 22:29:44', 1, 'TAKE_DOWN_ARTICLE', '[[3, 7]]', 'SUCCESS');
 INSERT INTO `my-project-blog`.operation_log (id, operation_time, operatorId, operation_type, operation_detail, operation_result) VALUES (59, '2025-03-18 22:29:49', 1, 'RECOVER_ARTICLE', '[[3, 7]]', 'SUCCESS');
+INSERT INTO `my-project-blog`.operation_log (id, operation_time, operatorId, operation_type, operation_detail, operation_result) VALUES (60, '2025-03-26 23:09:31', 1, 'REVIEW_APPROVE_ARTICLE', '[32]', 'SUCCESS');
+INSERT INTO `my-project-blog`.operation_log (id, operation_time, operatorId, operation_type, operation_detail, operation_result) VALUES (61, '2025-03-26 23:37:22', 16, 'REVIEW_APPROVE_ARTICLE', '[32]', 'SUCCESS');
+INSERT INTO `my-project-blog`.operation_log (id, operation_time, operatorId, operation_type, operation_detail, operation_result) VALUES (62, '2025-03-26 23:42:59', 1, 'REVIEW_REJECT_ARTICLE', '[43]', 'SUCCESS');

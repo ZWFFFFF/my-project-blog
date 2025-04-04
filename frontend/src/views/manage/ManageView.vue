@@ -1,19 +1,15 @@
 <script setup>
-import {DocumentChecked, DocumentDelete, Remove, User, UserFilled, SwitchButton, DataBoard} from "@element-plus/icons-vue";
+import {DocumentChecked, DocumentDelete, Remove, User, UserFilled, DataBoard} from "@element-plus/icons-vue";
 import {logout} from "@/net/auth.js";
 import {useStore} from "vuex";
 import {useRoute, useRouter} from "vue-router";
-import {getUserInfo} from "@/net/user.js";
-import {onMounted, reactive, computed} from "vue";
+import {computed} from "vue";
 import DropdownMenu from "@/components/DropdownMenu.vue";
+import {throttle} from "@/net/utils.js";
 
 const store = useStore()
-
 const router = useRouter()
-
 const route = useRoute()
-
-const user = reactive({})
 
 const title = computed(() => {
   if (route.name.startsWith('manage-article-review')) return '文章审核'
@@ -27,18 +23,29 @@ const dropdownMenuOptions = [
   {
     label: '个人中心',
     icon: User,
-    onClick: () => { router.push('/manage/hub') }
-  }, {
-    label: '退出',
-    icon: SwitchButton,
-    onClick: () => { userLogout() }
-
+    link: '/manage/hub'
+  },
+  {
+    label: '文章审核',
+    icon: DocumentChecked,
+    link: '/manage/article/review'
+  },
+  {
+    label: '文章下架',
+    icon: DocumentDelete,
+    link: '/manage/article/takeDown'
+  },
+  {
+    label: '封禁用户',
+    icon: Remove,
+    link: '/manage/ban'
+  },
+  {
+    label: '操作记录',
+    icon: DataBoard,
+    link: '/manage/log'
   }
 ]
-
-const handleOptionSelected = (option) => {
-  option.onClick();
-};
 
 function userLogout() {
   logout(() => {
@@ -47,15 +54,7 @@ function userLogout() {
   })
 }
 
-function fetchUserInfo(id) {
-  getUserInfo(id, (data) => {
-    Object.assign(user, data)
-  })
-}
-
-onMounted(() => {
-  fetchUserInfo(store.state.userId) // 信息更新后需要重新获取
-})
+const handleUserLogout = throttle(userLogout, 1000)
 </script>
 
 <template>
@@ -137,12 +136,28 @@ onMounted(() => {
         </div>
         <DropdownMenu
             :options="dropdownMenuOptions"
-            @option-selected="handleOptionSelected"
         >
-          <div class="flex items-center gap-4">
+          <template #header>
+            <div class="p-2">
+              <span class="font-bold">我的账号</span>
+            </div>
+          </template>
+          <template #default>
             <el-avatar :icon="UserFilled"></el-avatar>
-            <span class="text-base font-bold">{{ user.username }}</span>
-          </div>
+          </template>
+          <template #footer>
+            <button
+                class="flex items-center px-2 py-4 text-sm text-zinc-500 hover:text-zinc-800 transition-colors"
+                @click="handleUserLogout"
+            >
+                <span class="pr-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="size-4">
+                    <path fill-rule="evenodd" d="M2 4.75A2.75 2.75 0 0 1 4.75 2h3a2.75 2.75 0 0 1 2.75 2.75v.5a.75.75 0 0 1-1.5 0v-.5c0-.69-.56-1.25-1.25-1.25h-3c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h3c.69 0 1.25-.56 1.25-1.25v-.5a.75.75 0 0 1 1.5 0v.5A2.75 2.75 0 0 1 7.75 14h-3A2.75 2.75 0 0 1 2 11.25v-6.5Zm9.47.47a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1 0 1.06l-2.25 2.25a.75.75 0 1 1-1.06-1.06l.97-.97H5.25a.75.75 0 0 1 0-1.5h7.19l-.97-.97a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                  </svg>
+                </span>
+              <span>退出登录</span>
+            </button>
+          </template>
         </DropdownMenu>
       </div>
       <div id="content" class="flex-1 flex flex-col overflow-hidden">

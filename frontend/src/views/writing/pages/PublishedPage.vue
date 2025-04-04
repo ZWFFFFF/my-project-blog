@@ -14,6 +14,10 @@ const searchTitleKeyword = ref(''); // 标题搜索关键字
 const sortSelectValue = ref('createdAtDesc')
 const sortSelectOptions = [
   {
+    value: 'like',
+    label: '按点赞数',
+  },
+  {
     value: 'createdAtAsc',
     label: '按最创建早时间',
   },
@@ -80,6 +84,8 @@ const filterAndSortArticles = () => {
     case 'updatedAtDesc':
       filteredArticles.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
       break;
+    case 'like':
+      filteredArticles.sort((a, b) => b.like - a.like);
   }
 
   // 更新显示的文章列表
@@ -120,8 +126,8 @@ function deleteWriting(id) {
 
 <template>
   <div>
-    <div class="container mx-auto w-2/3">
-      <div class="mb-4 flex items-center gap-2 justify-end">
+    <div class="container mx-auto w-1/2">
+      <div class="mb-10 flex items-center gap-2 justify-start">
         <div>
           <el-input v-model="searchTitleKeyword" type="text" placeholder="请输入标题关键字">
             <template #prefix>
@@ -167,21 +173,40 @@ function deleteWriting(id) {
           </el-select>
         </div>
       </div>
-      <div class="flex flex-col gap-8">
-        <div v-for="article in searchFilteredData" :key="article.id" class="bg-white w-full min-h-72 p-8 flex flex-col justify-between gap-8 rounded-md shadow ring-2 ring-black ring-opacity-5">
-          <div>
-            <div class="flex justify-between gap-2">
-              <h3 class="mb-4 font-bold text-xl truncate">{{ article.title }}</h3>
-              <span class="text-gray-400">{{ article.status === 'take_down' ? '已下架投稿' : '已发布投稿' }}</span>
+      <div class="flex flex-col gap-10">
+        <div v-for="article in searchFilteredData"
+             :key="article.id"
+             class="w-full pb-8 flex flex-col justify-between border-b-2"
+        >
+          <div class="flex space-x-10 mb-10">
+            <div class="flex-1 overflow-auto">
+              <div>
+                <h3 class="mb-4 font-bold text-xl truncate">{{ article.title }}</h3>
+                <p class="break-words">{{ article.summary }}</p>
+              </div>
             </div>
-            <p class="break-words">{{ article.summary }}</p>
+            <div>
+              <span class="font-bold text-gray-400">{{ article.status === 'take_down' ? '已下架投稿' : '已发布投稿' }}</span>
+            </div>
           </div>
-          <div class="flex flex-col lg:flex-row lg:items-center justify-between items-start gap-2">
-            <div class="text-sm"><span>{{ formatTimestamp(article.createdAt) }}创建</span><span class="ml-4">于{{ formatTimestamp(article.updatedAt) }}有过修改</span></div>
-            <div class="flex gap-4">
-              <Button v-if="article.status === 'approved'" class="text-sm" @click="router.push('/article/approved/' + article.id)">查看</Button>
-              <Button v-if="article.status === 'approved'" class="text-sm" @click="router.push('/editor/update/article/' + article.id)">编辑</Button>
-              <Button class="text-sm" @click="deleteWriting(article.id)">删除</Button>
+          <div>
+            <div class="flex flex-row items-end justify-between gap-2">
+              <div>
+                <div class="flex mb-2">
+                  <span class="text-zinc-500 pr-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                      <path d="M1 8.25a1.25 1.25 0 1 1 2.5 0v7.5a1.25 1.25 0 1 1-2.5 0v-7.5ZM11 3V1.7c0-.268.14-.526.395-.607A2 2 0 0 1 14 3c0 .995-.182 1.948-.514 2.826-.204.54.166 1.174.744 1.174h2.52c1.243 0 2.261 1.01 2.146 2.247a23.864 23.864 0 0 1-1.341 5.974C17.153 16.323 16.072 17 14.9 17h-3.192a3 3 0 0 1-1.341-.317l-2.734-1.366A3 3 0 0 0 6.292 15H5V8h.963c.685 0 1.258-.483 1.612-1.068a4.011 4.011 0 0 1 2.166-1.73c.432-.143.853-.386 1.011-.814.16-.432.248-.9.248-1.388Z" />
+                    </svg>
+                  </span>
+                  <span class="text-sm text-zinc-500">{{ article.like === null ? 0 : article.like }}</span>
+                </div>
+                <div class="text-sm text-zinc-400"><span>{{ formatTimestamp(article.createdAt) }}创建</span><span class="ml-4">于{{ formatTimestamp(article.updatedAt) }}有过修改</span></div>
+              </div>
+              <div class="flex gap-4">
+                <Button v-if="article.status === 'approved'" class="text-sm" @click="router.push('/article/approved/' + article.id)">查看</Button>
+                <Button v-if="article.status === 'approved'" class="text-sm" @click="router.push('/editor/update/article/' + article.id)">编辑</Button>
+                <Button class="text-sm" @click="deleteWriting(article.id)">删除</Button>
+              </div>
             </div>
           </div>
         </div>
