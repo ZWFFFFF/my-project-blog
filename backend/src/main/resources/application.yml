@@ -22,7 +22,10 @@ spring:
     username: guest
     password: guest
     virtual-host: /
-
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
 # 自定义配置
 my-config:
   web:
@@ -41,3 +44,4 @@ my-config:
     project-domain: http://localhost:8080
     upload:
       avatar: C:/Users/feng/IdeaProjects/my-project-blog/resource/uploads/avatars # 上传头像文件存储路径
+      previewImage: C:/Users/feng/IdeaProjects/my-project-blog/resource/uploads/articlePreviewImage #上传文章预览图存储路径

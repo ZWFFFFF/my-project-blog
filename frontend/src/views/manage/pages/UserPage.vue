@@ -45,7 +45,7 @@ const rules = reactive({
 const changePwd = () => {
   formRef.value.validate((valid) => {
     if(valid) {
-      changePassword(store.state.userId, form.old_password, form.new_password, () => {
+      changePassword(store.state.user.id, form.old_password, form.new_password, () => {
         ElMessage.success('修改密码成功')
       })
     } else {

@@ -53,7 +53,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(conf -> conf
-                        .requestMatchers("/api/auth/**", "/error", "/avatar/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/error", "/avatar/**", "/articlePreviewImage/**").permitAll()
                         .requestMatchers(
                                 "/api/admin/**",
                                 "/api/article/pending-review-list",

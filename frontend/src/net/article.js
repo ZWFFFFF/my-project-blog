@@ -262,6 +262,20 @@ function getUserArticleCollects(success) {
     })
 }
 
+function uploadPreviewImage(file) {
+    return new Promise((resolve, reject) => {
+        post({
+            url: 'api/article/upload-preview-image',
+            data: file,
+            success: (data) => resolve(data),
+            failure: (message, code, url) => {
+                console.warn(`request url: ${url}, code: ${code}, message: ${message}`)
+                reject(new Error(message))
+            }
+        })
+    })
+}
+
 export {
     getArticleList, getArticle, getDraft, getUserArticles,
     getUserDrafts, getUserReviewArticles, searchArticleList, createArticle,
@@ -269,5 +283,5 @@ export {
     submitToReview, getPendingReviewList, getReviewingList, getReviewedArticle,
     startReview, approveReview, rejectReview, resetReviewing,
     getTakeDownList, takeDownArticle, recoverArticle, likeArticleToggle,
-    collectArticleToggle, getUserArticleCollects
+    collectArticleToggle, getUserArticleCollects, uploadPreviewImage
 }

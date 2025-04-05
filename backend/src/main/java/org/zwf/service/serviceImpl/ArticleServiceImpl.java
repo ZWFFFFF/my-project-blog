@@ -1,6 +1,8 @@
 package org.zwf.service.serviceImpl;
 
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
 import org.zwf.entity.RestBean;
 import org.zwf.entity.dto.Article;
 import org.zwf.entity.dto.ArticleCollect;
@@ -8,6 +10,7 @@ import org.zwf.entity.vo.request.CreateArticleVO;
 import org.zwf.entity.vo.request.UpdateArticleVO;
 import org.zwf.entity.vo.response.ArticleCollectVo;
 import org.zwf.entity.vo.response.ArticleVO;
+import org.zwf.exception.BusinessException;
 import org.zwf.mapper.ArticleCollectMapper;
 import org.zwf.mapper.ArticleLikeMapper;
 import org.zwf.mapper.ArticleMapper;
@@ -23,9 +26,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zwf.utils.AuthUtil;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * 文章管理相关服务
@@ -46,6 +54,10 @@ public class ArticleServiceImpl implements ArticleService {
     private FlowUtil flowUtil;
     @Resource
     private AmqpTemplate amqpTemplate;
+    @Value("${my-config.resource.upload.previewImage}")
+    private String uploadArticlePreviewImagePath;
+    @Value("${my-config.resource.project-domain}")
+    private String projectDomain;
 
     /**
      * 新建文章(状态默认为草稿)
@@ -60,9 +72,15 @@ public class ArticleServiceImpl implements ArticleService {
         String summary = vo.getSummary();
         String content = vo.getContent();
         Integer authorId = vo.getAuthorId();
+        String previewImage = vo.getPreviewImage();
 
         if(!accountService.isCurrentUser(authorId)) return "非法操作";
-        Article article = new Article(title, summary, content, authorId);
+        Article article = new Article();
+        article.setTitle(title);
+        article.setSummary(summary);
+        article.setContent(content);
+        article.setAuthorId(authorId);
+        article.setPreviewImage(previewImage);
 
         int insert;
         if(status.equals("draft")) {
@@ -90,6 +108,26 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = articleMapper.getArticleById(articleId);
         if(article == null || !article.getAuthorId().equals(userId)) return "非法操作";
 
+        String previewImage = article.getPreviewImage();
+        // 将预览图片文件删除
+        try {
+            if(previewImage != null) {
+                // 从 URL 中提取文件名
+                String oldFileName = previewImage.substring(previewImage.lastIndexOf("/") + 1);
+
+                // 拼接文件路径
+                Path oldFilePath = Paths.get(uploadArticlePreviewImagePath, oldFileName);
+
+                // 删除旧的文件
+                if (Files.exists(oldFilePath)) {
+                    Files.delete(oldFilePath);
+                }
+            }
+        } catch (IOException e) {
+            throw new BusinessException("文件保存失败"+e.getMessage());
+        }
+
+
         // 删除文章对应的评论
         commentMapper.deleteCommentsByArticleId(articleId);
         // 删除文章对应的收藏
@@ -115,6 +153,25 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = articleMapper.getArticleById(articleId);
         if(article == null || !article.getAuthorId().equals(userId)) return "非法操作";
 
+        String previewImage = article.getPreviewImage();
+        // 将预览图片文件删除
+        try {
+            if(previewImage != null) {
+                // 从 URL 中提取文件名
+                String oldFileName = previewImage.substring(previewImage.lastIndexOf("/") + 1);
+
+                // 拼接文件路径
+                Path oldFilePath = Paths.get(uploadArticlePreviewImagePath, oldFileName);
+
+                // 删除旧的文件
+                if (Files.exists(oldFilePath)) {
+                    Files.delete(oldFilePath);
+                }
+            }
+        } catch (IOException e) {
+            throw new BusinessException("文件保存失败"+e.getMessage());
+        }
+
         int delete = articleMapper.deleteDraftArticle(articleId);
         if(delete != 1) return "发生了一些错误，请联系管理员";
         return null;
@@ -136,15 +193,35 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = articleMapper.getArticleById(articleId);
         if(article == null || !article.getAuthorId().equals(userId)) return "非法操作";
 
+        String oldPreviewImage = article.getPreviewImage();
+        // 如果对图片进行更新要将原来的图片删除
+        try {
+            if(oldPreviewImage != null && !oldPreviewImage.equals(vo.getPreviewImage())) {
+                // 从 URL 中提取文件名
+                String oldFileName = oldPreviewImage.substring(oldPreviewImage.lastIndexOf("/") + 1);
+
+                // 拼接文件路径
+                Path oldFilePath = Paths.get(uploadArticlePreviewImagePath, oldFileName);
+
+                // 删除旧的文件
+                if (Files.exists(oldFilePath)) {
+                    Files.delete(oldFilePath);
+                }
+            }
+        } catch (IOException e) {
+            throw new BusinessException("文件保存失败"+e.getMessage());
+        }
+
         String title = vo.getTitle();
         String summary = vo.getSummary();
         String content = vo.getContent();
+        String previewImage = vo.getPreviewImage();
 
         if(type.equals("approved")) {
             articleMapper.updateArticleStatusById(articleId, "pending_review");
         }
 
-        int update = articleMapper.updateArticleById(articleId, title, summary, content);
+        int update = articleMapper.updateArticleById(articleId, title, summary, content, previewImage);
         if(update != 1) return "发生了一些错误，请联系管理员";
 
         return null;
@@ -570,6 +647,43 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
+     * 上传文章预览图文件
+     * @param file 文件
+     * @return 响应实体
+     */
+    @Transactional
+    @Override
+    public RestBean<Map<String, String>> uploadPreviewImage(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new BusinessException("文件不能为空");
+        }
+
+        try {
+            // 生成唯一的文件名
+            String originalFilename = file.getOriginalFilename();
+            String fileExtension = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf(".")) : "";
+            String uniqueFileName = UUID.randomUUID() + fileExtension;
+
+            // 创建目标文件路径
+            Path uploadPath = Paths.get(uploadArticlePreviewImagePath);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            // 保存文件到指定路径
+            Path filePath = uploadPath.resolve(uniqueFileName);
+            file.transferTo(filePath.toFile());
+
+            // 生成文件的访问 URL
+            String fileUrl = projectDomain + "/articlePreviewImage/" + uniqueFileName;
+
+            return RestBean.success(Map.of("url", fileUrl));
+        } catch (IOException e) {
+            throw new BusinessException("文件保存失败"+e.getMessage());
+        }
+    }
+
+    /**
      * 将文章实体转换为文章信息实体
      * @param article 文章实体
      * @return 文章信息实体
@@ -594,6 +708,7 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setStatus(article.getStatus());
         vo.setView(article.getView());
         vo.setLike(article.getLike());
+        vo.setPreviewImage(article.getPreviewImage());
         return vo;
     }
 

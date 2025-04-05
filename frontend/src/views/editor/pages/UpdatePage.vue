@@ -19,7 +19,8 @@ const article = reactive({
   title: '',
   summary: '',
   content: '',
-  authorId: null
+  authorId: null,
+  previewImage: null
 })
 const editorRef = ref()
 const titleRef = ref()
@@ -33,7 +34,7 @@ const fetchData = () => {
   if(articleType.value === 'article') {
     getArticle(articleId.value, (data) => {
       Object.assign(article, data)
-      if(article.authorId !== store.state.userId) {
+      if(article.authorId !== store.state.user.id) {
         ElMessage.error('非法操作')
         router.push('/')
       }
@@ -52,7 +53,7 @@ const fetchData = () => {
   } else if(articleType.value === 'draft') {
     getDraft(articleId.value, (data) => {
       Object.assign(article, data)
-      if(article.authorId !== store.state.userId) {
+      if(article.authorId !== store.state.user.id) {
         ElMessage.error('非法操作')
         router.push('/')
       }

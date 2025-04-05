@@ -1,6 +1,6 @@
 <script setup>
 import {Search, User, UserFilled, Setting, Edit, Tickets, Collection} from "@element-plus/icons-vue";
-import {ref} from 'vue'
+import {ref, computed} from 'vue'
 import {useRouter} from "vue-router";
 import {logout} from "@/net/auth.js";
 import {useStore} from "vuex";
@@ -10,6 +10,7 @@ import {throttle} from "@/net/utils.js";
 const store = useStore()
 const router = useRouter()
 const keyword = ref('');
+const userAvatar = computed(() => store.state.user.avatar)
 const dropdownMenuOptions = [
   {
     label: '个人中心',
@@ -26,7 +27,7 @@ const dropdownMenuOptions = [
   },{
     label: '设置',
     icon: Setting,
-    link: ''
+    link: '/me/settings'
   }
 ]
 
@@ -42,6 +43,7 @@ function userLogout() {
 }
 
 const handleUserLogout = throttle(userLogout, 1000)
+
 </script>
 
 <template>
@@ -86,7 +88,11 @@ const handleUserLogout = throttle(userLogout, 1000)
               </div>
             </template>
             <template #default>
-              <el-avatar :icon="UserFilled"></el-avatar>
+              <el-avatar
+                  :icon="UserFilled"
+                  :src="userAvatar || undefined"
+                  :fit="'fill'"
+              />
             </template>
             <template #footer>
               <button

@@ -79,7 +79,7 @@ const fetchData = () => {
     getDraft(articleId.value, (data) => {
       Object.assign(article, data)
       // 访问草稿需要检测userId，因为必须时登录的用户才可以看自己的草稿
-      if(article.authorId !== store.state.userId) {
+      if(article.authorId !== store.state.user.id) {
         ElMessage.error('非法操作')
         router.push('/')
       }
@@ -88,7 +88,7 @@ const fetchData = () => {
 }
 
 const articleLike = () => {
-  if(!store.state.userId) {
+  if(!store.state.user.id) {
     ElMessage.warning('请先登录')
   }
 
@@ -110,7 +110,7 @@ const articleLike = () => {
 const handleArticleLike = throttle(articleLike, 500)
 
 const collect = () => {
-  if(!store.state.userId) {
+  if(!store.state.user.id) {
     ElMessage.warning('请先登录')
   }
 
@@ -154,7 +154,7 @@ const handleClickCommentTextareaOutside = (e) => {
 }
 
 const submitComment = () => {
-  if(!store.state.userId) {
+  if(!store.state.user.id) {
     ElMessage.warning('请先登录')
   }
 
@@ -171,7 +171,7 @@ const submitComment = () => {
 
   const comment = {
     articleId: Number(articleId.value),
-    userId: store.state.userId,
+    userId: store.state.user.id,
     content: commentText.value
   }
 
@@ -202,7 +202,7 @@ const handleShowReplies = (commentId) => {
 }
 
 const commentLike = (commentId, isLiked) => {
-  if(!store.state.userId) {
+  if(!store.state.user.id) {
     ElMessage.warning('请先登录')
   }
 
@@ -249,7 +249,7 @@ const toggleReplyForm = (commentId) => {
 
 // 提交评论的函数
 const submitReply = (commentId) => {
-  if(!store.state.userId) {
+  if(!store.state.user.id) {
     ElMessage.warning('请先登录')
   }
 
@@ -268,7 +268,7 @@ const submitReply = (commentId) => {
   const comment = {
     parentId: commentId,
     articleId: Number(articleId.value),
-    userId: store.state.userId,
+    userId: store.state.user.id,
     content: content
   }
 
@@ -540,7 +540,7 @@ onUnmounted(() => {
                     回复
                   </button>
                   <button
-                      v-if="article.authorId === store.state.userId || comment.user.id === store.state.userId"
+                      v-if="article.authorId === store.state.user.id || comment.user.id === store.state.user.id"
                       class="text-zinc-500 text-sm"
                       @click="handleDeleteMyComment(comment.id)"
                   >
@@ -617,7 +617,7 @@ onUnmounted(() => {
                             <span class="text-sm text-zinc-500">{{ reply.like }}</span>
                           </button>
                           <button
-                              v-if="article.authorId === store.state.userId || reply.user.id === store.state.userId"
+                              v-if="article.authorId === store.state.user.id || reply.user.id === store.state.user.id"
                               class="text-zinc-500 text-sm"
                               @click="handleDeleteMyComment(reply.id)"
                           >

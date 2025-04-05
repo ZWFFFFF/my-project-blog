@@ -8,7 +8,8 @@ import BlotFormatter from "quill-blot-formatter";
 const article = reactive({
   title: '',
   summary: '',
-  content: ''
+  content: '',
+  previewImage: null
 })
 
 const titleRef = ref()

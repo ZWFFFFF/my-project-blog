@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.web.multipart.MultipartFile;
 import org.zwf.annotation.OperationLog;
 import org.zwf.entity.RestBean;
 import org.zwf.entity.vo.request.CreateArticleVO;
@@ -16,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用于文章管理相关Controller包含新建文章、编辑文章、删除文章、获取文章列表等接口
@@ -309,5 +311,16 @@ public class ArticleController {
     @Operation(summary = "获取收藏文章列表")
     public RestBean<List<ArticleCollectVo>> getCollectList() {
         return articleService.getCollectedArticles();
+    }
+
+    /**
+     * 上传文章预览图
+     * @param file 文件
+     * @return 响应实体
+     */
+    @PostMapping("/upload-preview-image")
+    @Operation(summary = "上传文章预览图")
+    public RestBean<Map<String, String>> uploadPreviewImage(@RequestParam @NotNull MultipartFile file) {
+        return articleService.uploadPreviewImage(file);
     }
 }

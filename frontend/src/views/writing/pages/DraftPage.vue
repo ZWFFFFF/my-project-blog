@@ -85,7 +85,7 @@ function deleteWriting(id) {
 
 <template>
   <div>
-    <div class="container mx-auto w-1/2">
+    <div class="">
       <div class="mb-10 flex items-center gap-2 justify-start">
         <div>
           <el-input v-model="searchTitleKeyword" type="text" placeholder="请输入标题关键字">

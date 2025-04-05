@@ -22,4 +22,5 @@ public class ArticleVO {
     private String status;
     private Boolean isCollected; // 用户是否收藏了该文章
     private Boolean isLiked; // 用户是否点赞了该文章
+    private String previewImage;
 }

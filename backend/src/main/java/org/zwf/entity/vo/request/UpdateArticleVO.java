@@ -21,4 +21,5 @@ public class UpdateArticleVO {
     private String content;
     @NotNull
     private Integer authorId;
+    private String previewImage;
 }

@@ -1,5 +1,6 @@
 package org.zwf.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import org.zwf.entity.RestBean;
 import org.zwf.entity.vo.request.CreateArticleVO;
 import org.zwf.entity.vo.request.UpdateArticleVO;
@@ -7,6 +8,7 @@ import org.zwf.entity.vo.response.ArticleCollectVo;
 import org.zwf.entity.vo.response.ArticleVO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ArticleService {
     String createArticle(CreateArticleVO vo, String status);
@@ -33,4 +35,5 @@ public interface ArticleService {
     String toggleLikeArticle(Integer articleId);
     String toggleCollect(Integer articleId);
     RestBean<List<ArticleCollectVo>> getCollectedArticles();
+    RestBean<Map<String, String>> uploadPreviewImage(MultipartFile file);
 }

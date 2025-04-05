@@ -50,9 +50,9 @@ const routes = [
                 component: () => import('@/views/index/pages/ArticlePage.vue')
             },
             {
-                path: 'user/:id',
-                name: 'index-user',
-                component: () => import('@/views/index/pages/UserPage.vue')
+                path: 'me/settings',
+                name: 'index-me-settings',
+                component: () => import('@/views/index/pages/SettingsPage.vue')
             }
         ]
     }, {

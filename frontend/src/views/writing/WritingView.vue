@@ -37,12 +37,6 @@ function userLogout() {
 
 const handleUserLogout = throttle(userLogout, 1000)
 
-function linkTo(path) {
-  router.push(path)
-}
-
-const throttledLinkTo = throttle(linkTo, 500)
-
 </script>
 
 <template>
@@ -99,48 +93,48 @@ const throttledLinkTo = throttle(linkTo, 500)
         </div>
       </div>
     </header>
-    <div>
-      <div class="w-full py-20">
-        <div class="container mx-auto w-1/2 mb-10 border-b">
-          <div class="mb-10">
-            <h1 class="text-3xl font-bold">作品管理</h1>
+    <div class="flex justify-center">
+      <div class="w-[968px] border-r">
+        <div class="w-full py-20">
+          <div class="w-1/2 mb-10 border-b">
+            <div class="mb-10">
+              <h1 class="text-3xl font-bold">作品管理</h1>
+            </div>
+            <div class="flex justify-start gap-x-10">
+              <router-link
+                  class="pb-3 font-bold text-lg text-zinc-400 hover:text-zinc-800 transition-colors"
+                  :class="{ 'border-black border-b-2 text-zinc-800' : route.path === '/writing/draft'  }"
+                  to="/writing/draft"
+              >
+                <span>草稿</span>
+              </router-link>
+              <router-link
+                  class="pb-3 font-bold text-lg text-zinc-400 hover:text-zinc-800 transition-colors"
+                  :class="{ 'border-black border-b-2 text-zinc-800' : route.path === '/writing/published' }"
+                  to="/writing/published"
+              >
+                <span>投稿管理</span>
+              </router-link>
+              <router-link
+                  class="pb-3 font-bold text-lg text-zinc-400 hover:text-zinc-800 transition-colors"
+                  :class="{ 'border-black border-b-2 text-zinc-800' : route.path === '/writing/reviewing' }"
+                  to="/writing/reviewing"
+              >
+                <span>审核</span>
+              </router-link>
+            </div>
           </div>
-          <div class="flex justify-start gap-x-10">
-            <router-link
-                class="pb-3 font-bold text-lg text-zinc-400 hover:text-zinc-800 transition-colors"
-                :class="{ 'border-black border-b-2 text-zinc-800' : route.path === '/writing/draft'  }"
-                to="/writing/draft"
-            >
-              <span>草稿</span>
-            </router-link>
-            <router-link
-                class="pb-3 font-bold text-lg text-zinc-400 hover:text-zinc-800 transition-colors"
-                :class="{ 'border-black border-b-2 text-zinc-800' : route.path === '/writing/published' }"
-                to="/writing/published"
-            >
-              <span>投稿管理</span>
-            </router-link>
-            <router-link
-                class="pb-3 font-bold text-lg text-zinc-400 hover:text-zinc-800 transition-colors"
-                :class="{ 'border-black border-b-2 text-zinc-800' : route.path === '/writing/reviewing' }"
-                to="/writing/reviewing"
-            >
-              <span>审核</span>
-            </router-link>
-          </div>
+          <router-view v-slot="{ Component }">
+            <transition name="el-fade-in-linear" mode="out-in">
+              <component :is="Component"/>
+            </transition>
+          </router-view>
         </div>
-        <router-view v-slot="{ Component }">
-          <transition name="el-fade-in-linear" mode="out-in">
-            <component :is="Component"/>
-          </transition>
-        </router-view>
+      </div>
+      <div class="w-[368px]">
+        头像
       </div>
     </div>
-    <footer>
-      <div class="mx-20 flex justify-center items-center py-10 border-t border-zinc-300">
-        <p>© 2025 ZWF, Inc. All rights reserved.</p>
-      </div>
-    </footer>
   </div>
 </template>
 

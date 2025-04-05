@@ -51,8 +51,8 @@ const typeSelectOptions = [
 ]
 
 const fetchData = () => {
-  if(store.state.userId !== null) {
-    getUserArticles(store.state.userId, (data) => {
+  if(store.state.user.id !== null) {
+    getUserArticles(store.state.user.id, (data) => {
       originalArticleList.value = data; // 保存原始数据
       filterAndSortArticles(); // 初始过滤和排序
     })
@@ -126,7 +126,7 @@ function deleteWriting(id) {
 
 <template>
   <div>
-    <div class="container mx-auto w-1/2">
+    <div class="">
       <div class="mb-10 flex items-center gap-2 justify-start">
         <div>
           <el-input v-model="searchTitleKeyword" type="text" placeholder="请输入标题关键字">

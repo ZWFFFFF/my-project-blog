@@ -81,7 +81,7 @@ function userLogin() {
     verifyCodeLoginFormRef.value.validate((valid) => {
       if(valid) {
         verifyCodeLogin(verifyCodeLoginForm.email, verifyCodeLoginForm.code, (data) => {
-          store.dispatch('login', data.id)
+          store.dispatch('initializeUser')
           router.push('/')
         })
       } else {
@@ -92,7 +92,7 @@ function userLogin() {
     passwordLoginFormRef.value.validate((valid) => {
       if(valid) {
         passwordLogin(passwordLoginForm.username, passwordLoginForm.password, (data) => {
-          store.dispatch('login', data.id)
+          store.dispatch('initializeUser')
           router.push('/')
         })
       } else {
