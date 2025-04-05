@@ -18,4 +18,5 @@ public class ArticleCollect {
     private Integer view;
     private Integer like;
     private Date collectedTime;
+    private String previewImage;
 }

@@ -36,7 +36,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="w-1/2 mx-auto">
+  <div class="w-[680px] mx-auto">
     <div class="w-full">
       <div class="mt-20">
         <div>

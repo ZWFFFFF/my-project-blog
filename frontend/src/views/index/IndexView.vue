@@ -116,11 +116,6 @@ const handleUserLogout = throttle(userLogout, 1000)
         <router-view></router-view>
       </div>
     </div>
-    <footer>
-      <div class="mx-20 flex justify-center items-center py-10 border-t border-zinc-300">
-        <p>© 2025 ZWF, Inc. All rights reserved.</p>
-      </div>
-    </footer>
   </div>
 </template>
 

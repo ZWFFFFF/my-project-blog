@@ -19,4 +19,5 @@ public class ArticleCollectVo {
     private Integer like;
     private String status;
     private Date collectedTime;
+    private String previewImage;
 }

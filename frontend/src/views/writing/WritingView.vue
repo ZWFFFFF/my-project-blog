@@ -95,8 +95,8 @@ const handleUserLogout = throttle(userLogout, 1000)
     </header>
     <div class="flex justify-center">
       <div class="w-[968px] border-r">
-        <div class="w-full py-20">
-          <div class="w-1/2 mb-10 border-b">
+        <div class="w-[680px] mx-auto py-20">
+          <div class="mb-10 border-b">
             <div class="mb-10">
               <h1 class="text-3xl font-bold">作品管理</h1>
             </div>

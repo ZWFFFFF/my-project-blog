@@ -5,6 +5,7 @@ import {onMounted, ref, watch, computed} from "vue";
 import {deleteDraft, getUserDrafts} from "@/net/article.js";
 import {formatTimestamp} from "@/net/utils.js";
 import {Search} from "@element-plus/icons-vue";
+import images from '@/assets/img';
 
 const router = useRouter()
 const store = useStore()
@@ -119,15 +120,22 @@ function deleteWriting(id) {
              :key="article.id"
              class="w-full pb-8 flex flex-col justify-between border-b-2"
         >
-          <div class="flex space-x-10 mb-10">
-            <div class="flex-1 overflow-auto">
+          <div class="mb-4 text-right">
+            <span class="font-bold text-gray-400">草稿</span>
+          </div>
+          <div class="flex mb-12">
+            <div class="w-[464px] overflow-auto">
               <div>
-                <h3 class="mb-4 font-bold text-xl truncate">{{ article.title }}</h3>
-                <p class="break-words">{{ article.summary }}</p>
+                <p class="mb-2 font-bold text-xl break-words">{{ article.title }}</p>
+                <p class="line-clamp-2 break-words">{{ article.summary }}</p>
               </div>
             </div>
-            <div>
-              <span class="font-bold text-gray-400">草稿</span>
+            <div class="flex-1">
+              <div class="ml-14">
+                <div>
+                  <img class="max-h-[120px] w-full object-cover" :src="article.previewImage ? article.previewImage : images.welcome_page" alt="">
+                </div>
+              </div>
             </div>
           </div>
           <div>

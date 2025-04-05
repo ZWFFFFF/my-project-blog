@@ -19,7 +19,7 @@ public interface ArticleMapper {
     Article getArticleById(Integer id);
     @Select("select id, title, summary, authorId, createdAt, updatedAt, status, view, `like`, previewImage from article where status = 'approved'")
     List<Article> getAllPublishedArticles();
-    @Select("select id, authorId, createdAt, updatedAt, status, view, `like`, previewImage from article where status = 'pending_review'")
+    @Select("select id, authorId, createdAt, updatedAt, status, view, `like` from article where status = 'pending_review'")
     List<Article> getAllPendingReviewArticles();
     @Select("select id, authorId, createdAt, updatedAt, status, view, `like` from article where status = 'reviewing'")
     List<Article> getAllReviewingArticles();

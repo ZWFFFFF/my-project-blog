@@ -736,6 +736,7 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setView(collect.getView());
         vo.setLike(collect.getLike());
         vo.setCollectedTime(collect.getCollectedTime());
+        vo.setPreviewImage(collect.getPreviewImage());
         return vo;
     }
 }

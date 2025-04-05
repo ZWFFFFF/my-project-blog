@@ -351,22 +351,55 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="bg-white pt-20">
-    <div class="container mx-auto w-1/2">
+  <div class="bg-white">
+    <div class="container mx-auto w-[680px]">
       <div>
-        <div class="px-2 pb-5 mb-10 border-b">
-          <div class="flex flex-col justify-center items-center mb-10">
-            <div class="mb-10 break-words w-full text-center"><p class="font-extrabold text-4xl">{{ article.title }}</p></div>
-            <div class="mb-4 break-words w-full text-center"><p>{{ article.summary }}</p></div>
-          </div>
-          <div class="flex flex-col justify-center items-center gap-2 mb-5">
-            <a>
-              <el-avatar :icon="UserFilled"></el-avatar>
-            </a>
-            <span>{{ article.author }}</span>
-          </div>
-          <div class="text-center">
-            <span class="font-bold">发布于：</span><span class="text-gray-400">{{ formatTimestamp(article.createdAt) }}</span>
+        <div class="px-2 border-b">
+<!--          <div class="my-12">-->
+<!--            <div class="w-[680px]">-->
+<!--              <img :src="article.previewImage">-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="mb-10">-->
+<!--            <div class="mb-10 break-words w-full"><p class="font-extrabold text-4xl">{{ article.title }}</p></div>-->
+<!--            <div class="mb-4 break-words w-full"><p>{{ article.summary }}</p></div>-->
+<!--          </div>-->
+<!--          <div class="flex flex-col justify-center items-center gap-2 mb-5">-->
+<!--            <a>-->
+<!--              <el-avatar :icon="UserFilled"></el-avatar>-->
+<!--            </a>-->
+<!--            <span>{{ article.author }}</span>-->
+<!--          </div>-->
+<!--          <div class="text-center">-->
+<!--            <span class="font-bold">发布于：</span><span class="text-gray-400">{{ formatTimestamp(article.createdAt) }}</span>-->
+<!--          </div>-->
+          <div class="my-12">
+            <div class="mb-10 break-words w-full">
+              <p class="font-extrabold text-4xl">{{ article.title }}</p>
+            </div>
+            <div class="flex items-center gap-4 mb-10">
+              <el-avatar
+                  :icon="UserFilled"
+                  :src="undefined"
+                  :fit="'fill'"
+                  :size="40"
+              />
+              <div class="text-sm">
+                <span>{{ article.author }}</span>
+                <div>
+                  <span>发布于：</span>
+                  <span class="text-gray-400">{{ formatTimestamp(article.createdAt) }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="break-words w-full mb-10">
+              <p>{{ article.summary }}</p>
+            </div>
+            <div class="my-12">
+              <div class="w-full">
+                <img class="max-h-[326px] w-full object-cover" :src="article.previewImage">
+              </div>
+            </div>
           </div>
         </div>
         <div class="px-2 mb-10">
