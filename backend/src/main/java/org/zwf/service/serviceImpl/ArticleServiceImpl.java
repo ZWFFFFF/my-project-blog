@@ -630,10 +630,7 @@ public class ArticleServiceImpl implements ArticleService {
      * @return 文章列表
      */
     @Override
-    public RestBean<List<ArticleCollectVo>> getCollectedArticles() {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Integer userId = Integer.valueOf(user.getUsername());
-
+    public RestBean<List<ArticleCollectVo>> getCollectedArticles(Integer userId) {
         List<ArticleCollect> collects = articleCollectMapper.getUserCollectArticles(userId);
 
         // 将非发布状态的文章过滤掉
@@ -691,6 +688,7 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleVO toArticleVO(Article article) {
         Integer authorId = article.getAuthorId();
         String author = accountService.getUsernameById(authorId);
+        String avatar = accountService.getUserAvatarById(authorId);
         if(author == null) {
             author = "账号已注销";
             authorId = null;
@@ -703,6 +701,7 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setContent(article.getContent());
         vo.setAuthorId(authorId);
         vo.setAuthor(author);
+        vo.setAuthorAvatar(avatar);
         vo.setCreatedAt(article.getCreatedAt());
         vo.setUpdatedAt(article.getUpdatedAt());
         vo.setStatus(article.getStatus());
@@ -720,6 +719,7 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleCollectVo toArticleCollectVO(ArticleCollect collect) {
         Integer authorId = collect.getAuthorId();
         String author = accountService.getUsernameById(authorId);
+        String avatar = accountService.getUserAvatarById(authorId);
         if(author == null) {
             author = "账号已注销";
             authorId = null;
@@ -731,6 +731,7 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setSummary(collect.getSummary());
         vo.setAuthorId(authorId);
         vo.setAuthor(author);
+        vo.setAuthorAvatar(avatar);
         vo.setCreatedAt(collect.getCreatedAt());
         vo.setStatus(collect.getStatus());
         vo.setView(collect.getView());

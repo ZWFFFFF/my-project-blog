@@ -30,9 +30,9 @@ spring:
 my-config:
   web:
     flow:
-      period: 3 # 计数时间周期，单位为秒
-      limit: 10 # 指定时间内最大请求次数限制
-      block: 30 # 超出请求限制封禁时间，单位为秒
+      period: 30 # 计数时间周期，单位为秒
+      limit: 100 # 指定时间内最大请求次数限制
+      block: 60 # 超出请求限制封禁时间，单位为秒
     cors:
       origin: '*' # 跨域请求原始站点
       methods: '*' # 跨域请求方法

@@ -1,39 +1,66 @@
 <script setup>
-import {ref, onMounted, computed} from "vue"
-import {UserFilled} from "@element-plus/icons-vue";
-import {getArticleList} from "@/net/article.js";
-import images from '@/assets/img';
+import {useRoute} from "vue-router";
+import {defineProps, ref, watch} from "vue";
+import {getUserArticleCollects} from "@/net/article.js";
+import images from "@/assets/img/index.js";
 import {formatTimestamp} from "@/net/utils.js";
+import {UserFilled} from "@element-plus/icons-vue";
 import store from "@/store/index.js";
 
+const route = useRoute()
 const articleList = ref([])
-const recommendArticles = computed(() => store.state.recommendArticles)
-
-const fetchData = () => {
-  getArticleList((data) => {
-    articleList.value = data
-    articleList.value.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    // 将点赞数最高的四篇文章存入store中
-    const topLikedArticles = [...articleList.value]
-        .sort((a, b) => b.like - a.like)
-        .slice(0, 4)
-    store.dispatch('initializedRecommendArticles', topLikedArticles)
-  })
-}
-
-onMounted(() => {
-  fetchData()
+const props = defineProps({
+  account: {
+    type: Object,
+    required: true
+  }
 })
 
+const fetchData = () => {
+  if(props.account.id) {
+    getUserArticleCollects(props.account.id, (data) => {
+      articleList.value = data.filter(article => article.status !== 'take_down')
+      articleList.value.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    })
+  }
+}
+
+watch(
+    () => props.account.id,
+    (newId) => {
+      if(newId) fetchData()
+    },
+    { immediate: true } // 立即执行一次
+)
 </script>
 
 <template>
   <div class="flex justify-center">
     <div class="w-[968px] border-r">
-      <div class="w-full">
-        <div class="mt-[50px] w-[728px] mx-auto grid grid-cols-1 gap-y-8">
-          <div v-for="article in articleList" class="col-span-full mx-6 border-b">
+      <div class="w-[680px] mx-auto py-20">
+        <div class="mb-10 border-b">
+          <div class="mb-10">
+            <h1 class="text-3xl font-bold">{{ account.username }}</h1>
+          </div>
+          <div class="flex justify-start gap-x-10">
+            <router-link
+                class="pb-3 font-bold text-lg text-zinc-400 hover:text-zinc-800 transition-colors"
+                :class="{ 'border-black border-b-2 text-zinc-800' : route.path === '/user/' + account.id + '/lists'  }"
+                :to="{ path: `/user/${account.id}/lists` }"
+            >
+              <span>投稿</span>
+            </router-link>
+            <router-link
+                class="pb-3 font-bold text-lg text-zinc-400 hover:text-zinc-800 transition-colors"
+                :class="{ 'border-black border-b-2 text-zinc-800' : route.path === '/user/' + account.id + '/collects' }"
+                :to="{ path: `/user/${account.id}/collects` }"
+            >
+              <span>收藏</span>
+            </router-link>
+          </div>
+        </div>
+        <div class="mt-[50px] w-full grid grid-cols-1 gap-y-8">
+          <div v-for="article in articleList" class="col-span-full border-b">
             <div class="pb-6">
               <router-link
                   :to="{ path: `/user/${article.authorId}/lists` }"
@@ -77,39 +104,26 @@ onMounted(() => {
               </router-link>
             </div>
           </div>
+          <div v-if="!articleList.length" class="text-center">
+            <p class="text-xl font-bold text-zinc-400">还没有内容</p>
+          </div>
         </div>
       </div>
     </div>
     <div class="w-[368px]">
       <div class="ml-10">
         <div class="mt-12">
-          <div>
-            <p class="font-bold">推荐阅读</p>
-          </div>
-          <div class="mt-6 grid grid-cols-1 gap-y-8">
-            <div v-for="article in recommendArticles" class="col-span-full">
-              <router-link
-                  :to="{ path: `/user/${article.authorId}/lists` }"
-                  class="flex items-center gap-2 mb-2"
-              >
-                <el-avatar
-                    :icon="UserFilled"
-                    :src="article.authorAvatar || undefined"
-                    :fit="'fill'"
-                    :size="25"
-                />
-                <span class="text-sm">{{ article.author }}</span>
-              </router-link>
-              <div>
-                <router-link :to="'/article/approved/' + article.id">
-                  <div class="mb-2">
-                    <p class="font-bold text-xl break-words line-clamp-2">{{ article.title }}</p>
-                  </div>
-                  <div><span class="text-sm text-zinc-400">{{ formatTimestamp(article.createdAt) }}</span></div>
-                </router-link>
-              </div>
-            </div>
-          </div>
+          <el-avatar
+              :src="account.avatar || undefined"
+              :fit="'fill'"
+              :size="88"
+          >user</el-avatar>
+        </div>
+        <div class="mt-2">
+          <p class="font-bold">{{ account.username }}</p>
+        </div>
+        <div v-if="account.id === store.state.user.id" class="mt-4 text-sm text-green-600">
+          <router-link to="/me/settings">编辑个人信息</router-link>
         </div>
       </div>
     </div>

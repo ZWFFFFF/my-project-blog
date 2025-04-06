@@ -58,7 +58,7 @@ const handleUserLogout = throttle(userLogout, 1000)
 </script>
 
 <template>
-  <div class="container h-screen bg-gray-100 flex">
+  <div class="h-screen bg-gray-100 flex">
     <!-- aside -->
     <aside class="w-56 text-gray-700 h-screen z-10 bg-[#fff] flex flex-col">
       <div class="p-4 mx-auto">
@@ -129,7 +129,7 @@ const handleUserLogout = throttle(userLogout, 1000)
         </div>
       </div>
     </aside>
-    <div class="container flex flex-col flex-1 overflow-auto">
+    <div class="flex flex-col flex-1 overflow-auto">
       <div id="header" class="w-full h-16 border flex justify-between items-center px-5 bg-[#fff]">
         <div>
           <span>{{ title }}</span>

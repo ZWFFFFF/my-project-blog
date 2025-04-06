@@ -31,5 +31,6 @@ public interface AccountService extends UserDetailsService {
     boolean isAccountBanned(Integer userId);
     boolean isAccountExistById(Integer userId);
     String getUsernameById(Integer userId);
+    String getUserAvatarById(Integer userId);
     RestBean<Map<String, String>> saveAvatar(MultipartFile file);
 }

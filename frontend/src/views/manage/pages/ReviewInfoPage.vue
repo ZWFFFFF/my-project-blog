@@ -7,6 +7,7 @@ import {useRoute, useRouter} from "vue-router";
 import {onMounted} from "vue";
 import {formatTimestamp} from "@/net/utils.js";
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
+import Button from "@/components/Button.vue";
 
 const route = useRoute();
 
@@ -56,19 +57,43 @@ onMounted(() => {
   <div class="h-full">
     <div class="bg-white py-8">
       <div class="px-8 py-4 border-b">
-        <span class="text-xl">文章审核</span>
+        <span class="text-xl font-bold">文章审核</span>
       </div>
-      <div class="container border-b">
-        <div class="mx-auto w-1/2 my-5">
-          <div class="mb-2">
-            <div class="mb-4 break-words"><h1 class="font-extrabold text-3xl">{{ article.title }}</h1></div>
-            <div class="mb-4 break-words"><p>{{ article.summary }}</p></div>
-            <div class="flex items-center">
-              <a class="flex items-center mr-8"><el-avatar :icon="UserFilled" class="mr-2"></el-avatar><span>{{ article.author }}</span></a>
-              <span class="text-gray-400">{{ formatTimestamp(article.createdAt) }}</span>
+      <div class="border-b">
+        <div class="container mx-auto w-[680px]">
+          <div class="px-2 border-b">
+            <div class="my-12">
+              <div class="mb-10 break-words w-full">
+                <p class="font-extrabold text-4xl">{{ article.title }}</p>
+              </div>
+              <div class="flex items-center gap-4 mb-10">
+                <router-link :to="{ path: `/user/${article.authorId}/lists` }">
+                  <el-avatar
+                      :icon="UserFilled"
+                      :src="article.authorAvatar || undefined"
+                      :fit="'fill'"
+                      :size="40"
+                  />
+                </router-link>
+                <div class="text-sm">
+                  <span>{{ article.author }}</span>
+                  <div>
+                    <span>发布于：</span>
+                    <span class="text-gray-400">{{ formatTimestamp(article.createdAt) }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="break-words w-full mb-10">
+                <p>{{ article.summary }}</p>
+              </div>
+              <div class="my-12">
+                <div class="w-full">
+                  <img class="max-h-[326px] w-full object-cover" :src="article.previewImage">
+                </div>
+              </div>
             </div>
           </div>
-          <div>
+          <div class="px-2 mb-10">
             <QuillEditor
                 ref="editorRef"
                 theme="bubble"
@@ -83,11 +108,11 @@ onMounted(() => {
       </div>
       <div class="px-8">
         <div class="py-4">
-          <span class="text-xl">审核结果</span>
+          <span class="font-bold text-xl text-zinc-400">审核结果</span>
         </div>
         <div class="flex justify-center items-center gap-8">
-          <div class="py-2 px-4 rounded border hover:bg-gray-100 shadow-sm cursor-pointer" @click="articleApprove(articleId)"><span>审核通过</span></div>
-          <div class="py-2 px-4 rounded border hover:bg-gray-100 shadow-sm cursor-pointer" @click="articleReject(articleId)"><span>审核不通过</span></div>
+          <Button class="text-sm" :style="'grey'" @click="articleReject(articleId)"><span>审核不通过</span></Button>
+          <Button class="text-sm" @click="articleApprove(articleId)"><span>审核通过</span></Button>
         </div>
       </div>
     </div>

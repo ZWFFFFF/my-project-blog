@@ -56,6 +56,22 @@ const routes = [
             }
         ]
     }, {
+        path: '/user/:id',
+        name: 'account',
+        component: () => import('@/views/account/AccountView.vue'),
+        children: [
+            {
+                path: 'lists',
+                name: 'account-user-lists',
+                component: () => import('@/views/account/pages/ListsPage.vue')
+            },
+            {
+                path: 'collects',
+                name: 'account-user-collects',
+                component: () => import('@/views/account/pages/CollectsPage.vue')
+            }
+        ]
+    }, {
         path: '/editor',
         name: 'editor',
         component: () => import('@/views/editor/EditView.vue'),

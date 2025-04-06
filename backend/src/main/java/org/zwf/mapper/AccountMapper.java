@@ -17,6 +17,8 @@ public interface AccountMapper {
     Account getAccountById(@Param("id") Integer id);
     @Select("select username from account where id = #{id}")
     String getUsernameById(@Param("id") Integer id);
+    @Select("select avatar from account where id = #{id}")
+    String getUserAvatarById(@Param("id") Integer id);
     @Insert("insert into account(password, email) values(#{password}, #{email})")
     Integer insertAccount(Account account);
     @Update("update account set password = #{password} where email = #{email}")

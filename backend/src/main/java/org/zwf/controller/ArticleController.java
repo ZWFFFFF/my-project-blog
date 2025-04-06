@@ -309,8 +309,8 @@ public class ArticleController {
      */
     @GetMapping("/collect-list")
     @Operation(summary = "获取收藏文章列表")
-    public RestBean<List<ArticleCollectVo>> getCollectList() {
-        return articleService.getCollectedArticles();
+    public RestBean<List<ArticleCollectVo>> getCollectList(@RequestParam @NotNull Integer userId) {
+        return articleService.getCollectedArticles(userId);
     }
 
     /**

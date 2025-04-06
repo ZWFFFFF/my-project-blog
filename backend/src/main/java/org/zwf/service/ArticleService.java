@@ -34,6 +34,6 @@ public interface ArticleService {
     RestBean<List<ArticleVO>> getTakeDownArticleList();
     String toggleLikeArticle(Integer articleId);
     String toggleCollect(Integer articleId);
-    RestBean<List<ArticleCollectVo>> getCollectedArticles();
+    RestBean<List<ArticleCollectVo>> getCollectedArticles(Integer userId);
     RestBean<Map<String, String>> uploadPreviewImage(MultipartFile file);
 }

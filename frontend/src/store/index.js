@@ -14,6 +14,7 @@ const store = createStore({
                 email: null,
                 avatar: null
             },
+            recommendArticles: [],
         }
     },
     // 修改状态的事件(需要提交才执行)
@@ -31,6 +32,9 @@ const store = createStore({
         },
         updateUserAvatar(state, avatar) {
             state.user.avatar = avatar
+        },
+        setRecommendArticles(state, articles) {
+            state.recommendArticles = articles
         }
     },
     // 对事件进行提交的动作
@@ -59,6 +63,9 @@ const store = createStore({
         },
         updateAvatar({ commit }, avatar) {
             commit('updateUserAvatar', avatar)
+        },
+        initializedRecommendArticles({ commit }, articles) {
+            commit('setRecommendArticles', articles)
         }
     }
 })

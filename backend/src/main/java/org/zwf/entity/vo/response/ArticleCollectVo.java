@@ -14,6 +14,7 @@ public class ArticleCollectVo {
     private String summary;
     private Integer authorId;
     private String author;
+    private String authorAvatar;
     private Date createdAt;
     private Integer view;
     private Integer like;

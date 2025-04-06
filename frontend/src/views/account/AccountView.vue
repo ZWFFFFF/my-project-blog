@@ -1,16 +1,27 @@
 <script setup>
-import {useRoute, useRouter} from 'vue-router'
-import {Collection, Edit, Setting, Tickets, User, UserFilled} from "@element-plus/icons-vue";
+import {Search, User, UserFilled, Setting, Edit, Tickets, Collection} from "@element-plus/icons-vue";
+import {ref, computed, reactive, onMounted, watch} from 'vue'
+import {useRoute, useRouter} from "vue-router";
 import {logout} from "@/net/auth.js";
-import store from "@/store/index.js";
+import {useStore} from "vuex";
 import DropdownMenu from "@/components/DropdownMenu.vue";
 import {throttle} from "@/net/utils.js";
-import {computed} from "vue";
+import {getUserInfo} from "@/net/user.js";
 
+const store = useStore()
 const router = useRouter()
 const route = useRoute()
+const keyword = ref('');
 const userAvatar = computed(() => store.state.user.avatar)
-const username = computed(() => store.state.user.username)
+const account = reactive({
+  id: '',
+  username: '',
+  avatar: '',
+  email: '',
+  role: '',
+  active: '',
+  registerTime: ''
+})
 const dropdownMenuOptions = [
   {
     label: '个人中心',
@@ -31,6 +42,17 @@ const dropdownMenuOptions = [
   }
 ]
 
+const fetchData = () => {
+  const currentId = route.params.id
+  getUserInfo(currentId, (data) => {
+    Object.assign(account, data)
+  })
+}
+
+function searchArticle() {
+  router.push({ path: '/search', query: { keyword: keyword.value } })
+}
+
 function userLogout() {
   logout(() => {
     store.dispatch('logout')
@@ -40,14 +62,32 @@ function userLogout() {
 
 const handleUserLogout = throttle(userLogout, 1000)
 
+watch(
+    () => route.params.id,
+    (newId) => {
+      if (newId) fetchData()
+    },
+    { immediate: true }
+)
+
+onMounted(() => {
+  fetchData()
+})
 </script>
 
 <template>
-  <div class="bg-[#FFFFFF] w-full min-h-screen">
+  <div class="bg-[#FFFFFF] w-full min-h-screen flex flex-col">
     <header>
       <div class="bg-[#FFFFFF] flex justify-between py-2 px-4 gap-4 items-center border-b">
-        <div class="w-1/2 pl-4">
+        <div class="w-1/2 flex gap-8 pl-4">
           <router-link to="/"><span class="font-extrabold font-serif text-2xl">Logo</span></router-link>
+          <div>
+            <el-input v-model="keyword" type="text" placeholder="搜索" @keyup.enter="searchArticle">
+              <template #prefix>
+                <el-icon><Search/></el-icon>
+              </template>
+            </el-input>
+          </div>
         </div>
         <div class="flex w-1/2 justify-end items-center space-x-4">
           <button
@@ -100,68 +140,13 @@ const handleUserLogout = throttle(userLogout, 1000)
         </div>
       </div>
     </header>
-    <div class="flex justify-center">
-      <div class="w-[968px] border-r">
-        <div class="w-[680px] mx-auto py-20">
-          <div class="mb-10 border-b">
-            <div class="mb-10">
-              <h1 class="text-3xl font-bold">作品管理</h1>
-            </div>
-            <div class="flex justify-start gap-x-10">
-              <router-link
-                  class="pb-3 font-bold text-lg text-zinc-400 hover:text-zinc-800 transition-colors"
-                  :class="{ 'border-black border-b-2 text-zinc-800' : route.path === '/writing/draft'  }"
-                  to="/writing/draft"
-              >
-                <span>草稿</span>
-              </router-link>
-              <router-link
-                  class="pb-3 font-bold text-lg text-zinc-400 hover:text-zinc-800 transition-colors"
-                  :class="{ 'border-black border-b-2 text-zinc-800' : route.path === '/writing/published' }"
-                  to="/writing/published"
-              >
-                <span>投稿管理</span>
-              </router-link>
-              <router-link
-                  class="pb-3 font-bold text-lg text-zinc-400 hover:text-zinc-800 transition-colors"
-                  :class="{ 'border-black border-b-2 text-zinc-800' : route.path === '/writing/reviewing' }"
-                  to="/writing/reviewing"
-              >
-                <span>审核</span>
-              </router-link>
-            </div>
-          </div>
-          <router-view v-slot="{ Component }">
-            <transition name="el-fade-in-linear" mode="out-in">
-              <component :is="Component"/>
-            </transition>
-          </router-view>
-        </div>
-      </div>
-      <div class="w-[368px]">
-        <div class="ml-10">
-          <div class="mt-12">
-            <el-avatar
-                :src="userAvatar || undefined"
-                :fit="'fill'"
-                :size="88"
-            >user</el-avatar>
-          </div>
-          <div class="mt-2">
-            <p class="font-bold">{{ username }}</p>
-          </div>
-          <div class="mt-4 text-sm text-green-600">
-            <router-link to="/me/settings">编辑个人信息</router-link>
-          </div>
-        </div>
+    <div class="flex-1 flex">
+      <div class="w-full flex-1 overflow-auto">
+        <router-view :account="account"></router-view>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.el-icon {
-  width: 80px;
-  height: 80px;
-}
 </style>

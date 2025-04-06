@@ -6,10 +6,12 @@ import {UserFilled} from "@element-plus/icons-vue";
 import {formatTimestamp} from "@/net/utils.js";
 import router from "@/router/index.js";
 import images from "@/assets/img/index.js";
+import store from "@/store/index.js";
 
 const route = useRoute()
 const keyword = computed(() => route.query.keyword)
 const articleList = ref([])
+const recommendArticles = computed(() => store.state.recommendArticles)
 
 // 获取文章列表
 const fetchData = () => {
@@ -18,7 +20,7 @@ const fetchData = () => {
     return
   }
 
-  if(keyword.value !== undefined) {
+  if(keyword.value) {
     searchArticleList(keyword.value, (data) => {
       articleList.value = data
     })
@@ -42,18 +44,20 @@ watch(() => route.query.keyword, () => {
         <div class="mt-[50px] w-[728px] mx-auto grid grid-cols-1 gap-y-8">
           <div v-for="article in articleList" class="col-span-full mx-6 border-b">
             <div class="pb-6">
-              <div class="flex items-center gap-2 mb-4">
+              <router-link
+                  :to="{ path: `/user/${article.authorId}/lists` }"
+                  class="flex items-center gap-2 mb-4">
                 <el-avatar
                     :icon="UserFilled"
-                    :src="undefined"
+                    :src="article.authorAvatar || undefined"
                     :fit="'fill'"
                     :size="30"
                 />
                 <span>{{ article.author }}</span>
-              </div>
+              </router-link>
               <router-link :to="'/article/approved/' + article.id" class="flex">
                 <div class="w-[464px]">
-                  <div class="mb-4">
+                  <div class="mb-2">
                     <p class="font-bold text-xl break-words">{{ article.title }}</p>
                   </div>
                   <div class="mb-6">
@@ -88,7 +92,37 @@ watch(() => route.query.keyword, () => {
       </div>
     </div>
     <div class="w-[368px]">
-      asdfdsa
+      <div class="ml-10">
+        <div class="mt-12">
+          <div>
+            <p class="font-bold">推荐阅读</p>
+          </div>
+          <div class="mt-6 grid grid-cols-1 gap-y-8">
+            <div v-for="article in recommendArticles" class="col-span-full">
+              <router-link
+                  :to="{ path: `/user/${article.authorId}/lists` }"
+                  class="flex items-center gap-2 mb-2"
+              >
+                <el-avatar
+                    :icon="UserFilled"
+                    :src="article.authorAvatar || undefined"
+                    :fit="'fill'"
+                    :size="25"
+                />
+                <span class="text-sm">{{ article.author }}</span>
+              </router-link>
+              <div>
+                <router-link :to="'/article/approved/' + article.id">
+                  <div class="mb-2">
+                    <p class="font-bold text-xl break-words line-clamp-2">{{ article.title }}</p>
+                  </div>
+                  <div><span class="text-sm text-zinc-400">{{ formatTimestamp(article.createdAt) }}</span></div>
+                </router-link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

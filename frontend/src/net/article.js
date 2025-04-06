@@ -253,9 +253,9 @@ function collectArticleToggle(articleId, success) {
     })
 }
 
-function getUserArticleCollects(success) {
+function getUserArticleCollects(userId, success) {
     get({
-        url: 'api/article/collect-list',
+        url: 'api/article/collect-list?userId=' + userId,
         success: (data) => {
             success(data)
         }

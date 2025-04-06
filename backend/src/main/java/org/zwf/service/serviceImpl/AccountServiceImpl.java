@@ -354,6 +354,16 @@ public class AccountServiceImpl implements AccountService {
     }
 
     /**
+     * 获取用户头像
+     * @param userId 用户Id
+     * @return 用户头像
+     */
+    @Override
+    public String getUserAvatarById(Integer userId) {
+        return accountMapper.getUserAvatarById(userId);
+    }
+
+    /**
      * 将用户实体转换为用户信息实体
      * @param account 用户实体
      * @return 用户信息实体

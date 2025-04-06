@@ -15,11 +15,11 @@ const dropdownMenuOptions = [
   {
     label: '个人中心',
     icon: User,
-    link: ''
+    link: '/user/' + store.state.user.id + '/lists'
   }, {
     label: '我的收藏',
     icon: Collection,
-    link: ''
+    link: '/user/' + store.state.user.id + '/collects'
   }, {
     label: '作品管理',
     icon: Tickets,

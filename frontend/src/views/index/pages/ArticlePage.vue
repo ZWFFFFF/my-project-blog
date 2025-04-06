@@ -24,6 +24,7 @@ const article = reactive({
   content: '',
   authorId: null,
   author: '',
+  authorAvatar: '',
   createdAt: '',
   updatedAt: '',
   view: null,
@@ -355,35 +356,19 @@ onUnmounted(() => {
     <div class="container mx-auto w-[680px]">
       <div>
         <div class="px-2 border-b">
-<!--          <div class="my-12">-->
-<!--            <div class="w-[680px]">-->
-<!--              <img :src="article.previewImage">-->
-<!--            </div>-->
-<!--          </div>-->
-<!--          <div class="mb-10">-->
-<!--            <div class="mb-10 break-words w-full"><p class="font-extrabold text-4xl">{{ article.title }}</p></div>-->
-<!--            <div class="mb-4 break-words w-full"><p>{{ article.summary }}</p></div>-->
-<!--          </div>-->
-<!--          <div class="flex flex-col justify-center items-center gap-2 mb-5">-->
-<!--            <a>-->
-<!--              <el-avatar :icon="UserFilled"></el-avatar>-->
-<!--            </a>-->
-<!--            <span>{{ article.author }}</span>-->
-<!--          </div>-->
-<!--          <div class="text-center">-->
-<!--            <span class="font-bold">发布于：</span><span class="text-gray-400">{{ formatTimestamp(article.createdAt) }}</span>-->
-<!--          </div>-->
           <div class="my-12">
             <div class="mb-10 break-words w-full">
               <p class="font-extrabold text-4xl">{{ article.title }}</p>
             </div>
             <div class="flex items-center gap-4 mb-10">
-              <el-avatar
-                  :icon="UserFilled"
-                  :src="undefined"
-                  :fit="'fill'"
-                  :size="40"
-              />
+              <router-link :to="{ path: `/user/${article.authorId}/lists` }">
+                <el-avatar
+                    :icon="UserFilled"
+                    :src="article.authorAvatar || undefined"
+                    :fit="'fill'"
+                    :size="40"
+                />
+              </router-link>
               <div class="text-sm">
                 <span>{{ article.author }}</span>
                 <div>
@@ -484,7 +469,12 @@ onUnmounted(() => {
         </div>
         <div class="flex flex-col items-start">
           <div class="mb-4 flex items-center gap-2">
-            <el-avatar :icon="UserFilled" :size="40"></el-avatar>
+            <el-avatar
+                :icon="UserFilled"
+                :src="article.authorAvatar || undefined"
+                :fit="'fill'"
+                :size="40"
+            />
             <span>{{ article.author }}</span>
           </div>
           <!-- 评论输入框 -->
@@ -540,7 +530,12 @@ onUnmounted(() => {
                 :key="comment.id"
                 class="flex gap-4 w-full"
             >
-              <el-avatar :icon="UserFilled" :size="40"></el-avatar>
+              <el-avatar
+                  :icon="UserFilled"
+                  :src="comment.user.avatar || undefined"
+                  :fit="'fill'"
+                  :size="40"
+              />
               <div class="flex-1">
                 <div class="flex items-center gap-2 mb-2">
                   <span class="font-medium text-sm">{{ comment.user.username }}</span>
@@ -623,7 +618,12 @@ onUnmounted(() => {
                       v-for="reply in comment.replies"
                   >
                     <div class="flex gap-4 w-full mt-2">
-                      <el-avatar :icon="UserFilled" :size="40"></el-avatar>
+                      <el-avatar
+                          :icon="UserFilled"
+                          :src="reply.user.avatar || undefined"
+                          :fit="'fill'"
+                          :size="40"
+                      />
                       <div class="flex-1">
                         <div class="flex items-center gap-2 mb-2">
                           <span class="font-medium text-sm">{{ reply.user.username }}</span>
