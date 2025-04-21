@@ -10,6 +10,7 @@ import {throttle} from "@/net/utils.js";
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
+const userAvatar = computed(() => store.state.user.avatar)
 
 const title = computed(() => {
   if (route.name.startsWith('manage-article-review')) return '文章审核'
@@ -143,7 +144,11 @@ const handleUserLogout = throttle(userLogout, 1000)
             </div>
           </template>
           <template #default>
-            <el-avatar :icon="UserFilled"></el-avatar>
+            <el-avatar
+                :icon="UserFilled"
+                :src="userAvatar || undefined"
+                :fit="'fill'"
+            />
           </template>
           <template #footer>
             <button

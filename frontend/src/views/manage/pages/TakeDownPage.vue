@@ -209,8 +209,8 @@ onMounted(() => {
             </div>
           </div>
           <div>
-            <Button class="text-sm" v-show="activeTab === 'takeDown'" @click="handleBatchTakeDown">批量下架</Button>
-            <Button class="text-sm" v-show="activeTab === 'recover'" @click="handleBatchRecover">批量恢复</Button>
+            <Button class="text-sm font-bold" v-show="activeTab === 'takeDown'" @click="handleBatchTakeDown">批量下架</Button>
+            <Button class="text-sm font-bold" v-show="activeTab === 'recover'" @click="handleBatchRecover">批量恢复</Button>
           </div>
         </div>
         <!-- 表格 -->

@@ -111,8 +111,8 @@ onMounted(() => {
           <span class="font-bold text-xl text-zinc-400">审核结果</span>
         </div>
         <div class="flex justify-center items-center gap-8">
-          <Button class="text-sm" :style="'grey'" @click="articleReject(articleId)"><span>审核不通过</span></Button>
-          <Button class="text-sm" @click="articleApprove(articleId)"><span>审核通过</span></Button>
+          <Button class="text-sm font-bold" :style="'grey'" @click="articleReject(articleId)"><span>审核不通过</span></Button>
+          <Button class="text-sm font-bold" @click="articleApprove(articleId)"><span>审核通过</span></Button>
         </div>
       </div>
     </div>

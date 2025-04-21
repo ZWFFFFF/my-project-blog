@@ -211,9 +211,9 @@ function deleteWriting(id) {
                 <div class="text-sm text-zinc-400"><span>{{ formatTimestamp(article.createdAt) }}创建</span><span class="ml-4">于{{ formatTimestamp(article.updatedAt) }}有过修改</span></div>
               </div>
               <div class="flex gap-4">
-                <Button v-if="article.status === 'approved'" class="text-sm" @click="router.push('/article/approved/' + article.id)">查看</Button>
-                <Button v-if="article.status === 'approved'" class="text-sm" @click="router.push('/editor/update/article/' + article.id)">编辑</Button>
-                <Button class="text-sm" @click="deleteWriting(article.id)">删除</Button>
+                <Button v-if="article.status === 'approved'" class="text-sm font-bold" @click="router.push('/article/approved/' + article.id)">查看</Button>
+                <Button v-if="article.status === 'approved'" class="text-sm font-bold" @click="router.push('/editor/update/article/' + article.id)">编辑</Button>
+                <Button class="text-sm font-bold" @click="deleteWriting(article.id)">删除</Button>
               </div>
             </div>
           </div>

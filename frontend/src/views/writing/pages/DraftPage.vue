@@ -142,9 +142,9 @@ function deleteWriting(id) {
             <div class="flex flex-row items-end justify-between gap-2">
               <div class="text-sm text-zinc-400"><span>{{ formatTimestamp(article.createdAt) }}创建</span><span class="ml-4">于{{ formatTimestamp(article.updatedAt) }}有过修改</span></div>
               <div class="flex gap-4">
-                <Button class="text-sm" @click="router.push('/article/draft/' + article.id)">预览</Button>
-                <Button class="text-sm" @click="router.push('/editor/update/draft/' + article.id)">编辑</Button>
-                <Button class="text-sm" @click="deleteWriting(article.id)">删除</Button>
+                <Button class="text-sm font-bold" @click="router.push('/article/draft/' + article.id)">预览</Button>
+                <Button class="text-sm font-bold" @click="router.push('/editor/update/draft/' + article.id)">编辑</Button>
+                <Button class="text-sm font-bold" @click="deleteWriting(article.id)">删除</Button>
               </div>
             </div>
           </div>

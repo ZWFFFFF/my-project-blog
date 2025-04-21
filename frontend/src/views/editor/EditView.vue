@@ -159,7 +159,7 @@ const closeSubmitDialog = () => {
           </el-breadcrumb>
         </div>
         <div>
-          <div><Button class="text-sm" @click="handleOpenSubmitDialog">下一步</Button></div>
+          <div><Button class="text-sm font-bold" @click="handleOpenSubmitDialog">下一步</Button></div>
         </div>
         <el-dialog
             v-model="submitDialogVisible"

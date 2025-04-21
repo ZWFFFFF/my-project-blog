@@ -94,9 +94,8 @@ public class AccountServiceImpl implements AccountService {
      */
     @Override
     public String emailVerifyCode(String type, String email, String ip) {
-        // ip.intern():如果池中已经有了一个等于此字符串的字符串，则返回这个字符串的引用；否则，将此字符串加入池中，并返回这个字符串的引用。
-        // 所有的String ip都是同一对象，所有线程共享这个对象，
-        // synchronized(线程竞争的资源):确保在同一时间只有一个线程能够执行某个代码块，从而避免线程安全问题
+        // 使用synchronized确保同一IP地址的请求串行处理
+        // ip.intern()确保所有相同IP字符串使用同一个字符串对象，作为锁对象
         synchronized (ip.intern()) {
             if(!verifyEmailCodeLimit(ip)) return "请求频繁，请稍后再试"; // 获取验证码限流
             // 生成验证码
