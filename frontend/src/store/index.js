@@ -9,10 +9,10 @@ const store = createStore({
     state() {
         return {
             user: {
-                id: null,
-                username: null,
-                email: null,
-                avatar: null
+                id: '',
+                username: '',
+                email: '',
+                avatar: ''
             },
             recommendArticles: [],
         }
@@ -24,14 +24,20 @@ const store = createStore({
         },
         cleanUser(state) {
             state.user = {
-                id: null,
-                username: null,
-                email: null,
-                avatar: null
+                id: '',
+                username: '',
+                email: '',
+                avatar: ''
             }
         },
         updateUserAvatar(state, avatar) {
             state.user.avatar = avatar
+        },
+        updateUsername(state, username) {
+            state.user.username = username
+        },
+        updateEmail(state, email) {
+            state.user.email = email
         },
         setRecommendArticles(state, articles) {
             state.recommendArticles = articles
@@ -63,6 +69,15 @@ const store = createStore({
         },
         updateAvatar({ commit }, avatar) {
             commit('updateUserAvatar', avatar)
+        },
+        updateUsername({ commit }, username) {
+            commit('updateUsername', username)
+        },
+        updateEmail({ commit }, email) {
+            commit('updateEmail', email)
+        },
+        deleteAccount({ commit }) {
+          commit('cleanUser')
         },
         initializedRecommendArticles({ commit }, articles) {
             commit('setRecommendArticles', articles)

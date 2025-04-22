@@ -23,8 +23,10 @@ public interface AccountMapper {
     Integer insertAccount(Account account);
     @Update("update account set password = #{password} where email = #{email}")
     Integer updateAccountPasswordByEmail(@Param("email") String email, @Param("password") String password);
-    @Update("update account set username = #{username} where username = #{oldUsername}")
-    Integer updateUsername(@Param("username") String username, @Param("oldUsername") String oldUsername);
+    @Update("update account set username = #{username} where id = #{id}")
+    Integer updateUsername(@Param("username") String username, @Param("id") Integer id);
+    @Update("update account set email = #{email} where id = #{id}")
+    Integer updateEmail(@Param("email") String email, @Param("id") Integer id);
     @Delete("delete from account where id = #{id}")
     Integer deleteAccountById(Integer id);
     @Update("update account set active = 0 where id = #{id}")

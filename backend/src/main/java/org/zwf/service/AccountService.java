@@ -21,10 +21,11 @@ public interface AccountService extends UserDetailsService {
     String registerAccount(EmailRegisterVO vo);
     String resetPassword(ResetPasswordVO vo);
     String changeUsername(Integer id, String newUsername);
+    String changeEmail(Integer id, String newEmail);
     RestBean<AccountVO> getAccountInfoById(Integer id);
     RestBean<List<AccountVO>> getAllUser();
     boolean isCurrentUser(Integer userId);
-    String deleteAccount(Integer userId, String username, String token);
+    String deleteAccount(Integer userId, String token);
     String changePassword(ChangePasswordVO vo);
     String banAccount(Integer userId);
     String unbanAccount(Integer userId);

@@ -10,6 +10,7 @@ import {formatTimestamp, throttle} from "@/net/utils.js";
 import {useStore} from "vuex";
 import Button from "@/components/Button.vue";
 import {creatComment, deleteComment, cancelLikeComment, getComments, likeComment} from "@/net/comment.js";
+import images from "@/assets/img/index.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -382,7 +383,7 @@ onUnmounted(() => {
             </div>
             <div class="my-12">
               <div class="w-full">
-                <img class="max-h-[326px] w-full object-cover" :src="article.previewImage">
+                <img class="max-h-[326px] w-full object-cover" :src="article.previewImage ? article.previewImage : images.welcome_page">
               </div>
             </div>
           </div>

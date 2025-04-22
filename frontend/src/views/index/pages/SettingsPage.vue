@@ -3,12 +3,15 @@
 import {Plus, UserFilled} from "@element-plus/icons-vue";
 import {ref, reactive, computed} from 'vue'
 import {ElMessage} from "element-plus";
-import {changePassword, uploadAvatar} from "@/net/user.js";
+import {changeEmail, changePassword, changeUsername, deleteAccount, uploadAvatar} from "@/net/user.js";
 import Button from "@/components/Button.vue";
 import {throttle} from "@/net/utils.js";
 import {useStore} from "vuex";
+import {useRouter} from "vue-router";
 
+const router = useRouter()
 const store = useStore()
+const id = store.state.user.id
 const userAvatar = computed(() => store.state.user.avatar)
 const username = computed(() => store.state.user.username)
 const email = computed(() => store.state.user.email)
@@ -33,6 +36,7 @@ const passwordForm = reactive({
   new_password: '',
   confirm_new_password: ''
 })
+const deleteAccountInput = ref('')
 
 // 头像文件选择时的处理
 const handleAvatarFileChange = (file) => {
@@ -85,12 +89,30 @@ const handleCancelUploadAvatar = throttle(cancelUploadAvatar, 1000)
 // 更新用户名
 const updateUsername = () => {
   usernameFormRef.value.validate((valid) => {
-    if(valid && usernameForm.username !== username.value) {
-      ElMessage.success('修改成功')
-      usernameDialogVisible.value = false
-    } else {
-      ElMessage.warning('请输入正确的信息')
+    if (!valid) {
+      ElMessage.warning('请输入正确的信息');
+      return;
     }
+
+    // 检查用户名是否符合规则（仅字母、数字、中文）
+    const usernameRegex = /^[a-zA-Z0-9\u4e00-\u9fa5]+$/;
+    if (!usernameRegex.test(usernameForm.username)) {
+      ElMessage.warning('用户名只能包含字母、数字或中文');
+      return;
+    }
+
+    // 检查是否真的修改了用户名
+    if (usernameForm.username === username.value) {
+      ElMessage.warning('新用户名不能与原用户名相同');
+      return;
+    }
+
+    // 验证通过，执行修改逻辑
+    changeUsername(id, usernameForm.username, () => {
+      store.dispatch('updateUsername', usernameForm.username)
+      ElMessage.success('修改成功');
+      usernameDialogVisible.value = false;
+    })
   })
 }
 
@@ -103,6 +125,29 @@ const cancelUpdateUsername = () => {
 
 const handleCancelUpdateUsername = throttle(cancelUpdateUsername, 1000)
 
+// 更新邮箱
+const updateEmail = () => {
+  emailFormRef.value.validate((valid) => {
+    if (!valid) {
+      ElMessage.warning('请输入正确的信息');
+      return;
+    }
+    // 检查是否真的修改了邮箱
+    if (emailForm.email === email.value) {
+      ElMessage.warning('新邮箱不能与原邮箱相同');
+      return;
+    }
+    // 验证通过，执行修改逻辑
+    changeEmail(id, emailForm.email, () => {
+      store.dispatch('updateEmail', emailForm.email)
+      ElMessage.success('修改成功');
+      emailDialogVisible.value = false;
+    })
+  })
+}
+
+const handleUpdateEmail = throttle(updateEmail, 1000)
+
 const cancelUpdateEmail = () => {
   emailDialogVisible.value = false
   emailForm.email = email.value
@@ -110,23 +155,58 @@ const cancelUpdateEmail = () => {
 
 const handleCancelUpdateEmail = throttle(cancelUpdateEmail, 1000)
 
+// 修改密码
+const changePwd = () => {
+  passwordFormRef.value.validate((valid) => {
+    if(valid) {
+      changePassword(id, passwordForm.old_password, passwordForm.new_password, () => {
+        ElMessage.success('修改密码成功')
+        passwordDialogVisible.value = false
+      })
+    } else {
+      ElMessage.warning('请输入正确的信息')
+    }
+  })
+}
+
+const handlePasswordChange = throttle(changePwd, 1000)
+
 const cancelUpdatePassword = () => {
+  passwordForm.old_password = ''
+  passwordForm.new_password = ''
+  passwordForm.confirm_new_password = ''
   passwordDialogVisible.value = false
 }
 
 const handleCancelUpdatePassword = throttle(cancelUpdatePassword, 1000)
 
+// 注销账号
+const delAccount = () => {
+    if(deleteAccountInput.value === 'delete') {
+      if(confirm("确定要注销账号吗？")) {
+        deleteAccount(id, () => {
+          ElMessage.success('删除成功')
+          store.dispatch('deleteAccount')
+          router.push('/welcome')
+        })
+      }
+    } else {
+      ElMessage.warning('请输入正确的信息')
+    }
+}
+
+const handleDeleteAccount = throttle(delAccount, 1000)
+
 const cancelDeleteAccount = () => {
   deleteAccountDialogVisible.value = false
+  deleteAccountInput.value = ''
 }
 
 const handleCancelDeleteAccount = throttle(cancelDeleteAccount, 1000)
 
 // 密码检测规则
 const validatePassword = (rule, value, callback) => {
-  if(value === '') {
-    callback(new Error('请再次输入密码'))
-  } else if(form.new_password !== value) {
+  if(passwordForm.new_password !== value) {
     callback(new Error('两次输入密码不一致'))
   } else {
     callback()
@@ -137,6 +217,13 @@ const validatePassword = (rule, value, callback) => {
 const usernameRules = reactive({
   username: [
     { required: true, min: 1, max: 20, message: '用户名最短为1个字符', trigger: ['blur', 'change'] }
+  ]
+})
+
+// 邮箱表单校验规则
+const emailRules = reactive({
+  email: [
+    { required: true, type: 'email', message: '请输入有效邮箱地址', trigger: ['blur', 'change'] }
   ]
 })
 
@@ -287,14 +374,23 @@ const validatePasswordRules = reactive({
                   </div>
                   <div class="pb-6 mb-12 border-b">
                     <div>
-
+                      <el-form
+                          ref="emailFormRef"
+                          :model="emailForm"
+                          :rules="emailRules"
+                      >
+                        <div class="mb-2"><p>你可以在这里更改邮箱信息</p></div>
+                        <el-form-item prop="email">
+                          <el-input v-model="emailForm.email" type="text" maxlength="20"/>
+                        </el-form-item>
+                      </el-form>
                     </div>
                   </div>
                   <div class="flex justify-end space-x-4">
                     <Button :style="'grey'" class="font-bold text-sm" @click="handleCancelUpdateEmail">
                       取消
                     </Button>
-                    <Button class="font-bold text-sm" @click="">
+                    <Button class="font-bold text-sm" @click="handleUpdateEmail">
                       确认
                     </Button>
                   </div>
@@ -316,14 +412,29 @@ const validatePasswordRules = reactive({
                   </div>
                   <div class="pb-6 mb-12 border-b">
                     <div>
-
+                      <el-form
+                          ref="passwordFormRef"
+                          :model="passwordForm"
+                          :rules="validatePasswordRules"
+                      >
+                        <div class="mb-2"><p>你可以在这里更改密码</p></div>
+                        <el-form-item prop="old_password">
+                          <el-input v-model="passwordForm.old_password" type="text" placeholder="旧密码" maxlength="20" show-password/>
+                        </el-form-item>
+                        <el-form-item prop="new_password">
+                          <el-input v-model="passwordForm.new_password" type="text" placeholder="新密码" maxlength="20" show-password/>
+                        </el-form-item>
+                        <el-form-item prop="confirm_new_password">
+                          <el-input v-model="passwordForm.confirm_new_password" type="text" placeholder="确认新密码" maxlength="20" show-password/>
+                        </el-form-item>
+                      </el-form>
                     </div>
                   </div>
                   <div class="flex justify-end space-x-4">
                     <Button :style="'grey'" class="font-bold text-sm" @click="handleCancelUpdatePassword">
                       取消
                     </Button>
-                    <Button class="font-bold text-sm" @click="">
+                    <Button class="font-bold text-sm" @click="handlePasswordChange">
                       确认
                     </Button>
                   </div>
@@ -347,14 +458,15 @@ const validatePasswordRules = reactive({
               </div>
               <div class="pb-6 mb-12 border-b">
                 <div>
-
+                  <div class="mb-2"><p class="text-red-700">如需注销账号，请在以下输入框输入"delete"</p></div>
+                  <el-input v-model="deleteAccountInput" type="text" maxlength="20"/>
                 </div>
               </div>
               <div class="flex justify-end space-x-4">
                 <Button :style="'grey'" class="font-bold text-sm" @click="handleCancelDeleteAccount">
                   取消
                 </Button>
-                <Button class="font-bold text-sm" @click="">
+                <Button class="font-bold text-sm" @click="handleDeleteAccount">
                   确认
                 </Button>
               </div>
@@ -363,7 +475,6 @@ const validatePasswordRules = reactive({
         </div>
       </div>
     </div>
-
   </div>
 </template>
 

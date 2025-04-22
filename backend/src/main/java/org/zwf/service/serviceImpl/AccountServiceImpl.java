@@ -205,7 +205,27 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountMapper.getAccountById(id);
         if(account == null) return "发生了一些错误，请联系管理员";
 
-        accountMapper.updateUsername(newUsername, account.getUsername());
+        accountMapper.updateUsername(newUsername, id);
+        return null;
+    }
+
+    /**
+     * 修改邮箱
+     * @param id 用户id
+     * @param newEmail 新的邮箱
+     * @return 操作结果，null表示正常，否则为错误原因string
+     */
+    @Override
+    @Transactional
+    public String changeEmail(Integer id, String newEmail) {
+        if(!this.isCurrentUser(id)) return "非法操作";
+
+        if(isAccountExistByEmail(newEmail)) return "该邮箱已被注册";
+
+        Account account = accountMapper.getAccountById(id);
+        if(account == null) return "发生了一些错误，请联系管理员";
+
+        accountMapper.updateEmail(newEmail, id);
         return null;
     }
 
@@ -252,16 +272,14 @@ public class AccountServiceImpl implements AccountService {
     /**
      * 删除账号
      * @param userId 用户id
-     * @param username 用户名
      * @return 操作结果，null表示正常，否则为错误原因string
      */
     @Override
     @Transactional
-    public String deleteAccount(Integer userId, String username, String token) {
+    public String deleteAccount(Integer userId, String token) {
         if(!this.isCurrentUser(userId)) return "非法操作";
         Account account = accountMapper.getAccountById(userId);
         if(account == null) return "用户不存在";
-        if(!account.getUsername().equals(username)) return "用户名不匹配";
 
         int delete = accountMapper.deleteAccountById(userId);
         if(delete <= 0) return "发生了一些错误，请联系管理员";

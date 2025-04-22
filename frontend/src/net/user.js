@@ -1,4 +1,4 @@
-import {get, post} from "@/net/index.js";
+import {deleteAccessToken, get, post} from "@/net/index.js";
 import {ElMessage} from "element-plus";
 function getUserInfo(id, success) {
     get({
@@ -36,6 +36,34 @@ function unbanUser(id, success) {
     })
 }
 
+function changeUsername(id, newUsername, success) {
+    get({
+        url: 'api/user/change-username?id=' + id + '&newUsername=' + newUsername,
+        success: () => {
+            success()
+        }
+    })
+}
+
+function changeEmail(id, newEmail, success) {
+    get({
+        url: 'api/user/change-email?id=' + id + '&newEmail=' + newEmail,
+        success: () => {
+            success()
+        }
+    })
+}
+
+function deleteAccount(id, success) {
+    get({
+        url: 'api/user/delete-account?id=' + id,
+        success: () => {
+            deleteAccessToken()
+            success()
+        }
+    })
+}
+
 function changePassword(id, oldPassword, newPassword, success) {
     post({
         url: 'api/user/change-password',
@@ -61,4 +89,8 @@ function uploadAvatar(file, success) {
     })
 }
 
-export {getUserInfo, getUserList, banUser, unbanUser, changePassword, uploadAvatar}
+export {
+    getUserInfo, getUserList, banUser, unbanUser,
+    changePassword, uploadAvatar, changeUsername, deleteAccount,
+    changeEmail
+}

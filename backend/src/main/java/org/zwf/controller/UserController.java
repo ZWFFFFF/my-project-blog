@@ -39,8 +39,20 @@ public class UserController {
     @GetMapping("/change-username")
     @Operation(summary = "修改用户名")
     public RestBean<Void> changeUsername(@RequestParam @NotNull Integer id,
-                                         @RequestParam @Length(min = 1, max = 10) @Pattern(regexp = "^[a-zA-Z0-9\\u4e00-\\u9fa5]+$") String newUsername) {
+                                         @RequestParam @Length(min = 1, max = 20) @Pattern(regexp = "^[a-zA-Z0-9\\u4e00-\\u9fa5]+$") String newUsername) {
         return RestBean.messageHandler(() -> accountService.changeUsername(id, newUsername));
+    }
+
+    /**
+     * 修改邮箱
+     * @param id 用户id
+     * @param newEmail 新的邮箱
+     * @return 响应实体
+     */
+    @GetMapping("/change-email")
+    @Operation(summary = "修改邮箱")
+    public RestBean<Void> changeEmail(@RequestParam @NotNull Integer id, @RequestParam @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\\.[a-zA-Z0-9-]+)*\\.[a-zA-Z]{2,}$") String newEmail) {
+        return RestBean.messageHandler(() -> accountService.changeEmail(id, newEmail));
     }
 
     /**
@@ -67,16 +79,14 @@ public class UserController {
     /**
      * 注销账号
      * @param id 用户id
-     * @param username 用户名
      * @return 响应实体
      */
     @GetMapping("/delete-account")
     @Operation(summary = "注销账号")
     public RestBean<Void> deleteAccount(@RequestParam @NotNull Integer id,
-                                        @RequestParam @Length(min = 1, max = 20) String username,
                                         HttpServletRequest request)  {
         String authorization = request.getHeader("Authorization");
-        return RestBean.messageHandler(() -> accountService.deleteAccount(id, username, authorization));
+        return RestBean.messageHandler(() -> accountService.deleteAccount(id, authorization));
     }
 
     /**
