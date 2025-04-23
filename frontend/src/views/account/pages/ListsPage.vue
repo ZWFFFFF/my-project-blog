@@ -1,6 +1,6 @@
 <script setup>
 import {useRoute} from "vue-router";
-import {defineProps, watch, ref} from "vue";
+import {defineProps, watch, ref, computed} from "vue";
 import {getUserArticles} from "@/net/article.js";
 import images from "@/assets/img/index.js";
 import {formatTimestamp} from "@/net/utils.js";
@@ -8,6 +8,12 @@ import store from "@/store/index.js";
 
 const route = useRoute()
 const articleList = ref([])
+const displayList = ref([]) // 当前显示的文章列表
+const loadSize = 10 // 每次加载的文章数量
+const currentPage = ref(1) // 当前页码
+const noMore = computed(() => displayList.value.length >= articleList.value.length) // 是否还有更多文章
+const loading = ref(false) // 是否正在加载
+const disabled = computed(() => loading.value || noMore.value)
 const props = defineProps({
   account: {
     type: Object,
@@ -15,11 +21,29 @@ const props = defineProps({
   }
 })
 
+// 加载文章数据
+const load = () => {
+  if(loading.value || noMore.value) return
+  loading.value = true
+  // 模拟异步加载
+  setTimeout(() => {
+    const startIndex = (currentPage.value - 1) * loadSize
+    const endIndex = startIndex + loadSize
+    const newArticles = articleList.value.slice(startIndex, endIndex)
+
+    displayList.value = [...displayList.value, ...newArticles]
+    currentPage.value++
+    loading.value = false
+  }, 1000)
+}
+
 const fetchData = () => {
   if(props.account.id) {
     getUserArticles(props.account.id, (data) => {
       articleList.value = data.filter(article => article.status !== 'take_down')
-      articleList.value.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      articleList.value.sort((a, b) => b.like - a.like);
+      // 加载显示数据
+      load()
     })
   }
 }
@@ -58,8 +82,13 @@ watch(
             </router-link>
           </div>
         </div>
-        <div class="mt-[50px] w-full grid grid-cols-1 gap-y-8">
-          <div v-for="article in articleList" class="col-span-full border-b">
+        <div
+            v-infinite-scroll="load"
+            :infinite-scroll-disabled="disabled"
+            :infinite-scroll-immediate="false"
+            class="mt-[50px] w-full grid grid-cols-1 gap-y-8"
+        >
+          <div v-for="article in displayList" class="col-span-full border-b">
             <div class="pb-6">
               <router-link :to="'/article/approved/' + article.id" class="flex">
                 <div class="w-[464px]">
@@ -91,9 +120,12 @@ watch(
               </router-link>
             </div>
           </div>
-        </div>
-        <div v-if="!articleList.length" class="text-center">
-          <p class="text-xl font-bold text-zinc-400">还没有内容</p>
+          <div v-if="articleList.length && noMore" class="col-span-full mx-6 text-center">
+            <p class="text-xl font-bold text-zinc-400">没有内容了</p>
+          </div>
+          <div v-if="!articleList.length" class="text-center">
+            <p class="text-xl font-bold text-zinc-400">还没有内容</p>
+          </div>
         </div>
       </div>
     </div>
