@@ -11,20 +11,58 @@ import store from "@/store/index.js";
 const route = useRoute()
 const keyword = computed(() => route.query.keyword)
 const articleList = ref([])
+const displayList = ref([]) // 当前显示的文章列表
 const recommendArticles = computed(() => store.state.recommendArticles)
+const loadSize = 10 // 每次加载的文章数量
+const currentPage = ref(1) // 当前页码
+const noMore = computed(() => displayList.value.length >= articleList.value.length) // 是否还有更多文章
+const loading = ref(false) // 是否正在加载
+const disabled = computed(() => loading.value || noMore.value)
+// 加载文章
+const load = () => {
+  if(loading.value || noMore.value) return
+  loading.value = true
+  // 模拟异步加载
+  setTimeout(() => {
+    const startIndex = (currentPage.value - 1) * loadSize
+    const endIndex = startIndex + loadSize
+    const newArticles = articleList.value.slice(startIndex, endIndex)
 
+    displayList.value = [...displayList.value, ...newArticles]
+    currentPage.value++
+    loading.value = false
+  }, 1000)
+}
 // 获取文章列表
 const fetchData = () => {
-  if(keyword.value === "") {
+  const rawKeyword = keyword.value.trim()
+
+  if(!rawKeyword) {
     router.push('/home')
     return
   }
 
-  if(keyword.value) {
-    searchArticleList(keyword.value, (data) => {
+  // 将危险字符过滤掉
+  const safeKeyword = rawKeyword.replace(/[\\<>'"&\s]/g, '')
+  if(!safeKeyword) {
+    router.push('/home')
+    return
+  }
+
+  resetPagination() // 重置页面显示状态
+
+  if(safeKeyword) {
+    searchArticleList(safeKeyword, (data) => {
       articleList.value = data
+      load()
     })
   }
+}
+
+// 重新搜索时重置分页和显示列表
+const resetPagination = () => {
+  displayList.value = []
+  currentPage.value = 1
 }
 
 onMounted(() => {
@@ -41,8 +79,13 @@ watch(() => route.query.keyword, () => {
   <div class="flex justify-center">
     <div class="w-[968px] border-r">
       <div class="w-full">
-        <div class="mt-[50px] w-[728px] mx-auto grid grid-cols-1 gap-y-8">
-          <div v-for="article in articleList" class="col-span-full mx-6 border-b">
+        <div
+            v-infinite-scroll="load"
+            :infinite-scroll-disabled="disabled"
+            :infinite-scroll-immediate="false"
+            class="mt-[50px] w-[728px] mb-12 mx-auto grid grid-cols-1 gap-y-8"
+        >
+          <div v-for="article in displayList" class="col-span-full mx-6 border-b">
             <div class="pb-6">
               <router-link
                   :to="{ path: `/user/${article.authorId}/lists` }"
@@ -84,6 +127,9 @@ watch(() => route.query.keyword, () => {
                 </div>
               </router-link>
             </div>
+          </div>
+          <div v-if="articleList.length && noMore" class="col-span-full mx-6 text-center">
+            <p class="text-xl font-bold text-zinc-400">没有内容了</p>
           </div>
           <div v-if="articleList.length === 0" class="flex justify-center items-center">
             <p class="font-extrabold text-xl text-zinc-400">没有相关内容哦</p>

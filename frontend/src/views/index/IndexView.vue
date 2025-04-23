@@ -101,7 +101,7 @@ const handleUserLogout = throttle(userLogout, 1000)
       </div>
     </header>
     <div class="flex-1 flex">
-      <div class="w-full flex-1 overflow-auto">
+      <div class="w-full flex-1">
         <router-view></router-view>
       </div>
     </div>
