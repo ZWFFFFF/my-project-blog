@@ -8,6 +8,7 @@ import {onMounted} from "vue";
 import {formatTimestamp} from "@/net/utils.js";
 import '@vueup/vue-quill/dist/vue-quill.bubble.css';
 import Button from "@/components/Button.vue";
+import images from "@/assets/img/index.js";
 
 const route = useRoute();
 
@@ -55,7 +56,7 @@ onMounted(() => {
 
 <template>
   <div class="h-full">
-    <div class="bg-white py-8">
+    <div class="bg-white py-4 rounded-md">
       <div class="px-8 py-4 border-b">
         <span class="text-xl font-bold">文章审核</span>
       </div>
@@ -88,7 +89,7 @@ onMounted(() => {
               </div>
               <div class="my-12">
                 <div class="w-full">
-                  <img class="max-h-[326px] w-full object-cover" :src="article.previewImage">
+                  <img class="max-h-[326px] w-full object-cover" :src="article.previewImage ? article.previewImage : images.welcome_page">
                 </div>
               </div>
             </div>

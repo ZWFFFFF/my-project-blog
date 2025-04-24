@@ -29,6 +29,8 @@ const sortSelectOptions = [
     label: '按最近修改时间',
   }
 ]
+const currentPage = ref(1) // 当前页码
+const pageSize = ref(10)   // 每页显示数量
 
 const fetchPendingReviewArticles = () => {
   getPendingReviewList((data) => {
@@ -54,6 +56,7 @@ const fetchReviewingArticles = () => {
 
 const toggleSwitch = () => {
   activeTab.value = activeTab.value === 'pending' ? 'reviewing' : 'pending';
+  currentPage.value = 1 // 切换标签页时重置页码
   handleAction();
 };
 
@@ -101,6 +104,18 @@ const filteredTableData = computed(() => {
   });
 });
 
+// 计算分页后的数据
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredTableData.value.slice(start, end)
+})
+
+// 处理页码变化
+const handleCurrentChange = (val) => {
+  currentPage.value = val
+}
+
 const sortData = () => {
   switch (sortSelectValue.value) {
     case 'createdAtAsc':
@@ -119,8 +134,13 @@ const sortData = () => {
 }
 
 watch(sortSelectValue, () => {
+  currentPage.value = 1 // 排序时重置页码
   sortData()
 });
+
+watch(searchKeyword, () => {
+  currentPage.value = 1 // 搜索时重置页码
+})
 
 onMounted(() => {
   fetchPendingReviewArticles()
@@ -129,8 +149,8 @@ onMounted(() => {
 
 <template>
   <div class="h-full">
-    <div class="bg-white py-8 rounded-md">
-      <div class="py-4 px-8">
+    <div class="bg-white py-4 rounded-md">
+      <div class="px-8">
         <span class="text-xl font-bold">文章审核</span>
       </div>
       <div class="m-4">
@@ -188,7 +208,7 @@ onMounted(() => {
           </div>
         </div>
         <!-- 表格 -->
-        <el-table :data="filteredTableData" style="width: 100%" empty-text="No Data">
+        <el-table :data="paginatedData" style="width: 100%" empty-text="No Data">
           <el-table-column prop="id" label="文章id" width="200" />
           <el-table-column prop="authorId" label="用户id" width="200" />
           <el-table-column prop="formattedCreatedAt" label="创建于" width="280" />
@@ -200,6 +220,18 @@ onMounted(() => {
             </template>
           </el-table-column>
         </el-table>
+        <!-- 分页组件 -->
+        <div class="mt-4 flex justify-center">
+          <el-pagination
+              :current-page="currentPage"
+              :page-size="pageSize"
+              :pager-count="11"
+              layout="prev, pager, next"
+              :hide-on-single-page="true"
+              :total="filteredTableData.length"
+              @current-change="handleCurrentChange"
+          />
+        </div>
       </div>
     </div>
   </div>

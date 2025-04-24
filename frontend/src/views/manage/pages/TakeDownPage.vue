@@ -30,6 +30,8 @@ const sortSelectOptions = [
     label: '按最近修改时间',
   }
 ]
+const currentPage = ref(1) // 当前页码
+const pageSize = ref(10)   // 每页显示数量
 
 const fetchApprovedArticles = () => {
   getArticleList((data) => {
@@ -55,6 +57,8 @@ const fetchTakeDownArticles = () => {
 
 const toggleSwitch = () => {
   activeTab.value = activeTab.value === 'takeDown' ? 'recover' : 'takeDown';
+  currentPage.value = 1 // 切换标签页时重置页码
+  selectedRows.value = [] // 切换标签页时清空选中的行数据
   handleAction();
 };
 
@@ -87,6 +91,18 @@ const filteredTableData = computed(() => {
     return String(row[searchColumn.value]).toLowerCase().includes(keyword);
   });
 });
+
+// 计算分页后的数据
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredTableData.value.slice(start, end)
+})
+
+// 处理页码变化
+const handleCurrentChange = (val) => {
+  currentPage.value = val
+}
 
 // 处理多选
 const handleSelectionChange = (selection) => {
@@ -139,8 +155,15 @@ const sortData = () => {
 }
 
 watch(sortSelectValue, () => {
+  currentPage.value = 1 // 排序时重置页码
+  selectedRows.value = [] // 排序时清空选中的行数据
   sortData()
 });
+
+watch(searchKeyword, () => {
+  selectedRows.value = [] // 搜索时清空选中的行数据
+  currentPage.value = 1 // 搜索时重置页码
+})
 
 onMounted(() => {
   fetchApprovedArticles()
@@ -149,8 +172,8 @@ onMounted(() => {
 
 <template>
   <div class="h-full">
-    <div class="bg-white py-8 rounded-md">
-      <div class="py-4 px-8">
+    <div class="bg-white py-4 rounded-md">
+      <div class="px-8">
         <span class="text-xl font-bold">文章下架</span>
       </div>
       <div class="m-4">
@@ -215,7 +238,7 @@ onMounted(() => {
         </div>
         <!-- 表格 -->
         <el-table
-            :data="filteredTableData"
+            :data="paginatedData"
             style="width: 100%"
             @selection-change="handleSelectionChange"
         >
@@ -231,6 +254,18 @@ onMounted(() => {
             </template>
           </el-table-column>
         </el-table>
+        <!-- 分页组件 -->
+        <div class="mt-4 flex justify-center">
+          <el-pagination
+              :current-page="currentPage"
+              :page-size="pageSize"
+              :pager-count="11"
+              layout="prev, pager, next"
+              :hide-on-single-page="true"
+              :total="filteredTableData.length"
+              @current-change="handleCurrentChange"
+          />
+        </div>
       </div>
     </div>
   </div>

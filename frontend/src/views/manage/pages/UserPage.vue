@@ -61,10 +61,10 @@ const handlePasswordChange = throttle(changePwd, 1000)
 <template>
   <div class="h-full">
     <div class="bg-white py-4 px-8 rounded-md">
-      <div class="py-4">
+      <div>
         <span class="text-xl font-bold">修改密码</span>
       </div>
-      <div class="flex flex-col justify-center">
+      <div class="mt-4 flex flex-col justify-center">
         <el-form
             class="max-w-[500px]"
             ref="formRef"

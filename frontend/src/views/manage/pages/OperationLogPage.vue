@@ -21,6 +21,8 @@ const sortSelectOptions = [
     label: '按最近操作时间',
   },
 ]
+const currentPage = ref(1) // 当前页码
+const pageSize = ref(10)   // 每页显示数量
 
 const fetchData = () => {
   getLogs((data) => {
@@ -46,6 +48,18 @@ const filteredTableData = computed(() => {
   });
 });
 
+// 计算分页后的数据
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredTableData.value.slice(start, end)
+})
+
+// 处理页码变化
+const handleCurrentChange = (val) => {
+  currentPage.value = val
+}
+
 function convertOperationType(operationType) {
   switch(operationType) {
     case 'BAN_USER': return '封禁用户';
@@ -69,8 +83,13 @@ const sortData = () => {
 }
 
 watch(sortSelectValue, () => {
+  currentPage.value = 1 // 排序时重置页码
   sortData()
 });
+
+watch(searchKeyword, () => {
+  currentPage.value = 1 // 搜索时重置页码
+})
 
 onMounted(() => {
   fetchData()
@@ -79,11 +98,11 @@ onMounted(() => {
 
 <template>
   <div class="h-full">
-    <div class="bg-white py-8 rounded-md">
-      <div class="py-4 px-8">
+    <div class="bg-white py-4 rounded-md">
+      <div class="px-8">
         <span class="text-xl font-bold">操作记录</span>
       </div>
-      <div class="px-4">
+      <div class="mt-4 px-4">
         <div class="mb-5 flex items-center gap-3">
           <div>
             <el-select v-model="searchColumn" placeholder="请选择搜索列" style="width: 150px; margin-right: 10px;">
@@ -119,7 +138,7 @@ onMounted(() => {
             </el-select>
           </div>
         </div>
-        <el-table :data="filteredTableData" style="width: 100%" empty-text="No Data">
+        <el-table :data="paginatedData" style="width: 100%" empty-text="No Data">
           <el-table-column prop="operatorId" label="用户id" width="100" />
           <el-table-column prop="operator" label="用户" width="200" />
           <el-table-column prop="operationType" label="操作" width="200" />
@@ -127,6 +146,18 @@ onMounted(() => {
           <el-table-column prop="formattedOperationTime" label="操作时间" width="200" />
           <el-table-column prop="result" label="操作结果"/>
         </el-table>
+        <!-- 分页组件 -->
+        <div class="mt-4 flex justify-center">
+          <el-pagination
+              :current-page="currentPage"
+              :page-size="pageSize"
+              :pager-count="11"
+              layout="prev, pager, next"
+              :hide-on-single-page="true"
+              :total="filteredTableData.length"
+              @current-change="handleCurrentChange"
+          />
+        </div>
       </div>
     </div>
   </div>
