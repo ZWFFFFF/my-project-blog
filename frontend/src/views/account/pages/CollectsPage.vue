@@ -12,7 +12,7 @@ const articleList = ref([])
 const displayList = ref([]) // 当前显示的文章列表
 const loadSize = 10 // 每次加载的文章数量
 const currentPage = ref(1) // 当前页码
-const noMore = computed(() => displayList.value.length >= articleList.value.length) // 是否还有更多文章
+const noMore = ref(false) // 是否还有更多文章
 const loading = ref(false) // 是否正在加载
 const disabled = computed(() => loading.value || noMore.value)
 const props = defineProps({
@@ -35,6 +35,9 @@ const load = () => {
     displayList.value = [...displayList.value, ...newArticles]
     currentPage.value++
     loading.value = false
+    if(displayList.value.length >= articleList.value.length) {
+      noMore.value = true
+    }
   }, 1000)
 }
 

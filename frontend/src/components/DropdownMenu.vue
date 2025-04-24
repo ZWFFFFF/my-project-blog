@@ -27,7 +27,7 @@
           v-if="isOpen"
           class="min-w-[220px] absolute right-0 mt-2 w-36 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
       >
-        <div class="p-1">
+        <div class="py-1 px-2">
           <header class="border-b">
             <slot name="header"></slot>
           </header>
