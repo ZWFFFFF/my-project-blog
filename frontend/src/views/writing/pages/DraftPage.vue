@@ -9,6 +9,7 @@ import images from '@/assets/img';
 
 const router = useRouter()
 const store = useStore()
+const originalArticleList = ref([]) // 存储原始数据
 const articleList = ref([])
 const searchTitleKeyword = ref(''); // 标题搜索关键字
 const selectValue = ref('createdAtDesc')
@@ -30,29 +31,36 @@ const selectOptions = [
     label: '按最近修改时间',
   },
 ]
+const currentPage = ref(1) // 当前页码
+const pageSize = ref(5)   // 每页显示数量
 
 const fetchData = () => {
   getUserDrafts((data) => {
-    articleList.value = data
+    originalArticleList.value = data
     sortArticles()
   })
 }
 
 const sortArticles = () => {
+  let sortedArticles = [...originalArticleList.value];
+
   switch (selectValue.value) {
     case 'createdAtAsc':
-      articleList.value.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      sortedArticles.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
       break;
     case 'createdAtDesc':
-      articleList.value.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      sortedArticles.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       break;
     case 'updatedAtAsc':
-      articleList.value.sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt));
+      sortedArticles.sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt));
       break;
     case 'updatedAtDesc':
-      articleList.value.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+      sortedArticles.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
       break;
   }
+
+  articleList.value = sortedArticles
+  currentPage.value = 1 // 重置到第一页
 };
 
 // 根据搜索标题关键字过滤数据
@@ -66,9 +74,24 @@ const filteredData = computed(() => {
   });
 });
 
+// 计算分页后的数据
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return filteredData.value.slice(start, end)
+})
+// 处理页码变化
+const handleCurrentChange = (val) => {
+  currentPage.value = val
+}
+
 // 监听 selectValue 的变化
 watch(selectValue, () => {
   sortArticles();
+});
+
+watch(searchTitleKeyword, () => {
+  currentPage.value = 1; // 搜索时强制回到第一页
 });
 
 onMounted(() => {
@@ -116,7 +139,7 @@ function deleteWriting(id) {
         </div>
       </div>
       <div class="flex flex-col gap-10">
-        <div v-for="article in filteredData"
+        <div v-for="article in paginatedData"
              :key="article.id"
              class="w-full pb-8 flex flex-col justify-between border-b-2"
         >
@@ -149,6 +172,18 @@ function deleteWriting(id) {
             </div>
           </div>
         </div>
+      </div>
+      <!-- 分页组件 -->
+      <div class="mt-4 flex justify-center">
+        <el-pagination
+            :current-page="currentPage"
+            :page-size="pageSize"
+            :pager-count="11"
+            layout="prev, pager, next"
+            :hide-on-single-page="true"
+            :total="filteredData.length"
+            @current-change="handleCurrentChange"
+        />
       </div>
     </div>
   </div>

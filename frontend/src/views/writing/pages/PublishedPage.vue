@@ -50,6 +50,8 @@ const typeSelectOptions = [
     label: '已下架投稿',
   }
 ]
+const currentPage = ref(1) // 当前页码
+const pageSize = ref(5)   // 每页显示数量
 
 const fetchData = () => {
   if(store.state.user.id !== null) {
@@ -91,6 +93,7 @@ const filterAndSortArticles = () => {
 
   // 更新显示的文章列表
   articleList.value = filteredArticles;
+  currentPage.value = 1 // 重置到第一页
 };
 
 // 根据搜索标题关键字过滤数据
@@ -104,6 +107,18 @@ const searchFilteredData = computed(() => {
   });
 });
 
+// 计算分页后的数据
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return searchFilteredData.value.slice(start, end)
+})
+
+// 处理页码变化
+const handleCurrentChange = (val) => {
+  currentPage.value = val
+}
+
 watch(sortSelectValue, () => {
   filterAndSortArticles()
 });
@@ -111,6 +126,10 @@ watch(sortSelectValue, () => {
 watch(typeSelectValue, () => {
   filterAndSortArticles()
 })
+
+watch(searchTitleKeyword, () => {
+  currentPage.value = 1; // 搜索时强制回到第一页
+});
 
 onMounted(() => {
   fetchData()
@@ -175,7 +194,7 @@ function deleteWriting(id) {
         </div>
       </div>
       <div class="flex flex-col gap-10">
-        <div v-for="article in searchFilteredData"
+        <div v-for="article in paginatedData"
              :key="article.id"
              class="w-full pb-8 flex flex-col justify-between border-b-2"
         >
@@ -218,6 +237,18 @@ function deleteWriting(id) {
             </div>
           </div>
         </div>
+      </div>
+      <!-- 分页组件 -->
+      <div class="mt-4 flex justify-center">
+        <el-pagination
+            :current-page="currentPage"
+            :page-size="pageSize"
+            :pager-count="11"
+            layout="prev, pager, next"
+            :hide-on-single-page="true"
+            :total="searchFilteredData.length"
+            @current-change="handleCurrentChange"
+        />
       </div>
     </div>
   </div>
