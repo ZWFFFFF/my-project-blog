@@ -14,6 +14,7 @@ const currentPage = ref(1) // 当前页码
 const noMore = ref(false) // 是否还有更多文章
 const loading = ref(false) // 是否正在加载
 const disabled = computed(() => loading.value || noMore.value)
+const initialLoading = ref(true) // 初始的加载动画
 const props = defineProps({
   account: {
     type: Object,
@@ -33,6 +34,9 @@ const load = () => {
 
     displayList.value = [...displayList.value, ...newArticles]
     currentPage.value++
+    if(initialLoading.value) {
+      initialLoading.value = false // 将初始加载动画效果关闭
+    }
     loading.value = false
     if(displayList.value.length >= articleList.value.length) {
       noMore.value = true
@@ -89,6 +93,7 @@ watch(
             v-infinite-scroll="load"
             :infinite-scroll-disabled="disabled"
             :infinite-scroll-immediate="false"
+            v-loading="initialLoading"
             class="mt-[50px] w-full grid grid-cols-1 gap-y-8"
         >
           <div v-for="article in displayList" class="col-span-full border-b">

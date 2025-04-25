@@ -244,6 +244,15 @@ function likeArticleToggle(articleId, success) {
     })
 }
 
+function viewArticle(articleId, success) {
+    post({
+        url: 'api/article/view?articleId=' + articleId,
+        success: () => {
+            success();
+        }
+    })
+}
+
 function collectArticleToggle(articleId, success) {
     get({
         url: 'api/article/collect-toggle?articleId=' + articleId,
@@ -283,5 +292,5 @@ export {
     submitToReview, getPendingReviewList, getReviewingList, getReviewedArticle,
     startReview, approveReview, rejectReview, resetReviewing,
     getTakeDownList, takeDownArticle, recoverArticle, likeArticleToggle,
-    collectArticleToggle, getUserArticleCollects, uploadPreviewImage
+    collectArticleToggle, getUserArticleCollects, uploadPreviewImage, viewArticle
 }

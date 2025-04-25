@@ -52,12 +52,16 @@ const typeSelectOptions = [
 ]
 const currentPage = ref(1) // 当前页码
 const pageSize = ref(5)   // 每页显示数量
+const initialLoading = ref(true) // 初始的加载动画
 
 const fetchData = () => {
   if(store.state.user.id !== null) {
     getUserArticles(store.state.user.id, (data) => {
-      originalArticleList.value = data; // 保存原始数据
-      filterAndSortArticles(); // 初始过滤和排序
+      setTimeout(() => {
+        originalArticleList.value = data; // 保存原始数据
+        filterAndSortArticles(); // 初始过滤和排序
+        initialLoading.value = false;
+      }, 1000)
     })
   } else {
     router.push('/welcome')
@@ -146,7 +150,7 @@ function deleteWriting(id) {
 
 <template>
   <div>
-    <div class="">
+    <div v-loading="initialLoading">
       <div class="mb-10 flex items-center gap-2 justify-start">
         <div>
           <el-input v-model="searchTitleKeyword" type="text" placeholder="请输入标题关键字">

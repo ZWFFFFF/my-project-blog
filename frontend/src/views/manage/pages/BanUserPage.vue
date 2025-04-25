@@ -22,15 +22,19 @@ const sortSelectOptions = [
 ]
 const currentPage = ref(1) // 当前页码
 const pageSize = ref(10)   // 每页显示数量
+const initialLoading = ref(true) // 初始的加载动画
 
 const fetchData = () => {
   getUserList((data) => {
-    tableData.value = data.map(item => ({
-      ...item,
-      formattedRegisterTime: convertToLocalTime(item.registerTime),
-      ban: !item.active
-    }))
-    sortData()
+    setTimeout(() => {
+      tableData.value = data.map(item => ({
+        ...item,
+        formattedRegisterTime: convertToLocalTime(item.registerTime),
+        ban: !item.active
+      }))
+      sortData()
+      initialLoading.value = false
+    }, 1000)
   })
 }
 
@@ -116,7 +120,7 @@ onMounted(() => {
       <div class="px-8">
         <span class="text-xl font-bold">封禁用户</span>
       </div>
-      <div class="mt-4 px-4">
+      <div class="mt-4 px-4" v-loading="initialLoading">
         <div class="mb-5 flex items-center gap-3">
           <div>
             <el-select v-model="searchColumn" placeholder="请选择搜索列" style="width: 150px; margin-right: 10px;">

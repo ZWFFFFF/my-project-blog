@@ -33,6 +33,7 @@ const selectOptions = [
 ]
 const currentPage = ref(1) // 当前页码
 const pageSize = ref(5)   // 每页显示数量
+const initialLoading = ref(true) // 初始的加载动画
 
 const fetchData = () => {
   if(store.state.user.id === null) {
@@ -41,8 +42,11 @@ const fetchData = () => {
   }
 
   getUserReviewArticles((data) => {
-    originalArticleList.value = data
-    sortArticles()
+    setTimeout(() => {
+      originalArticleList.value = data
+      sortArticles()
+      initialLoading.value = false
+    }, 1000)
   })
 }
 
@@ -104,7 +108,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <div class="">
+    <div v-loading="initialLoading">
       <div class="mb-10 flex items-center gap-2 justify-start">
         <div>
           <el-input v-model="searchTitleKeyword" type="text" placeholder="请输入标题关键字">

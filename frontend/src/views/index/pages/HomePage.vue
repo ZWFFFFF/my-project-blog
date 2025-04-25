@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onMounted, computed} from "vue"
+import {ref, onMounted, computed, watch} from "vue"
 import {UserFilled} from "@element-plus/icons-vue";
 import {getArticleList} from "@/net/article.js";
 import images from '@/assets/img';
@@ -14,7 +14,8 @@ const currentPage = ref(1) // 当前页码
 const noMore = ref(false) // 是否还有更多文章
 const loading = ref(false) // 是否正在加载
 const disabled = computed(() => loading.value || noMore.value)
-const skeletonLoading = ref(true)
+const mainSkeletonLoading = ref(true)
+const sideSkeletonLoading = ref(true)
 // 加载文章数据
 const load = () => {
   if(loading.value || noMore.value) return
@@ -33,8 +34,8 @@ const load = () => {
     }
 
     // 首次加载完成后，将骨架屏隐藏
-    if(skeletonLoading) {
-      skeletonLoading.value = false
+    if(mainSkeletonLoading) {
+      mainSkeletonLoading.value = false
     }
   }, 1000)
 }
@@ -53,6 +54,15 @@ const fetchData = () => {
   })
 }
 
+// recommendArticles变化时，关闭侧边栏骨架屏
+watch(recommendArticles, (newVal) => {
+  if (newVal && newVal.length > 0) {
+    setTimeout(() => {
+      sideSkeletonLoading.value = false
+    }, 1000)
+  }
+}, { immediate: true })
+
 onMounted(() => {
   fetchData()
 })
@@ -70,7 +80,7 @@ onMounted(() => {
             class="mt-[50px] w-[728px] mb-12 mx-auto grid grid-cols-1 gap-y-8"
         >
           <el-skeleton
-              :loading="skeletonLoading"
+              :loading="mainSkeletonLoading"
               animated
               :count="4"
           >
@@ -149,33 +159,48 @@ onMounted(() => {
     <div class="w-[368px]">
       <div class="ml-10">
         <div class="mt-12">
-          <div>
-            <p class="font-bold">推荐阅读</p>
-          </div>
-          <div class="mt-6 grid grid-cols-1 gap-y-8">
-            <div v-for="article in recommendArticles" class="col-span-full">
-              <router-link
-                  :to="{ path: `/user/${article.authorId}/lists` }"
-                  class="flex items-center gap-2 mb-2"
-              >
-                <el-avatar
-                    :icon="UserFilled"
-                    :src="article.authorAvatar || undefined"
-                    :fit="'fill'"
-                    :size="25"
-                />
-                <span class="text-sm">{{ article.author }}</span>
-              </router-link>
-              <div>
-                <router-link :to="'/article/approved/' + article.id">
-                  <div class="mb-2">
-                    <p class="font-bold text-xl break-words line-clamp-2">{{ article.title }}</p>
-                  </div>
-                  <div><span class="text-sm text-zinc-400">{{ formatTimestamp(article.createdAt) }}</span></div>
-                </router-link>
+          <el-skeleton
+              :loading="sideSkeletonLoading"
+              animated
+              :count="2"
+          >
+            <template #template>
+              <div class="mb-12">
+                <el-skeleton-item variant="h1" style="width: 40%"/>
+                <el-skeleton-item variant="p" style="width: 100%"/>
+                <el-skeleton-item variant="p" style="width: 80%"/>
               </div>
-            </div>
-          </div>
+            </template>
+            <template #default>
+              <div>
+                <p class="font-bold">推荐阅读</p>
+              </div>
+              <div class="mt-6 grid grid-cols-1 gap-y-8">
+                <div v-for="article in recommendArticles" class="col-span-full">
+                  <router-link
+                      :to="{ path: `/user/${article.authorId}/lists` }"
+                      class="flex items-center gap-2 mb-2"
+                  >
+                    <el-avatar
+                        :icon="UserFilled"
+                        :src="article.authorAvatar || undefined"
+                        :fit="'fill'"
+                        :size="25"
+                    />
+                    <span class="text-sm">{{ article.author }}</span>
+                  </router-link>
+                  <div>
+                    <router-link :to="'/article/approved/' + article.id">
+                      <div class="mb-2">
+                        <p class="font-bold text-xl break-words line-clamp-2">{{ article.title }}</p>
+                      </div>
+                      <div><span class="text-sm text-zinc-400">{{ formatTimestamp(article.createdAt) }}</span></div>
+                    </router-link>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </el-skeleton>
         </div>
       </div>
     </div>

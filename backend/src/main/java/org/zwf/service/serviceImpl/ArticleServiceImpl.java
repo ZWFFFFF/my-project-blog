@@ -11,10 +11,7 @@ import org.zwf.entity.vo.request.UpdateArticleVO;
 import org.zwf.entity.vo.response.ArticleCollectVo;
 import org.zwf.entity.vo.response.ArticleVO;
 import org.zwf.exception.BusinessException;
-import org.zwf.mapper.ArticleCollectMapper;
-import org.zwf.mapper.ArticleLikeMapper;
-import org.zwf.mapper.ArticleMapper;
-import org.zwf.mapper.CommentMapper;
+import org.zwf.mapper.*;
 import org.zwf.service.AccountService;
 import org.zwf.service.ArticleService;
 import org.zwf.utils.Const;
@@ -132,6 +129,8 @@ public class ArticleServiceImpl implements ArticleService {
         commentMapper.deleteCommentsByArticleId(articleId);
         // 删除文章对应的收藏
         articleCollectMapper.deleteArticleCollectByArticleId(articleId);
+        // 删除文章对应点赞表
+        articleLikeMapper.deleteArticleLikeByArticleId(articleId);
 
         // 删除文章
         int delete = articleMapper.deletePublishedArticle(articleId);

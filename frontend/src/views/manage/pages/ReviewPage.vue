@@ -31,32 +31,40 @@ const sortSelectOptions = [
 ]
 const currentPage = ref(1) // 当前页码
 const pageSize = ref(10)   // 每页显示数量
+const initialLoading = ref(true) // 初始的加载动画
 
 const fetchPendingReviewArticles = () => {
   getPendingReviewList((data) => {
-    tableData.value = data.map(item => ({
-      ...item,
-      formattedCreatedAt: convertToLocalTime(item.createdAt),
-      formattedUpdatedAt: convertToLocalTime(item.updatedAt)
-    }))
-    sortData()
+    setTimeout(() => {
+      tableData.value = data.map(item => ({
+        ...item,
+        formattedCreatedAt: convertToLocalTime(item.createdAt),
+        formattedUpdatedAt: convertToLocalTime(item.updatedAt)
+      }))
+      sortData()
+      initialLoading.value = false
+    }, 1000)
   })
 }
 
 const fetchReviewingArticles = () => {
   getReviewingList((data) => {
-    tableData.value = data.map(item => ({
-      ...item,
-      formattedCreatedAt: convertToLocalTime(item.createdAt),
-      formattedUpdatedAt: convertToLocalTime(item.updatedAt)
-    }))
-    sortData()
+    setTimeout(() => {
+      tableData.value = data.map(item => ({
+        ...item,
+        formattedCreatedAt: convertToLocalTime(item.createdAt),
+        formattedUpdatedAt: convertToLocalTime(item.updatedAt)
+      }))
+      sortData()
+      initialLoading.value = false
+    }, 1000)
   })
 }
 
 const toggleSwitch = () => {
   activeTab.value = activeTab.value === 'pending' ? 'reviewing' : 'pending';
   currentPage.value = 1 // 切换标签页时重置页码
+  initialLoading.value = true // 重置加载动画
   handleAction();
 };
 
@@ -170,7 +178,7 @@ onMounted(() => {
           </div>
         </div>
       </div>
-      <div class="px-4">
+      <div class="px-4" v-loading="initialLoading">
         <!-- 搜索框和列选择器 -->
         <div class="mb-5 flex items-center gap-3">
           <div>
