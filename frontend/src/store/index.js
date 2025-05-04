@@ -22,6 +22,9 @@ const store = createStore({
         setUser(state, user) {
             state.user = { ...user }
         },
+        setUserId(state, userId) {
+            state.user.id = userId
+        },
         cleanUser(state) {
             state.user = {
                 id: '',
@@ -49,6 +52,8 @@ const store = createStore({
             const str = localStorage.getItem(authItemName)
             if(str) { // 有token才设置
                 const authObj = JSON.parse(str)
+                commit('setUserId', authObj.id)
+
                 const user = {
                     id: null,
                     username: null,

@@ -1,6 +1,6 @@
 <script setup>
 import {Search, User, UserFilled, Setting, Edit, Tickets, Collection} from "@element-plus/icons-vue";
-import {ref, computed} from 'vue'
+import {ref, computed, onMounted} from 'vue'
 import {useRouter} from "vue-router";
 import {logout} from "@/net/auth.js";
 import {useStore} from "vuex";
@@ -11,15 +11,16 @@ const store = useStore()
 const router = useRouter()
 const keyword = ref('');
 const userAvatar = computed(() => store.state.user.avatar)
+const userId = computed(() => store.state.user.id)
 const dropdownMenuOptions = [
   {
     label: '个人中心',
     icon: User,
-    link: '/user/' + store.state.user.id + '/lists'
+    link: '/user/' + userId.value + '/lists'
   }, {
     label: '我的收藏',
     icon: Collection,
-    link: '/user/' + store.state.user.id + '/collects'
+    link: '/user/' + userId.value + '/collects'
   }, {
     label: '作品管理',
     icon: Tickets,

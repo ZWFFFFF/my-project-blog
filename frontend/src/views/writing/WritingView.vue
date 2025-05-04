@@ -10,16 +10,17 @@ import {computed} from "vue";
 const router = useRouter()
 const route = useRoute()
 const userAvatar = computed(() => store.state.user.avatar)
+const userId = computed(() => store.state.user.id)
 const username = computed(() => store.state.user.username)
 const dropdownMenuOptions = [
   {
     label: '个人中心',
     icon: User,
-    link: '/user/' + store.state.user.id + '/lists'
+    link: '/user/' + userId.value + '/lists'
   }, {
     label: '我的收藏',
     icon: Collection,
-    link: '/user/' + store.state.user.id + '/collects'
+    link: '/user/' + userId.value + '/collects'
   }, {
     label: '作品管理',
     icon: Tickets,
