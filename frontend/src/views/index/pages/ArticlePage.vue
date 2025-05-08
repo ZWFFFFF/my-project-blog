@@ -15,6 +15,8 @@ import images from "@/assets/img/index.js";
 const route = useRoute();
 const router = useRouter();
 const store = useStore()
+const userAvatar = computed(() => store.state.user.avatar)
+const username = computed(() => store.state.user.username)
 const editorRef = ref()
 const articleType = ref(route.params.type)
 const articleId = ref(route.params.id)
@@ -510,11 +512,11 @@ onUnmounted(() => {
               <div class="mb-4 flex items-center gap-2">
                 <el-avatar
                     :icon="UserFilled"
-                    :src="article.authorAvatar || undefined"
+                    :src="userAvatar || undefined"
                     :fit="'fill'"
                     :size="40"
                 />
-                <span>{{ article.author }}</span>
+                <span>{{ username }}</span>
               </div>
               <!-- 评论输入框 -->
               <div class="w-full" ref="commentContainer">

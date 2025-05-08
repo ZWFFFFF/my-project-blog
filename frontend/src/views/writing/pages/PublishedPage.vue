@@ -242,6 +242,9 @@ function deleteWriting(id) {
           </div>
         </div>
       </div>
+      <div v-if="!originalArticleList.length" class="text-center">
+        <p class="text-xl font-bold text-zinc-400">还没有内容</p>
+      </div>
       <!-- 分页组件 -->
       <div class="mt-4 flex justify-center">
         <el-pagination
