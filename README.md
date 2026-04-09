@@ -14,3 +14,10 @@
 - 采用TailwindCss作为css框架，进行自定义UI设计
 - 采用Axios作为异步请求框架
 - 采用Element-Plus作为Vue组件库
+## 预览
+<img width="1151" height="600" alt="2b1edbf3a3138ebe645ef724cad9330" src="https://github.com/user-attachments/assets/2d538d13-2b6d-4c53-936b-f4cd18287c82" />
+<img width="1152" height="599" alt="21f019c8ee2ed30764bfef880c8dd28" src="https://github.com/user-attachments/assets/01abcf16-34a5-4eca-8321-0f384a499973" />
+<img width="1152" height="597" alt="8cb547f984b4183402fe41b99790f49" src="https://github.com/user-attachments/assets/6da0593d-30b7-41af-9ae2-014b0b95da22" />
+<img width="1151" height="585" alt="c2a6269b306957777f9f75ace31bdb4" src="https://github.com/user-attachments/assets/210d4338-834f-44e5-850c-ed2c63bfa8dc" />
+<img width="1152" height="598" alt="10873f62de99565ae943efe26567017" src="https://github.com/user-attachments/assets/315bc609-6059-4be4-9ada-20171e3f267a" />
+<img width="1152" height="599" alt="feab68c5d5da49f8a7d64ea25892268" src="https://github.com/user-attachments/assets/ac4a18fc-0cf0-492b-97d4-fef8d2ae712c" />
